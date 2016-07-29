@@ -5,24 +5,24 @@
 # ## FFT solver for 1D Gross-Pitaevski equation
 
 # We look for the complex function $\psi(x)$ satisfying the GP equation
-# 
+#
 # $ i\partial_t \psi = -\frac{1}{2}(i\partial_x - \Omega)^2\psi+ V(x)\psi + g|\psi|^2\psi $,
-# 
+#
 # with periodic boundary conditions.
-# 
-# Integration: pseudospectral method with split (time evolution) operator; 
+#
+# Integration: pseudospectral method with split (time evolution) operator;
 # that is evolving in real (R) or momentum (K) space according to the operators
 # in the Hamiltonian, i.e.
 # first we evaluate
-# 
+#
 # $\hat{\psi}(x,\frac{t}{2})=\cal{F}^{-1}\left[\exp\left(-i \frac{\hbar^2 k^2}{2} \frac{t}{2}\right)\,\psi(k,0)\right] $
-# 
+#
 # and later
-# 
-# $\psi(k,t) = \exp(-i \frac{\hbar^2 k^2}{2} \frac{t}{2})\, 
+#
+# $\psi(k,t) = \exp(-i \frac{\hbar^2 k^2}{2} \frac{t}{2})\,
 # \cal{F}\left[\exp\left(-i (V(x)+|\hat{\psi}(x,\frac{t}{2})|^2)\, t \right)\,\hat{\psi}(x,\frac{t}{2}) \,
 # \right]$
-# 
+#
 # where $\cal{F}$ is the Fourier transform.
 #
 # Program: Evolution in real time. We evolve in real time the wave pack, the user decides the type of movement (free or osc. harm.).
@@ -42,7 +42,16 @@ from scipy.fftpack import fft, ifft
 from gpe_fft_utilities import * # local folder utilities
 from wave_functions import *
 import numpy.linalg as lin
-from pylab import* 
+from pylab import*
+import os, glob
+try:
+    from tkinter import *  
+    from tkinter import ttk 
+    v3=True
+except ImportError:
+    from Tkinter import *
+    import ttk
+    v3=False
 
 close('all')
 pi=np.pi
@@ -54,31 +63,121 @@ pi=np.pi
 # In[2]:
 
 # User decides the time
-osci =raw_input('introduce el numero de unidades de tiempo que dura la simulacion entre 1 y 10')
-osci=float(osci)
-while ((osci<1) or (osci>10)):
-    print "ERROR: la simulacion debe de estar entre un rango de 1 y 10"
-    osci=raw_input("introduce el numero de unidades de tiempo que dure la simulacion")
-    osci=float(osci)
+
+
+class Demowave:
+    def __init__(self,master,v3):
+        self.name1=""
+        self.name2=""
+        self.name3=""
+        self.master=master
+        self.v3=v3
+        frame=Frame(self.master)
+        frame.pack()
+        self.t_name1=DoubleVar()
+        self.t_name2=IntVar()
+        self.t_name3=DoubleVar()
+        nb = ttk.Notebook(rootwave)
+        page1 = ttk.Frame(nb)
+        page2 = ttk.Frame(nb)         
+        nb.add(page1, text='Programa')
+        nb.add(page2, text='Notas')
+        nb.pack(expand=1, fill="both")
+        if self.v3==True:
+            label1 = Label(page1, text="Tiempo de simulacion", background="black", foreground="white",font = "Verdana 16 bold")
+            label1.pack(fill=X)
+            bar1 = Scale(page1, from_=1, to=10, variable=self.t_name1, length=600, tickinterval=3, resolution=0.1, orient=HORIZONTAL)  
+            bar1.set(1)
+            bar1.configure(background='black',foreground='white')
+            bar1.pack(pady=10)
+            label3 = Label(page1, text="Posicion del paquete", background="black", foreground="white",font = "Verdana 16 bold")
+            label3.pack(fill=X)
+            bar2 = Scale(page1, from_=-5, to=5, variable=self.t_name3, length=600, tickinterval=5, resolution=0.1, orient=HORIZONTAL) 
+            bar2.set(0)
+            bar2.configure(background='black',foreground='white')
+            bar2.pack()
+        else:
+            label1 = Label(page1, text="Tiempo de simulacion", background="black", foreground="white",font = "Verdana 16 bold")
+            label1.pack(fill=X)
+            bar1 = ttk.Scale(page1, from_=1, to=10, variable=self.t_name1, length=600, orient=HORIZONTAL)  
+            bar1.set(1)
+            bar1.pack(pady=10)
+            label3 = Label(page1, text="Posicion del paquete", background="black", foreground="white",font = "Verdana 16 bold")
+            label3.pack(fill=X)
+            bar2 = ttk.Scale(page1, from_=-5, to=5, variable=self.t_name3, length=600, orient=HORIZONTAL) 
+            bar2.set(0)
+            bar2.pack()            
+        label2 = Label(page1, text="Trampa harmonica", background="black", foreground="white",font = "Verdana 16 bold")
+        label2.pack(fill=X)
+        cb=Checkbutton(page1, variable=self.t_name2)
+        cb.pack()
+        self.button=Button(page1, text='OK', command=self.show_values).pack()
+        
+        text2 = Text(page2, height=15, width=70)
+  #      scroll = Scrollbar(root, command=text2.yview)
+#        text2.configure(yscrollcommand=scroll.set)
+        text2.tag_configure('bold_italics', font=('Arial', 12, 'bold', 'italic'))
+        text2.tag_configure('big', font=('Verdana', 20, 'bold'))
+        text2.tag_configure('color', foreground='#476042', 
+						font=('Tempus Sans ITC', 12, 'bold'))
+  #      text2.tag_bind('follow', '<1>', lambda e, t=text2: t.insert(END, "Not now, maybe later!"))
+        text2.insert(END,'\nWilliam Shakespeare\n', 'big')
+        quote = """
+        To be, or not to be that is the question:
+        Whether 'tis Nobler in the mind to suffer
+        The Slings and Arrows of outrageous Fortune,
+        Or to take Arms against a Sea of troubles,
+        """
+        text2.insert(END, quote, 'color')        
+        text2.pack(side=LEFT)
+
+
+    def show_values(self):
+        self.name1= (self.t_name1.get())
+        self.name2= (self.t_name2.get())
+        self.name3= (self.t_name3.get())
+        rootwave.destroy()
+        
+rootwave = Tk()
+rootwave.wm_title("Wave packet dispersion")
+Dewave=Demowave(rootwave,v3)
+rootwave.mainloop()
+
+osci=Dewave.name1
+harm=Dewave.name2
+x0=Dewave.name3
+
+#while True:
+#    try:
+#        osci =float(input('introduce el numero de unidades de tiempo que dura la simulacion entre 1 y 10'))
+#        while ((osci<1) or (osci>10)):
+#            print ("ERROR: la simulacion debe de estar entre un rango de 1 y 10")
+#            osci=float(input("introduce el numero de unidades de tiempo que dure la simulacion"))
+#        break
+#    except ValueError:
+#        print("Escribe un numero")
 
 Zmax = 50.0              # Grid half length
 Npoint =512              # Number of grid points
 Nparticle = 500          # Number of particles
-a_s = 0.0                # scattering length 
+a_s = 0.0                # scattering length
 
 # User decides the type of movement (free movement or harm. osc.)
-harm=raw_input('introduce si quieres movimiento oscilatorio harmonico o no (1=si ; 0=no)')
-harm=float(harm)
-while (harm != 1 and harm!=0):
-    print 'ERROR: introduce 0 o 1'
-    harm=raw_input('introduce 1 o 0')
-    harm=float(harm)
-    
+#while True:
+#    try:
+#        harm=float(input('introduce si quieres movimiento oscilatorio harmonico o no (1=si ; 0=no)'))
+#        while (harm != 1 and harm!=0):
+#            print ('ERROR: introduce 0 o 1')
+#            harm=float(input('introduce 1 o 0'))
+#        break
+#    except ValueError:
+#        print ("Escoge las opciones que se te han dado")
+
 if (harm==1):
     whoz = 1.0               # harmonic oscilator angular frequency
 if (harm==0):
     whoz = 0.0               # harmonic oscilator angular frequency
-    
+
 Omega = pi/(2*Zmax)          # reference frame velocity
 Dtr = 1.0e-3                 # real time step
 Dti = 1.0e-3                 # imaginary time step
@@ -87,12 +186,15 @@ Ntime_out = 100              # number of time steps for intermediate outputs
 
 # We choose the initial position of wave pack:
 
-x0=raw_input("introduce posicion inicial del paquete de 0 a 5")
-x0=float(x0)
-while (np.abs(x0)>(5)): # tolerance for the initial position of the soliton
-    print "ERROR: la posicion inicial del paquete debe estar dentro del rango de 0 a 5"
-    x0=raw_input("introduce posicion inicial del soliton")
-    x0=float(x0)
+#while True:
+#    try:
+#        x0=float(input("introduce posicion inicial del paquete de 0 a 5"))
+#        while (np.abs(x0)>(5)): # tolerance for the initial position of the soliton
+#            print ("ERROR: la posicion inicial del paquete debe estar dentro del rango de 0 a 5")
+#            x0=float(input("introduce posicion inicial del soliton"))
+#        break
+#    except ValueError:
+#        print ("Escoge un numero")
 
 # Print evolution data:
 
@@ -128,7 +230,7 @@ print(" Characteristic interaction energy = %g"%(gint))
 
 # In[5]:
 
-z = np.arange(-Zmax+Dz,Zmax+Dz,Dz)  # physical (R-space) grid points in ascending order 
+z = np.arange(-Zmax+Dz,Zmax+Dz,Dz)  # physical (R-space) grid points in ascending order
 zp = changeFFTposition(z,Npoint,1)  # (R-space) grid points with FFT order
 
 kp = np.arange(-Kmax+Dk,Kmax+Dk,Dk) # physical (K-space) grid points in ascending order
@@ -145,12 +247,12 @@ Ekin_K = 0.5*(kp**2) # Kinetic energy in K space
 # Potential energy in R space:
 # Harmonic oscillator with angular frequency whoz:
 
-Vpot_R = 0.5*whoz*zp**2  
+Vpot_R = 0.5*whoz*zp**2
 
-    
+
 # Main functions:
 # ________________________________________________________________________________________
-    
+
 # In[7]:
 
 def Energy(c): # Energy (per particle) calculation
@@ -167,18 +269,18 @@ def T_K (t,Dt,psi): # Action of the time evolution operator over state c in K sp
     global Ekin_K
     #psi is the wave function in K space
     # t is the time (which is not used for time independant Hamiltonians)
-    # Dt is the complex time step   
-    
+    # Dt is the complex time step
+
     return np.exp(-1j*0.5*Dt*Ekin_K)*psi # return action on psi
 
 def T_R_psi(t,Dt,psi): # Action of the time evolution operator over state c in R space
     global gint, Vpot_R
     # Includes the external potential and the interaction operators:
-    #       T_R_psi = exp(-i Dt (Vpot_R+ gint|psi|^2) ) c    
+    #       T_R_psi = exp(-i Dt (Vpot_R+ gint|psi|^2) ) c
     # psi is the wave function in R space
     # t is the time (which is not used for time independant Hamiltonians)
-    # Dt is the complex time step 
-    
+    # Dt is the complex time step
+
     return np.exp( -1j*Dt*(Vpot_R + gint*(abs(psi)**2)) )*psi # return action on psi
 
 def normaliza(c): # normalization to 1
@@ -186,7 +288,7 @@ def normaliza(c): # normalization to 1
     if ((norm-1.0)>1.0e-4): # check norm
         print("normalization from: ",norm)
     return c/norm
-    
+
 
 # Plots of the initial state:
 #____________________________________________________________________________________________
@@ -198,17 +300,17 @@ c=normaliza(gaussian(zp,Npoint,x0,0,0.5,0.0))
 cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
 psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 
-psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
+##psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
 #plot different propieties of psi:
 
-plot_density(z,psi,Zmax,t)    
-plot_phase(z,psi,Zmax,t)  
+plot_density(z,psi,Zmax,t)
+plot_phase(z,psi,Zmax,t)
 plot_real_imag(z,psi,Zmax,t)
 
 print("Energies:          Emed    mu    Ekin    Epot    Eint")
 print("         initial = %g %g %g %g %g"%(Energy(c)))
-    
-psi_sol=psi                  # we chance name variable    
+
+psi_sol=psi                  # we chance name variable
 
 # Choose initial wave function and evolve in real time:
 # __________________________________________________________________________________________
@@ -233,6 +335,27 @@ val_minus=np.empty([Ninter+1]) # put the minus value in a vector
 energi=np.empty([5])           # put the energies in a vector
 
 tevol[0]=t0
+
+# where the files of evolution will be saved
+dir = "wp_evolution" # name of the directory
+if (not os.path.exists(dir)): # creates the directory
+    os.makedirs(dir)
+else: # removes its contents if it already exists
+    print ("Directory %r already exists. Do you want to continue?" % (dir))
+    while True:
+        try:
+            ans = 'Y'#str(input("\tY/N: ")) # pause, answer to continue
+        except ValueError:
+            continue
+        else:
+            if (ans!='Y' and ans!='y' and ans!='N' and ans!='n'):
+                continue
+            else:
+                break
+    if (ans == 'N' or ans == 'n'):
+        sys.exit("End of program")
+
+
 # Open files
 file=open('energies.txt','w')
 file.write('Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
@@ -243,20 +366,20 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
     t += Dt.real
     psi=ifft(T_K(t0,Dt.real,c))*Npoint
     c=T_K(t0,Dt.real,fft(T_R_psi(t0,Dt.real,psi))/Npoint)
-    c = normaliza(c); # check norm in the wf         
-    
+    c = normaliza(c); # check norm in the wf
+
 
     if(not(i%Ntime_out)):
         j+=1
         tevol[j] = t
-# Write energies from function Energy        
+# Write energies from function Energy
         energi=(Energy(c))
         file.write('%s\t' %t)
         file.write('%g\t%g\t%g\t%g\t%g\n' %(Energy(c)))
 # Representation of intermediate solutions
         cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
         psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
-        
+
         plt.title('Evolution in time'%(tevol[Ninter]),fontsize=15)
         plt.xlabel('$x/a_{ho}$',fontsize=15)
         plt.xticks(np.arange(-Zmax, Zmax+1,Zmax/2))
@@ -267,18 +390,17 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        plt.plot(z, np.angle(psi), 'b.',label='$Arg(\psi)$')
         f4.show()
         psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
-      
 
-# Writes wave function        
-        file2=open('WfWd-%08d.txt'%(j),'w')
+# Writes wave function
+        file2=open('./%s/WfWd-%08d.txt'%(dir, j),'w')
         file2.write('Tiempo=%s\n' %(t))
         file2.write('Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
         file2.write('x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for i in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(abs(c)**2,Npoint,0)[i]))
-        
 
-file.close()       
+plt.show()
+file.close()
 file2.close()
-# Prints final energy        
-print("         final = %g %g %g %g %g"%(Energy(c)))           
+# Prints final energy
+print("         final = %g %g %g %g %g"%(Energy(c)))
