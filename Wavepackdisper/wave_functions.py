@@ -93,6 +93,6 @@ def bright_soliton(x,n,x0,gn,v): # 1/cosh(x/\xi) wf
     xi = 1.0/(abs(gn))**0.5
     print('healing length=',xi)
     print('  velocity = ',v )
-    fx = np.exp(1j*v*x)/np.cos((x-x0)/xi)   # wave function in R3
+    fx = np.exp(1j*v*x)/np.cosh((x-x0)/xi)   # wave function in R3
     return fft(fx)/n     # FFT to K3
 
