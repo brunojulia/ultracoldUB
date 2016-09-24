@@ -40,7 +40,7 @@ class Main(QMainWindow,Ui_MainWindow):
     def changefig(self,item):
         text=item.text()
         self.rmmpl()
-        self.addmpl(self.fig_dict[text])
+        self.addmpl(self.fig_dict[str(text)])
         
     def addfig(self,name,fig):
         self.fig_dict[name]=fig
