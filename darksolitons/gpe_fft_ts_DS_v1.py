@@ -45,6 +45,7 @@ import numpy.linalg as lin
 from pylab import* 
 import time
 from Tkinter import *
+import math
 
 close('all')
 pi=np.pi
@@ -264,6 +265,11 @@ psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
 #plot different propieties of psi:
 
+file=open('position_10.txt','w')
+for i in range (0,int(2*Zmax/Dz)):
+    file.write("%s\t%s \n" %(z[i],(abs(psi)**2)[i]))
+
+file.close()
 #plot_density(z,psi,Zmax,t)    
 #plot_phase(z,psi,Zmax,t)  
 #plot_real_imag(z,psi,Zmax,t)
@@ -375,7 +381,7 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         
 
 # Minus of density (soliton) 
-        point= x0/Dz
+        point= abs(x0/Dz)
         rang=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
         rang_2=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
         
@@ -388,7 +394,8 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 # Saves in a vector minus position/value and writes in a file. Also, writes the difference phase that creates soliton.
                 j+=0
                 pos_minus[j]=z[i+int((Npoint/2)-point-15)]
-                dif_phase=np.angle(psi[i+int((Npoint/2)-point)])-np.angle(psi[i+int((Npoint/2)-point-30)])
+                dif_phase=math.atan2(np.imag(psi[i+int((Npoint/2)-point)]),np.real(psi[i+int((Npoint/2)-point)]))-math.atan2(np.imag(psi[i+int((Npoint/2)-point-30)]),np.real(psi[i+int((Npoint/2)-point-30)]))
+#                dif_phase=np.angle(psi[i+int((Npoint/2)-point)])-np.angle(psi[i+int((Npoint/2)-point-30)])
                 val_minus[j]=min(rang)
                 file3.write('%s\t%s\t%s\n' %(t,pos_minus[j],val_minus[j]))
                 file4.write('%s\t%s\n' %(t,dif_phase))
