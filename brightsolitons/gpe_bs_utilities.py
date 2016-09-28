@@ -44,12 +44,13 @@ def Vpot(n, z):
     """
     global Zmax, Npoint, whoz, xb, xbr, xbl, hb, wall, wall_h
     Vpot_R = np.empty([Npoint]) # vector of the same length as z, initially empty
+    Vpot_Rc = np.empty([Npoint])#confinement
     m = 1000                    # slope used to define the walls and barrier
     wall_x = 0.75*Zmax          # position of the walls relative to the halfwidth of the box
     tol_exp = 1e100; tol_arg = 500
     # defines the walls of the box
     if wall != 0 :
-        Vpot_R = 0.0*z
+        Vpot_Rc = 0.0*z
         for i in range(0,Npoint):
             if m*(z[i]-wall_x) > tol_arg:
                 wall_exp1 = tol_exp
@@ -59,14 +60,14 @@ def Vpot(n, z):
                 wall_exp2 = tol_exp
             else:
                 wall_exp2 = np.exp(m*(z[i]+wall_x))
-            Vpot_R[i] = wall_h - wall_h/(1.0+wall_exp1) + wall_h/(1.0+wall_exp2)
+            Vpot_Rc[i] = wall_h - wall_h/(1.0+wall_exp1) + wall_h/(1.0+wall_exp2)
     else:
-        Vpot_R = 0.0*z
+        Vpot_Rc = 0.0*z
     # defines the potential (barriers, harmonic trap, etc.)
     if(n==0):
-        Vpot_R = Vpot_R
+        Vpot_R = Vpot_Rc
     elif(n==1):
-        Vpot_R = 0.5*whoz**2*z**2
+        Vpot_R = 0.5*whoz**2*z**2 + Vpot_Rc
     elif(n==2):
         Vpot_R = 0.0*z
         for i in range(0,Npoint):
@@ -78,10 +79,10 @@ def Vpot(n, z):
                 barrier_exp2 = tol_exp
             else:
                 barrier_exp2 = np.exp(m*(z[i]-xbl))
-            Vpot_R[i] = Vpot_R[i] + hb/(1.0+barrier_exp1) - hb/(1.0+barrier_exp2)
+            Vpot_R[i] = Vpot_Rc[i] + hb/(1.0+barrier_exp1) - hb/(1.0+barrier_exp2)
     else:
-        Vpot_R = Vpot_R
-    return Vpot_R
+        Vpot_R = Vpot_Rc
+    return Vpot_R,Vpot_Rc
 
 
 # operators and energies
@@ -148,7 +149,7 @@ def normaliza(c,file):
     if file != 0 and file != 1: #and != 1:
         file.write(frmt %(norm))
     elif file == 1:
-        print("Initial norm: %g" %(norm**2) )
+        pass
     return c/norm
 
 def changeFFTposition(f,N,j):
