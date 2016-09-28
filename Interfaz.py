@@ -5,6 +5,8 @@ Created on Sun Sep 18 15:14:44 2016
 @author: ivan
 """
 from PyQt4 import QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
 Ui_MainWindow,QMainWindow=loadUiType('Main.ui')
 
@@ -16,6 +18,11 @@ class Main(QMainWindow,Ui_MainWindow):
         self.button2.clicked.connect(self.brightbutton)
         self.button3.clicked.connect(self.dispersionbutton)
         
+        scene = QGraphicsScene()
+        scene.addPixmap(QPixmap('initial.png'))
+        self.DS.setScene(scene)
+    
+        self.DS.show()
         
     def darkbutton(self):
         self.hide()
