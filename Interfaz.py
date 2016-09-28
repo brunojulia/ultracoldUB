@@ -4,9 +4,48 @@ Created on Sun Sep 18 15:14:44 2016
 
 @author: ivan
 """
-
+from PyQt4 import QtGui
 from PyQt4.uic import loadUiType
-Ui_MainWindow,QMainWindow=loadUiType('window.ui')
+Ui_MainWindow,QMainWindow=loadUiType('Main.ui')
+
+class Main(QMainWindow,Ui_MainWindow):
+    def __init__(self):
+        super(Main,self).__init__()
+        self.setupUi(self)
+        self.button1.clicked.connect(self.darkbutton)
+        self.button2.clicked.connect(self.brightbutton)
+        self.button3.clicked.connect(self.dispersionbutton)
+        
+        
+    def darkbutton(self):
+        self.hide()
+        self.dark_window = DS(self)
+        self.dark_window.show()
+        self.dark_window.raise_()
+    
+    def brightbutton(self):
+        self.hide()
+        self.bright_window = BS(self)
+        self.bright_window.show()
+        self.bright_window.raise_()   
+        
+    def dispersionbutton(self):
+        self.hide()
+        self.dispersion_window = WD(self)
+        self.dispersion_window.show()
+        self.dispersion_window.raise_()   
+        
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'EXIT',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+          
+          
+Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 import os
 import subprocess
 import time
@@ -15,28 +54,45 @@ from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
-class Main(QMainWindow,Ui_MainWindow):
-    def __init__(self):
-        super(Main,self).__init__()
+class DS(QMainWindow,Ui_MainWindow):
+    def __init__(self,parent=None):
+        QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
-        self.mplfigs.hide()
-        self.mplwindow.hide()
-        self.interact.hide()
-        self.button=QtGui.QPushButton('DARK SOLITONS',self)
-        self.button.clicked.connect(self.darksoliton)
-        layout = QtGui.QVBoxLayout(self)
-        layout.addWidget(self.button)
+#        self.mplfigs.hide()
+#        self.mplwindow.hide()
         self.start.clicked.connect(self.start1)
-        
+        self.back.clicked.connect(self.close)
         self.fig_dict={}
         
         self.mplfigs.itemClicked.connect(self.changefig)
         
+        self.horizontalSlider.valueChanged.connect(self.initial)
         fig=Figure()
-        self.addmpl(fig)
-        
-        
+        self.addmpl(fig)        
     
+    def initial(self):
+        file=open('initial.txt','r')
+        lines=file.readlines()
+        file.close()
+        for i in range(1,13):
+            globals()['x%s' %i]=[]
+        for line in lines:
+            p=line.split()
+            for i in range(1,13):
+                globals()['x%s' %i].append(float(p[i-1]))
+        for i in range(1,13):
+                globals()['xv%s' %i]=np.array(globals()['x%s' %i])       
+        value=self.horizontalSlider.value()
+        
+        for i in range(2,13):
+            if value==i-7:
+                self.rmmpl()
+                fig2=Figure()
+                ax1f2=fig2.add_subplot(111)
+                ax1f2.plot(xv1,globals()['xv%s' %i])
+                ax1f2.set_title('INITIAL STATE')
+                self.addmpl(fig2)
+
     def changefig(self,item):
         text=item.text()
         self.rmmpl()
@@ -59,9 +115,6 @@ class Main(QMainWindow,Ui_MainWindow):
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
    
-    def darksoliton(self):
-        self.interact.show()
-        self.button.hide()
         
     def start1(self):
         prevdir = os.getcwd()
@@ -72,7 +125,7 @@ class Main(QMainWindow,Ui_MainWindow):
             file.close()
             subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
             print os.getcwd()
-            time.sleep(15.0*self.spinBox.value())
+            time.sleep(30.0*self.spinBox.value())
             print "READY"
         
             file = open('energies.txt', 'r')
@@ -150,6 +203,10 @@ class Main(QMainWindow,Ui_MainWindow):
         self.mplvl.removeWidget(self.toolbar)
         self.canvas.close()
                 
+    def close(self):
+        self.hide()
+        self.parent().show()
+            
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'EXIT',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
@@ -158,7 +215,49 @@ class Main(QMainWindow,Ui_MainWindow):
             event.accept()
         else:
             event.ignore()
-            
+ 
+ 
+Ui_MainWindow,QMainWindow=loadUiType('BS.ui')
+
+class BS(QMainWindow,Ui_MainWindow):
+    def __init__(self,parent=None):
+        QtGui.QWidget.__init__(self,parent)
+        self.setupUi(self)
+        self.back.clicked.connect(self.close)
+
+    def close(self):
+        self.hide()
+        self.parent().show()
+        
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'EXIT',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+         
+Ui_MainWindow,QMainWindow=loadUiType('WD.ui')
+class WD(QMainWindow,Ui_MainWindow):
+    def __init__(self,parent=None):
+        QtGui.QWidget.__init__(self,parent)
+        self.setupUi(self)
+        self.back.clicked.connect(self.close)
+
+    def close(self):
+        self.hide()
+        self.parent().show()
+        
+    def closeEvent(self, event):
+        reply = QtGui.QMessageBox.question(self, 'EXIT',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+        
 if __name__=='__main__':
     import sys
     from PyQt4 import QtGui
