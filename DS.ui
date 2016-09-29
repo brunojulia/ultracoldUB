@@ -17,10 +17,10 @@
    <widget class="QWidget" name="mplwindow" native="true">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>9</y>
+      <x>10</x>
+      <y>100</y>
       <width>621</width>
-      <height>531</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -32,7 +32,17 @@
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
-    <layout class="QVBoxLayout" name="mplvl"/>
+    <layout class="QVBoxLayout" name="mplvl">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+    </layout>
    </widget>
    <widget class="QListWidget" name="mplfigs">
     <property name="geometry">
@@ -109,8 +119,8 @@
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>50</y>
+       <x>110</x>
+       <y>10</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -170,6 +180,84 @@
     </property>
     <property name="text">
      <string>Back</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="slider_simulation">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>70</y>
+      <width>581</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Simulation Time:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>46</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ButtonOn">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Go on</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ButtonBack">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Go back</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ButtonPause">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>20</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pause</string>
     </property>
    </widget>
   </widget>
@@ -232,6 +320,22 @@
     <hint type="destinationlabel">
      <x>302</x>
      <y>282</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slider_simulation</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_4</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>548</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>529</y>
     </hint>
    </hints>
   </connection>
