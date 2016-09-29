@@ -111,7 +111,7 @@ for line in lines:
     p = line.split()
     x0=(float(p[0]))
     osci=(float(p[1])) 
-print x0,osci
+print (x0,osci)
 #root = Tk()
 #De=Demo(root)
 #root.mainloop()
@@ -265,11 +265,11 @@ psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
 #plot different propieties of psi:
 
-file=open('position_10.txt','w')
-for i in range (0,int(2*Zmax/Dz)):
-    file.write("%s\t%s \n" %(z[i],(abs(psi)**2)[i]))
-
-file.close()
+#file=open('position_10.txt','w')
+#for i in range (0,int(2*Zmax/Dz)):
+#    file.write("%s\t%s \n" %(z[i],(abs(psi)**2)[i]))
+#
+#file.close()
 #plot_density(z,psi,Zmax,t)    
 #plot_phase(z,psi,Zmax,t)  
 #plot_real_imag(z,psi,Zmax,t)
@@ -372,7 +372,7 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 
 # Writes wave function        
         file2=open('WfDs-%08d.txt'%(j),'w')
-        file2.write('Tiempo=%s\n' %(t))
+#        file2.write('Tiempo=%s\n' %(t))
 #        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
 #        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for i in range (0,int(2*Zmax/Dz)):
@@ -398,6 +398,8 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #                dif_phase=np.angle(psi[i+int((Npoint/2)-point)])-np.angle(psi[i+int((Npoint/2)-point-30)])
                 val_minus[j]=min(rang)
                 file3.write('%s\t%s\t%s\n' %(t,pos_minus[j],val_minus[j]))
+                if dif_phase<0:
+                    dif_phase=dif_phase+(2.0*pi)
                 file4.write('%s\t%s\n' %(t,dif_phase))
         
 file.close()    
@@ -420,7 +422,7 @@ print("         final = %g %g %g %g %g"%(Energy(c)))
 ##f5.show()
 ##         
 end=time.time()
-print end-start
+print (end-start)
 
 
 
