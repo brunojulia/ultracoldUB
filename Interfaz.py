@@ -67,13 +67,21 @@ class DS(QMainWindow,Ui_MainWindow):
         self.setupUi(self)
 #        self.mplfigs.hide()
 #        self.mplwindow.hide()
+        self.ButtonOn.hide()
+        self.ButtonBack.hide()
+        self.ButtonPause.hide()
         self.start.clicked.connect(self.start1)
         self.back.clicked.connect(self.close)
+#        self.ButtonOn.clicked.connect(self.on)
+#        self.ButtonBack.clicked.connect(self.back)
+#        self.ButtonPause.clicked.connect(self.pause)        
         self.fig_dict={}
         
         self.mplfigs.itemClicked.connect(self.changefig)
-        
+        self.label_5.hide()
+        self.slider_simulation.hide()
         self.horizontalSlider.valueChanged.connect(self.initial)
+        self.slider_simulation.valueChanged.connect(self.simulation)
         fig=Figure()
         self.addmpl(fig)        
     
@@ -118,10 +126,18 @@ class DS(QMainWindow,Ui_MainWindow):
     def addmpl(self,fig):
         self.canvas=FigureCanvas(fig)
         self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
-        self.mplvl.addWidget(self.toolbar)        
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
-   
+        self.mplvl.addWidget(self.toolbar)
+
+#    def pause(self):
+#        print "pause"
+#    def on(self):
+#        print "on"
+#    def back(s):
+#        print "back"
+        
+
         
     def start1(self):
         prevdir = os.getcwd()
@@ -131,9 +147,17 @@ class DS(QMainWindow,Ui_MainWindow):
             file.write ('%s\t%s' %(self.horizontalSlider.value(),self.spinBox.value()))
             file.close()
             subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
-            print os.getcwd()
-            time.sleep(30.0*self.spinBox.value())
-            print "READY"
+            print (os.getcwd())
+            time.sleep(20.0*self.spinBox.value())
+            print ("READY")
+            self.label_5.show()
+            self.ButtonOn.show()
+            self.ButtonBack.show()
+            self.ButtonPause.show()
+            self.slider_simulation.show()
+            self.slider_simulation.setMinimum(0)
+            self.slider_simulation.setMaximum(self.spinBox.value()*88-1)
+            self.slider_simulation.setSingleStep(1)
         
             file = open('energies.txt', 'r')
             lines = file.readlines()
@@ -203,7 +227,38 @@ class DS(QMainWindow,Ui_MainWindow):
         self.addfig('ENERGY',fig2)
         self.addfig('MINUS',fig3)
                 
-        
+    def simulation(self):
+        time=88*self.spinBox.value()
+        value=self.slider_simulation.value()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./darksolitons'))
+            for i in range(1,time+1):
+                file=open('WfDs-%08d.txt'%(i),'r')
+                globals()['lines%s' %i]=file.readlines()
+                file.close()
+#            
+#            
+                if value==i:                    
+                    x1=[]
+                    x2=[]
+                    for line in (globals()['lines%s' %i]):
+                        p=line.split()
+                        x1.append(float(p[0]))
+                        x2.append(float(p[1]))
+                    xv1=np.array(x1)
+                    xv2=np.array(x2)
+                    
+                    self.rmmpl()
+                    fig=Figure()
+                    axf=fig.add_subplot(111)
+                    axf.plot(xv1,xv2)
+                    axf.set_title('STATE')
+                    self.addmpl(fig)
+        finally:
+            os.chdir(prevdir)
+            
+            
     def rmmpl(self):
         self.mplvl.removeWidget(self.canvas)
         self.canvas.close()
