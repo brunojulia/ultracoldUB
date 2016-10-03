@@ -60,7 +60,7 @@ import time
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-
+sim=0
 class DS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
@@ -72,7 +72,7 @@ class DS(QMainWindow,Ui_MainWindow):
         self.ButtonPause.hide()
         self.start.clicked.connect(self.start1)
         self.back.clicked.connect(self.close)
-#        self.ButtonOn.clicked.connect(self.on)
+        self.ButtonOn.clicked.connect(self.on)
 #        self.ButtonBack.clicked.connect(self.back)
 #        self.ButtonPause.clicked.connect(self.pause)        
         self.fig_dict={}
@@ -82,8 +82,9 @@ class DS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.hide()
         self.horizontalSlider.valueChanged.connect(self.initial)
         self.slider_simulation.valueChanged.connect(self.simulation)
-        fig=Figure()
-        self.addmpl(fig)        
+        self.fig=Figure()
+        self.addmpl(self.fig) 
+        sim=0
     
     def initial(self):
         file=open('initial.txt','r')
@@ -101,17 +102,22 @@ class DS(QMainWindow,Ui_MainWindow):
         
         for i in range(2,13):
             if value==i-7:
-                self.rmmpl()
-                fig2=Figure()
-                ax1f2=fig2.add_subplot(111)
+                if self.fig==None:
+                    self.rmmpl()
+                    self.fig=Figure()
+                    self.addmpl(self.fig)
+                
+                self.fig.clear()
+                ax1f2=self.fig.add_subplot(111)
                 ax1f2.plot(xv1,globals()['xv%s' %i])
                 ax1f2.set_title('INITIAL STATE')
-                self.addmpl(fig2)
+                self.canvas.draw()
 
     def changefig(self,item):
         text=item.text()
         self.rmmpl()
         self.addmpl(self.fig_dict[str(text)])
+        self.fig=None
         
     def addfig(self,name,fig):
         self.fig_dict[name]=fig
@@ -125,20 +131,49 @@ class DS(QMainWindow,Ui_MainWindow):
             
     def addmpl(self,fig):
         self.canvas=FigureCanvas(fig)
-        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
+        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
         self.mplvl.addWidget(self.toolbar)
-
 #    def pause(self):
 #        print "pause"
-#    def on(self):
-#        print "on"
-#    def back(s):
-#        print "back"
+    def plot(self):
+        global sim
+        prevdir = os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./darksolitons'))
+            sim+=1
+            file=open('WfDs-%08d.txt'%(sim),'r')
+            globals()['lines%s' %sim]=file.readlines()
+            file.close()
+            x1=[]
+            x2=[]
+            for line in (globals()['lines%s' %sim]):
+                p=line.split()
+                x1.append(float(p[0]))
+                x2.append(float(p[1]))
+            xv1=np.array(x1)
+            xv2=np.array(x2)
+                
+        finally:
+            os.chdir(prevdir)
+        if self.fig==None:
+            self.rmmpl()
+            self.fig=Figure()
+            self.addmpl(self.fig)    
+        self.fig.clear()
+        axf=self.fig.add_subplot(111)
+        axf.plot(xv1,xv2)
+        axf.set_title('STATE')
+        self.canvas.draw()
+    
         
+    def on(self):
+        timer=QtCore.QTimer(self)
+        timer.timeout.connect(self.plot)
+        timer.start(500)
 
-        
+
     def start1(self):
         prevdir = os.getcwd()
         try:
@@ -156,7 +191,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.ButtonPause.show()
             self.slider_simulation.show()
             self.slider_simulation.setMinimum(0)
-            self.slider_simulation.setMaximum(self.spinBox.value()*88-1)
+            self.slider_simulation.setMaximum(self.spinBox.value()*44-1)
             self.slider_simulation.setSingleStep(1)
         
             file = open('energies.txt', 'r')
@@ -226,9 +261,10 @@ class DS(QMainWindow,Ui_MainWindow):
         self.addfig('PHASE',fig1)
         self.addfig('ENERGY',fig2)
         self.addfig('MINUS',fig3)
+        
                 
     def simulation(self):
-        time=88*self.spinBox.value()
+        time=44*self.spinBox.value()
         value=self.slider_simulation.value()
         prevdir = os.getcwd()
         try:
@@ -249,21 +285,25 @@ class DS(QMainWindow,Ui_MainWindow):
                     xv1=np.array(x1)
                     xv2=np.array(x2)
                     
-                    self.rmmpl()
-                    fig=Figure()
-                    axf=fig.add_subplot(111)
+                    if self.fig==None:
+                        self.rmmpl()
+                        self.fig=Figure()
+                        self.addmpl(self.fig)
+                    self.fig.clear()
+                    axf=self.fig.add_subplot(111)
                     axf.plot(xv1,xv2)
                     axf.set_title('STATE')
-                    self.addmpl(fig)
+                    self.canvas.draw()
         finally:
             os.chdir(prevdir)
             
             
     def rmmpl(self):
+        self.mplvl.removeWidget(self.toolbar)
+        self.canvas.close()        
         self.mplvl.removeWidget(self.canvas)
         self.canvas.close()
-        self.mplvl.removeWidget(self.toolbar)
-        self.canvas.close()
+        
                 
     def close(self):
         self.hide()
