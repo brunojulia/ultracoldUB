@@ -63,6 +63,7 @@ class DS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
+        self.sim=0
 #        self.mplfigs.hide()
 #        self.mplwindow.hide()
         self.ButtonOn.hide()
@@ -160,7 +161,7 @@ class DS(QMainWindow,Ui_MainWindow):
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./darksolitons'))
-            self.slider_simulation.value()
+            self.sim+=1
             file=open('WfDs-%08d.txt'%(self.sim),'r')
             globals()['lines%s' %self.sim]=file.readlines()
             file.close()
@@ -423,11 +424,7 @@ class WD(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
-        self.back.clicked.connect(self.close)
-
-    def close(self):
-        self.hide()
-        self.parent().show()
+        
         
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'EXIT',
