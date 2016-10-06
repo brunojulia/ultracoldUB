@@ -55,7 +55,6 @@ class Main(QMainWindow,Ui_MainWindow):
 Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 import os
 import subprocess
-import time
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
@@ -64,6 +63,7 @@ class DS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
+        self.sim=0
 #        self.mplfigs.hide()
 #        self.mplwindow.hide()
         self.ButtonOn.hide()
@@ -161,7 +161,7 @@ class DS(QMainWindow,Ui_MainWindow):
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./darksolitons'))
-            self.slider_simulation.value()
+            self.sim+=1
             file=open('WfDs-%08d.txt'%(self.sim),'r')
             globals()['lines%s' %self.sim]=file.readlines()
             file.close()
@@ -404,202 +404,7 @@ class BS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
-        self.ButtonOn.hide() #amaguem tots els sliders o botons no necessaris pel moment
-        self.ButtonBack.hide()
-        self.ButtonPause.hide()
-        self.harm.hide() #seguim amagant coses no necessaries pel moment
-        self.none.hide()
-        self.wall.hide()
-        self.label_5.hide()
-        self.slider_simulation.hide()
-        
-        #let's give the possible values to sliders
-        self.horizontalSlider_4.setMinimum(-60)
-        self.horizontalSlider_4.setMaximum(-20)
-        self.horizontalSlider_4.setSingleStep(1)
-        self.horizontalSlider_4.TicksBelow
-        
-        self.btn_none.clicked.connect(self.V_none)
-        self.btn_harm.clicked.connect(self.V_harm)
-        self.btn_wall.clicked.connect(self.V_wall)
-
-        self.fig_dict={}
-        
-        self.mplfigs.itemClicked.connect(self.changefig)
-
-        self.fig=Figure()
-        self.addmpl(self.fig)   
-        
-        self.start.clicked.connect(self.start2) #despres definirem start1 que ens dona les dades inicials
         self.back.clicked.connect(self.close)
-        
-    def addmpl(self,fig):
-        self.canvas=FigureCanvas(fig)
-        self.mplvl.addWidget(self.canvas)
-        self.canvas.draw()
-        self.toolbar=NavigationToolbar(self.canvas,self.mpl_window,coordinates=True)
-        self.mplvl.addWidget(self.toolbar)
-        
-    def rmmpl(self,):
-        self.mplvl.removeWidget(self.canvas)
-        self.canvas.close()
-        self.mplvl.removeWidget(self.toolbar)
-        self.toolbar.close()
-        
-    def addfig(self,name,fig):
-        self.fig_dict[name]=fig
-        self.mplfigs.addItem(name)
-        
-    def changefig(self,item):
-        text=item.text()
-        self.rmmpl()
-        self.addmpl(self.fig_dict[str(text)])
-        
-    def V_none(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(0))
-        file_pot.close()
-        
-    def V_harm(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(1))
-        file_pot.close()
-        
-    def V_wall(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(2))
-        file_pot.close()
-        
-    def start2(self):
-        pot_file=open('pot_input.txt','r')
-        prevdir=os.getcwd()
-        try:
-            os.chdir(os.path.expanduser('./brightsolitons'))
-            pot=int((pot_file.readlines())[0])
-            file_data=open('input.txt','w')
-            if pot==0:           
-                file_data.write('%d \t %d \t %f \t %f \t %d' %(0,self.gn.value(),self.horizontalSlider.value(),self.horizontalSlider_2.value(),self.yes_no.value()))
-            elif pot==1:
-                file_data.write('%d \t %d \t %f \t %d \t %d' %(1,self.gn.value(),self.horizontalSlider_3.value(),self.spinBox.value(),0))
-            elif pot==2:
-                file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0))
-            file_data.close()
-            pot_file.close()
-            subprocess.Popen('python gpe_bright_solitons.py',shell=True) #we run our code with the input already written
-            if pot==0 or pot==2:
-                time.sleep(80.0)
-            elif pot==1:
-                time.sleep(80.0*self.spinBox.value())
-            #let's read the ouput files to plot the data            
-            energyfile=open('./bs_evolution/energies.dat','r')
-            energy=energyfile.readlines()
-            energyfile.close()
-            meanvalfile=open('./bs_evolution/meanvalues.dat','r')
-            meanval=meanvalfile.readlines()
-            meanvalfile.close()
-        
-        finally:
-            os.chdir(prevdir)
-                        
-        #meanvalues (1st line of the data file is information)
-        tmv=[] #time
-        mv=[]  #mean value
-        smv=[] #sigma
-        for i in xrange(1,len(meanval)):
-            tmv.append(float((meanval[i].split('\t'))[0]))
-            mv.append(float((meanval[i].split('\t'))[1]))
-            smv.append(float((meanval[i].split('\t'))[2]))
-        fig1=Figure()
-        figmv=fig1.add_subplot(111) #only one plot in the window
-        atmv=np.array(tmv)
-        amv=np.array(mv)
-        figmv.plot(atmv,amv)
-        if pot==1:
-            figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
-            figmv.axes.set_ylim([-36.0,36.0])
-        else:
-            figmv.axes.set_xlim([0,20.0])
-            figmv.axes.set_ylim([-128.0,128.0])
-        figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($s$)")
-        figmv.set_ylabel("Position")
-            
-        #energies
-        ftime=[]
-        etot=[]
-        chem=[]
-        ekin=[]
-        epot=[]
-        eint=[]
-        lint=[]
-        iint=[]
-        rint=[]
-        for i in xrange(1,len(energy)):
-            ftime.append(float((energy[i].split('\t'))[0]))
-            etot.append(float((energy[i].split('\t'))[1]))
-            chem.append(float((energy[i].split('\t'))[2]))
-            ekin.append(float((energy[i].split('\t'))[3]))
-            epot.append(float((energy[i].split('\t'))[4]))
-            eint.append(float((energy[i].split('\t'))[5]))
-            if pot==2:
-                lint.append(float((energy[i].split('\t'))[6]))
-                iint.append(float((energy[i].split('\t'))[7]))
-                rint.append(float((energy[i].split('\t'))[8]))
-            else:
-                pass
-                
-        fig2=Figure()
-        fig3=Figure()
-          
-        atime=np.array(ftime)
-        aetot=np.array(etot)
-        achem=np.array(chem)
-        aekin=np.array(ekin)
-        aepot=np.array(epot)
-        aeint=np.array(eint)
-        if pot==2:
-            alint=np.array(lint)
-            aiint=np.array(iint)
-            arint=np.array(rint)
-        else:
-            pass
-           
-        if pot==1:
-            allenergies=fig2.add_subplot(111)
-#            kinpot=fig2.add_subplot(122)
-            allenergies.plot(atime,aetot,label='$E_{tot}$')
-            allenergies.plot(atime,achem,label='$\mu$')
-            allenergies.plot(atime,aekin,label='$E_{kin}$')
-            allenergies.plot(atime,aepot,label='$E_{pot}$')
-            allenergies.plot(atime,aeint,label='$E_{int}$')
-            allenergies.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
- #           kinpot.plot(atime,aetot,label='$E_{tot}$')
- #           kinpot.plot(atime,aepot,label='$e_{pot}$')
- #           kinpot.plot(atime,aekin,label='$E_{kin}$')
- #           kinpot.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
-        else:
-            allenergies=fig2.add_subplot(111)
-            allenergies.plot(atime,aetot,label='$E_{tot}$')
-            allenergies.plot(atime,achem,label='$\mu$')
-            allenergies.plot(atime,aekin,label='$E_{kin}$')
-            allenergies.plot(atime,aepot,label='$E_{pot}$')
-            allenergies.plot(atime,aeint,label='$E_{int}$')
-            if pot==2:
-                integrals=fig3.add_subplot(111)
-                integrals.plot(atime,alint,label='left side')
-                integrals.plot(atime,aiint,label='inside')
-                integrals.plot(atime,arint,label='right side')
-          
-  #      self.delfig()
-  #      self.delfig()
-        if pot==2:
-  #          self.delfig()
-            self.addfig("Integral",fig3)
-        else:
-            pass
-        self.addfig("Position's mean value", fig1)
-        self.addfig("Energies",fig2)
-        
 
     def close(self):
         self.hide()
@@ -619,11 +424,7 @@ class WD(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
-        self.back.clicked.connect(self.close)
-
-    def close(self):
-        self.hide()
-        self.parent().show()
+        
         
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'EXIT',
