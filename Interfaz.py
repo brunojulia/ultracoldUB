@@ -55,12 +55,10 @@ class Main(QMainWindow,Ui_MainWindow):
 Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 import os
 import subprocess
-import time
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-sim=0
 class DS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
@@ -73,8 +71,8 @@ class DS(QMainWindow,Ui_MainWindow):
         self.start.clicked.connect(self.start1)
         self.back.clicked.connect(self.close)
         self.ButtonOn.clicked.connect(self.on)
-#        self.ButtonBack.clicked.connect(self.back)
-#        self.ButtonPause.clicked.connect(self.pause)        
+        self.ButtonBack.clicked.connect(self.back1)
+        self.ButtonPause.clicked.connect(self.pause)        
         self.fig_dict={}
         
         self.mplfigs.itemClicked.connect(self.changefig)
@@ -82,9 +80,27 @@ class DS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.hide()
         self.horizontalSlider.valueChanged.connect(self.initial)
         self.slider_simulation.valueChanged.connect(self.simulation)
+        
+        file=open('position_0.txt','r')
+        lines=file.readlines()
+        file.close()
+        x=[]
+        x1=[]
+        for line in lines:
+            p=line.split()
+            x.append(float(p[0]))
+            x1.append(float(p[1]))
+        xv=np.array(x)
+        xv1=np.array(x1)
+        
         self.fig=Figure()
+        axf=self.fig.add_subplot(111)
+        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
+        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+        axf.plot(xv,xv1)
+        axf.set_title('condensate')
         self.addmpl(self.fig) 
-        sim=0
+            
     
     def initial(self):
         file=open('initial.txt','r')
@@ -106,11 +122,14 @@ class DS(QMainWindow,Ui_MainWindow):
                     self.rmmpl()
                     self.fig=Figure()
                     self.addmpl(self.fig)
+                    
                 
                 self.fig.clear()
                 ax1f2=self.fig.add_subplot(111)
+                ax1f2.set_xlabel('$x/a_{ho}$',fontsize=17)
+                ax1f2.set_ylabel('density $|\psi|^2$',fontsize=14)
                 ax1f2.plot(xv1,globals()['xv%s' %i])
-                ax1f2.set_title('INITIAL STATE')
+                ax1f2.set_title('initial state')
                 self.canvas.draw()
 
     def changefig(self,item):
@@ -131,24 +150,23 @@ class DS(QMainWindow,Ui_MainWindow):
             
     def addmpl(self,fig):
         self.canvas=FigureCanvas(fig)
+        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
+        self.mplvl.addWidget(self.toolbar)        
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
-        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
-        self.mplvl.addWidget(self.toolbar)
-#    def pause(self):
-#        print "pause"
+
+
     def plot(self):
-        global sim
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./darksolitons'))
-            sim+=1
-            file=open('WfDs-%08d.txt'%(sim),'r')
-            globals()['lines%s' %sim]=file.readlines()
+            self.slider_simulation.value()
+            file=open('WfDs-%08d.txt'%(self.sim),'r')
+            globals()['lines%s' %self.sim]=file.readlines()
             file.close()
             x1=[]
             x2=[]
-            for line in (globals()['lines%s' %sim]):
+            for line in (globals()['lines%s' %self.sim]):
                 p=line.split()
                 x1.append(float(p[0]))
                 x2.append(float(p[1]))
@@ -163,27 +181,71 @@ class DS(QMainWindow,Ui_MainWindow):
             self.addmpl(self.fig)    
         self.fig.clear()
         axf=self.fig.add_subplot(111)
+        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
+        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
         axf.plot(xv1,xv2)
-        axf.set_title('STATE')
+        axf.set_title('state at %s' %(self.sim))
         self.canvas.draw()
-    
         
+        if (self.sim==self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))-1):
+            self.timer.stop()
+            
+    def plot2(self):
+        prevdir = os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./darksolitons'))
+            self.sim-=1
+            file=open('WfDs-%08d.txt'%(self.sim),'r')
+            globals()['lines%s' %self.sim]=file.readlines()
+            file.close()
+            x1=[]
+            x2=[]
+            for line in (globals()['lines%s' %self.sim]):
+                p=line.split()
+                x1.append(float(p[0]))
+                x2.append(float(p[1]))
+            xv1=np.array(x1)
+            xv2=np.array(x2)
+                
+        finally:
+            os.chdir(prevdir)
+        if self.fig==None:
+            self.rmmpl()
+            self.fig=Figure()
+            self.addmpl(self.fig)    
+        self.fig.clear()
+        axf=self.fig.add_subplot(111)
+        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
+        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+        axf.plot(xv1,xv2)
+        axf.set_title('state at %s' %(self.sim))
+        self.canvas.draw()
+        if (self.sim==1):
+            self.timer.stop()
+            
     def on(self):
-        timer=QtCore.QTimer(self)
-        timer.timeout.connect(self.plot)
-        timer.start(500)
+        self.timer=QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plot)
+        self.timer.start(250)
+    
+    def pause(self):
+        self.timer.stop()
+        
+    def back1(self):
+        self.timer.timeout.connect(self.plot2)
+        self.timer.start(75)
 
 
     def start1(self):
+        self.sim=0
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./darksolitons'))
             file=open('input.txt','w')  
             file.write ('%s\t%s' %(self.horizontalSlider.value(),self.spinBox.value()))
             file.close()
-            subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
+            subprocess.call('python gpe_fft_ts_DS_v1.py',shell=True)
             print (os.getcwd())
-            time.sleep(20.0*self.spinBox.value())
             print ("READY")
             self.label_5.show()
             self.ButtonOn.show()
@@ -191,7 +253,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.ButtonPause.show()
             self.slider_simulation.show()
             self.slider_simulation.setMinimum(0)
-            self.slider_simulation.setMaximum(self.spinBox.value()*44-1)
+            self.slider_simulation.setMaximum(self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))-1)
             self.slider_simulation.setSingleStep(1)
         
             file = open('energies.txt', 'r')
@@ -217,8 +279,13 @@ class DS(QMainWindow,Ui_MainWindow):
         yv2 = np.array(y2)
         fig1=Figure()
         ax1f1=fig1.add_subplot(111)
+        ax1f1.set_ylabel('PHASE',fontsize=14)
+        ax1f1.set_xlabel('$T/t_{ho}$',fontsize=17)        
         ax1f1.plot(xv2,yv2, 'b.-')
         ax1f1.set_title('Phase difference produced by soliton')
+      
+
+
         
         x1 = []
         y1 = []
@@ -234,12 +301,17 @@ class DS(QMainWindow,Ui_MainWindow):
         
         fig2=Figure()
         ax1f2=fig2.add_subplot(121)
+        ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
+        ax1f2.set_ylabel('$E/hw$',fontsize=17)
         ax1f2.plot(xv,yv, 'b.-')
         ax1f2.set_title('Medium Energy')
         
         ax2f2=fig2.add_subplot(122)
+        ax2f2.set_xlabel('$T/t_{ho}$',fontsize=17)
         ax2f2.plot(xv,zv, 'r.-')
         ax2f2.set_title('Chemical Potential')
+       
+        
         
         x3 = []
         y3 = []
@@ -252,8 +324,12 @@ class DS(QMainWindow,Ui_MainWindow):
         
         fig3=Figure()
         ax1f3=fig3.add_subplot(111)
+        ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
+        ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
         ax1f3.plot(xv3,yv3,'b.-')
         ax1f3.set_title('Soliton Position')
+
+        
         
         self.delfig()
         self.delfig()
@@ -264,7 +340,7 @@ class DS(QMainWindow,Ui_MainWindow):
         
                 
     def simulation(self):
-        time=44*self.spinBox.value()
+        time=self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))-1
         value=self.slider_simulation.value()
         prevdir = os.getcwd()
         try:
@@ -291,8 +367,10 @@ class DS(QMainWindow,Ui_MainWindow):
                         self.addmpl(self.fig)
                     self.fig.clear()
                     axf=self.fig.add_subplot(111)
+                    axf.set_xlabel('$x/a_{ho}$',fontsize=17)
+                    axf.set_ylabel('density $|\psi|^2$',fontsize=14)
                     axf.plot(xv1,xv2)
-                    axf.set_title('STATE')
+                    axf.set_title('state at %s' %(i))
                     self.canvas.draw()
         finally:
             os.chdir(prevdir)
