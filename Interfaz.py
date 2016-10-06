@@ -55,6 +55,7 @@ class Main(QMainWindow,Ui_MainWindow):
 Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 import os
 import subprocess
+import time
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
@@ -246,7 +247,6 @@ class DS(QMainWindow,Ui_MainWindow):
             file.close()
             subprocess.call('python gpe_fft_ts_DS_v1.py',shell=True)
             print (os.getcwd())
-            time.sleep(70.0*self.spinBox.value())
             print ("READY")
             self.label_5.show()
             self.ButtonOn.show()
