@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>10</y>
       <width>621</width>
       <height>461</height>
      </rect>
@@ -34,12 +34,15 @@
     </property>
     <layout class="QVBoxLayout" name="mplvl">
      <property name="spacing">
-      <number>6</number>
+      <number>2</number>
      </property>
      <property name="leftMargin">
       <number>0</number>
      </property>
      <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
     </layout>
@@ -50,7 +53,7 @@
       <x>633</x>
       <y>197</y>
       <width>200</width>
-      <height>311</height>
+      <height>271</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -185,8 +188,8 @@
    <widget class="QSlider" name="slider_simulation">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>70</y>
+      <x>20</x>
+      <y>520</y>
       <width>581</width>
       <height>22</height>
      </rect>
@@ -199,7 +202,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
+      <y>500</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -212,7 +215,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>40</y>
+      <y>500</y>
       <width>46</width>
       <height>21</height>
      </rect>
@@ -225,7 +228,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>20</y>
+      <y>480</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -238,7 +241,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>20</y>
+      <y>480</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -251,7 +254,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>20</y>
+      <y>480</y>
       <width>75</width>
       <height>23</height>
      </rect>
