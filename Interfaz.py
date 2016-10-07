@@ -653,7 +653,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 true=1
             if (self.radioButton_2.isChecked()==True):
                 true=0
-            file.write ('%s\t%s\t%s' %(self.horizontalSlider.value(),true,self.spinBox.value()))
+            file.write ('%s\t%s\t%s\t%s' %(self.horizontalSlider.value(),true,self.spinBox.value(),self.spinBox_2.value()))
             file.close()
             subprocess.call('python gpe_fft_ts_WP_v1.py',shell=True)
             print (os.getcwd())
@@ -671,6 +671,10 @@ class WD(QMainWindow,Ui_MainWindow):
             file = open('energies.txt', 'r')
             lines = file.readlines()
             file.close()
+            
+            file2 = open('mean_value.txt','r')
+            lines2 = file2.readlines()
+            file2.close()
 
         finally:
             os.chdir(prevdir)
@@ -694,14 +698,46 @@ class WD(QMainWindow,Ui_MainWindow):
         ax1f2=fig.add_subplot(111)
         ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
         ax1f2.set_ylabel('$E/hw$',fontsize=17)
-        ax1f2.plot(xv,yv,label='$E_{tot}$')
-        ax1f2.plot(xv,zv,label='Kinetic Energy')
-        ax1f2.plot(xv,jv,label='Potential Energy')
+        ax1f2.plot(xv,yv,'r.-',label='$E_{tot}$')
+        ax1f2.plot(xv,zv,'y.-',label='Kinetic Energy')
+        ax1f2.plot(xv,jv,'b.-',label='Potential Energy')
+        ax1f2.legend()
         ax1f2.set_title('Energies')
-    
         
+        
+    
+        x1 = []
+        y1 = []
+        z1 = []
+        for line in lines2:
+            p = line.split()
+            x1.append(float(p[0]))
+            y1.append(float(p[1]))
+            z1.append(float(p[2]))                            
+        xv = np.array(x1)
+        yv = np.array(y1)
+        zv = np.array(z1)
+        
+        fig2=Figure()
+        ax1f2=fig2.add_subplot(111)
+        ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
+        ax1f2.set_ylabel('$x/a_{ho}$',fontsize=17)
+        ax1f2.plot(xv,yv, 'b.-')
+        ax1f2.set_title('Mean value x')
+        
+        fig3=Figure()
+        ax2f2=fig3.add_subplot(111)
+        ax2f2.set_xlabel('$T/t_{ho}$',fontsize=17)
+        ax2f2.set_ylabel('$(-)$',fontsize=17)
+        ax2f2.plot(xv,zv, 'r.-')
+        ax2f2.set_title('Mean value x dispersion')
+
+        self.delfig()        
+        self.delfig()
         self.delfig()
         self.addfig('ENERGY',fig)
+        self.addfig('MEAN VALUE X',fig2)
+        self.addfig('DISPERSION', fig3)
     
     def simulation(self):
         time=self.spinBox.value()*int((10*np.pi*2.0))-1
@@ -740,6 +776,7 @@ class WD(QMainWindow,Ui_MainWindow):
                     axf.plot(xv1,xv2,label='R-Space')
                     axf.plot(xv1,xv3,label='K-Space')
                     axf.set_title('state at %s' %(i))
+                    axf.legend()
                     self.canvas.draw()
         finally:
             os.chdir(prevdir)
@@ -775,6 +812,7 @@ class WD(QMainWindow,Ui_MainWindow):
         axf.set_ylabel('density $|\psi|^2$',fontsize=14)
         axf.plot(xv1,xv2,label="$R-Space$")
         axf.plot(xv1,xv3,label='$K-Space$')
+        axf.legend()
         axf.set_title('state at %s' %(self.sim))
         self.canvas.draw()
         if (self.sim==self.spinBox.value()*int((10*np.pi*2.0)-1)):
@@ -812,6 +850,7 @@ class WD(QMainWindow,Ui_MainWindow):
         axf.set_ylabel('density $|\psi|^2$',fontsize=14)
         axf.plot(xv1,xv2,label='$R-Space$')
         axf.plot(xv1,xv3,label='$K-Space$')
+        axf.legend()
         axf.set_title('state at %s' %(self.sim))
         self.canvas.draw()
         if (self.sim==1):
