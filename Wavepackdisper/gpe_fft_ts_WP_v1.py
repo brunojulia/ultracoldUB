@@ -74,7 +74,7 @@ for line in lines:
 #    except ValueError:
 #        print("Escribe un numero")
 
-Zmax = 25.0              # Grid half length
+Zmax = 40.0              # Grid half length
 Npoint =512              # Number of grid points
 Nparticle = 500          # Number of particles
 a_s = 0.0                # scattering length
@@ -250,6 +250,7 @@ pos_minus=np.empty([Ninter+1]) # put the minus position in a vector
 val_minus=np.empty([Ninter+1]) # put the minus value in a vector
 energi=np.empty([5])           # put the energies in a vector
 
+
 tevol[0]=t0
 
 # where the files of evolution will be saved
@@ -276,6 +277,7 @@ tevol[0]=t0
 file=open('energies.txt','w')
 #file.write('# Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
 #file.write('# Tiempo\tEnergia media\tPotencial quimico\tEnergia cinetica\tEnergia potencial\tEnergia interna\n' )
+file3=open('mean_value.txt','w')
 
 #f4=plt.figure()
 for i in range(1, Ntime_fin+1): # time evolution cicle
@@ -286,6 +288,9 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 
 
     if(not(i%Ntime_out)):
+        integral_x=0.0
+        integral_x2=0.0
+        sigma=0.0
         j+=1
         tevol[j] = t
 # Write energies from function Energy
@@ -312,11 +317,15 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        file2.write('Tiempo=%s\n' %(t))
 #        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
 #        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
-        for i in range (0,int(2*Zmax/Dz)):
-            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(abs(c)**2,Npoint,0)[i]))
-
+        for k in range (0,int(2*Zmax/Dz)):
+            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c)**2,Npoint,0)[k]))
+            integral_x +=((z[k])*(np.abs((psi[k])**2))*Dz)
+            integral_x2 +=((((z[j]))**2)*(np.abs((psi[j])**2))*Dz)
+        sigma=np.sqrt(np.abs((integral_x2)-(integral_x**2)))
+        file3.write('%s\t%s\t%s\n' %(t,integral_x,sigma))
 plt.show()
 file.close()
 file2.close()
+file3.close()
 # Prints final energy
 print("         final = %g %g %g %g %g"%(Energy(c)))
