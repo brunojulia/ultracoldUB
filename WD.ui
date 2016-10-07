@@ -51,9 +51,9 @@
     <property name="geometry">
      <rect>
       <x>633</x>
-      <y>227</y>
+      <y>287</y>
       <width>200</width>
-      <height>241</height>
+      <height>181</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -75,7 +75,7 @@
       <x>630</x>
       <y>10</y>
       <width>211</width>
-      <height>211</height>
+      <height>271</height>
      </rect>
     </property>
     <widget class="QSlider" name="horizontalSlider">
@@ -107,7 +107,7 @@
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>140</y>
+       <y>200</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -149,7 +149,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>120</y>
+       <y>180</y>
        <width>181</width>
        <height>16</height>
       </rect>
@@ -162,7 +162,7 @@
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>180</y>
+       <y>240</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -208,6 +208,32 @@
      </property>
      <property name="text">
       <string>Harmonic:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>120</y>
+       <width>181</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Excitation of the state:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_2">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>140</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>2</number>
      </property>
     </widget>
    </widget>
@@ -328,8 +354,8 @@
      <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>658</x>
-     <y>87</y>
+     <x>760</x>
+     <y>56</y>
     </hint>
    </hints>
   </connection>
@@ -341,7 +367,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>717</x>
-     <y>175</y>
+     <y>211</y>
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
@@ -357,7 +383,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>735</x>
-     <y>185</y>
+     <y>211</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
