@@ -62,6 +62,7 @@ for line in lines:
     x0=(float(p[0]))
     harm=(float(p[1]))
     osci=(float(p[2])) 
+    exc=(float(p[3]))
     
 # User decides the time
 #while True:
@@ -74,7 +75,7 @@ for line in lines:
 #    except ValueError:
 #        print("Escribe un numero")
 
-Zmax = 25.0              # Grid half length
+Zmax = 40.0              # Grid half length
 Npoint =512              # Number of grid points
 Nparticle = 500          # Number of particles
 a_s = 0.0                # scattering length
@@ -206,6 +207,14 @@ def normaliza(c): # normalization to 1
         print("normalization from: ",norm)
     return c/norm
 
+def state(x,n,x0):# initial wave function
+    if (exc==0):
+        fx=np.exp(-((x-x0)**2)/2); # define the initial wf in R3
+    if (exc==1):
+        fx=2*(x-x0)*np.exp(-((x-x0)**2)/2)
+    if (exc==2):
+        fx=((4*(x-x0)**2)-2)*np.exp(-((x-x0)**2)/2)
+    return fft(fx)/n;   # FFT to K3
 
 # Plots of the initial state:
 #____________________________________________________________________________________________
@@ -213,9 +222,9 @@ def normaliza(c): # normalization to 1
 # In[9]:
 
 t=0.0
-c=normaliza(gaussian(zp,Npoint,x0,0,1.0,0.0))
-cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
-psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+#c=normaliza(gaussian(zp,Npoint,x0,0,1.0,0.0))
+#cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
+#psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 
 #plot different propieties of psi:
 
@@ -223,10 +232,10 @@ psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
 #plot_phase(z,psi,Zmax,t)
 #plot_real_imag(z,psi,Zmax,t)
 
-print("Energies:          Emed    mu    Ekin    Epot    Eint")
-print("         initial = %g %g %g %g %g"%(Energy(c)))
+#print("Energies:          Emed    mu    Ekin    Epot    Eint")
+#print("         initial = %g %g %g %g %g"%(Energy(c)))
 
-psi_sol=psi                  # we chance name variable
+#psi_sol=psi                  # we chance name variable
 
 # Choose initial wave function and evolve in real time:
 # __________________________________________________________________________________________
@@ -234,8 +243,8 @@ psi_sol=psi                  # we chance name variable
 # In[11]:
 # temporal evolution soliton
 
-psi_sol=changeFFTposition(psi_sol,Npoint,1)
-c0=normaliza(fft(psi_sol)/Npoint) # initial wave function
+#psi_sol=changeFFTposition(psi_sol,Npoint,1)
+c0=normaliza(state(zp,Npoint,x0)) # initial wave function
 
 print("Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint")
 print("         initial = %g %g %g %g %g"%(Energy(c0)))
@@ -249,6 +258,7 @@ tevol=np.empty([Ninter+1])     # time vector
 pos_minus=np.empty([Ninter+1]) # put the minus position in a vector
 val_minus=np.empty([Ninter+1]) # put the minus value in a vector
 energi=np.empty([5])           # put the energies in a vector
+
 
 tevol[0]=t0
 
@@ -276,6 +286,7 @@ tevol[0]=t0
 file=open('energies.txt','w')
 #file.write('# Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
 #file.write('# Tiempo\tEnergia media\tPotencial quimico\tEnergia cinetica\tEnergia potencial\tEnergia interna\n' )
+file3=open('mean_value.txt','w')
 
 #f4=plt.figure()
 for i in range(1, Ntime_fin+1): # time evolution cicle
@@ -286,6 +297,9 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 
 
     if(not(i%Ntime_out)):
+        integral_x=0.0
+        integral_x2=0.0
+        sigma=0.0
         j+=1
         tevol[j] = t
 # Write energies from function Energy
@@ -312,11 +326,15 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        file2.write('Tiempo=%s\n' %(t))
 #        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
 #        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
-        for i in range (0,int(2*Zmax/Dz)):
-            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(abs(c)**2,Npoint,0)[i]))
-
+        for k in range (0,int(2*Zmax/Dz)):
+            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c)**2,Npoint,0)[k]))
+            integral_x +=((z[k])*(np.abs((psi[k])**2))*Dz)
+            integral_x2 +=((((z[j]))**2)*(np.abs((psi[j])**2))*Dz)
+        sigma=np.sqrt(np.abs((integral_x2)-(integral_x**2)))
+        file3.write('%s\t%s\t%s\n' %(t,integral_x,sigma))
 plt.show()
 file.close()
 file2.close()
+file3.close()
 # Prints final energy
 print("         final = %g %g %g %g %g"%(Energy(c)))
