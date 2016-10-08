@@ -44,7 +44,6 @@ from gpe_fft_utilities import * # local folder utilities
 import numpy.linalg as lin
 from pylab import* 
 import time
-from Tkinter import *
 import math
 
 close('all')
@@ -142,7 +141,7 @@ Dz = 2*Zmax/Npoint              # length step size
 Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
-Ninter = Ntime_fin/Ntime_out    # Number of outputs with the intermediate states
+Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gint))
 
 
