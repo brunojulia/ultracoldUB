@@ -622,6 +622,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.setupUi(self)
         self.ButtonBack.clicked.connect(self.back1)
         self.sim=0
+        self.true1=0
         
         self.ButtonOn.hide()
         self.ButtonBack.hide()
@@ -646,15 +647,16 @@ class WD(QMainWindow,Ui_MainWindow):
 
     def start1(self):
         self.sim=0
+        self.true1=0
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./Wavepackdisper'))
             file=open('input.txt','w')  
             if (self.radioButton.isChecked()==True):
-                true=1
+                self.true1=1
             if (self.radioButton_2.isChecked()==True):
-                true=0
-            file.write ('%s\t%s\t%s\t%s' %(self.horizontalSlider.value(),true,self.spinBox.value(),self.spinBox_2.value()))
+                self.true1=0
+            file.write ('%s\t%s\t%s\t%s' %(self.horizontalSlider.value(),self.true1,self.spinBox.value(),self.spinBox_2.value()))
             file.close()
             subprocess.call('python gpe_fft_ts_WP_v1.py',shell=True)
             print (os.getcwd())
