@@ -83,9 +83,9 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
 
     # define vectors for the energies, time and % of the wf (matrix)
     tevol=np.empty([Ninter+1])
-    tmeanval=np.empty(Ntime_fin/500.0 + 1)
-    meanval=np.empty(Ntime_fin/500.0 + 1)   #x mean value (from integral <x>)
-    sigma=np.empty(Ntime_fin/500.0 + 1)
+    tmeanval=np.empty(Ntime_fin//500 + 1)
+    meanval=np.empty(Ntime_fin//500 + 1)   #x mean value (from integral <x>)
+    sigma=np.empty(Ntime_fin//500 + 1)
     energy_cicle=np.empty([Ninter+1,5])
     wave_function = np.empty([Ninter+1,3])
     number_name_file=[]

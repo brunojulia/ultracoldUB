@@ -485,11 +485,12 @@ class BS(QMainWindow,Ui_MainWindow):
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0))
             file_data.close()
             pot_file.close()
-            subprocess.Popen('python gpe_bright_solitons.py',shell=True) #we run our code with the input already written
-            if pot==0 or pot==2:
-                time.sleep(80.0)
-            elif pot==1:
-                time.sleep(80.0*self.spinBox.value())
+#            subprocess.Popen('python gpe_bright_solitons.py',shell=True) #we run our code with the input already written
+            subprocess.call('python gpe_bright_solitons.py',shell=True)
+#            if pot==0 or pot==2:
+#                time.sleep(80.0)
+#            elif pot==1:
+#                time.sleep(80.0*self.spinBox.value())
             #let's read the ouput files to plot the data            
             energyfile=open('./bs_evolution/energies.dat','r')
             energy=energyfile.readlines()
