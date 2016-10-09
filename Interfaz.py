@@ -745,6 +745,7 @@ class WD(QMainWindow,Ui_MainWindow):
     def simulation(self):
         time=self.spinBox.value()*int((10*np.pi*2.0))-1
         value=self.slider_simulation.value()
+        self.sim=value
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./Wavepackdisper'))
@@ -785,89 +786,30 @@ class WD(QMainWindow,Ui_MainWindow):
             os.chdir(prevdir)
             
     def plot(self):
-        prevdir = os.getcwd()
-        try:
-            os.chdir(os.path.expanduser('./Wavepackdisper'))
-            self.sim+=1
-            file=open('WfWd-%08d.txt'%(self.sim),'r')
-            globals()['lines%s' %self.sim]=file.readlines()
-            file.close()
-            x1=[]
-            x2=[]
-            x3=[]
-            for line in (globals()['lines%s' %self.sim]):
-                p=line.split()
-                x1.append(float(p[0]))
-                x2.append(float(p[1]))
-                x3.append(float(p[5]))
-            xv1=np.array(x1)
-            xv2=np.array(x2)
-            xv3=np.array(x3)
-        finally:
-            os.chdir(prevdir)
-        if self.fig==None:
-            self.rmmpl()
-            self.fig=Figure()
-            self.addmpl(self.fig)    
-        self.fig.clear()
-        axf=self.fig.add_subplot(111)
-        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.plot(xv1,xv2,label="$R-Space$")
-        axf.plot(xv1,xv3,label='$K-Space$')
-        axf.legend()
-        axf.set_title('state at %s' %(self.sim))
-        self.canvas.draw()
-        if (self.sim==self.spinBox.value()*int((10*np.pi*2.0)-1)):
-            self.timer.stop()    
+        self.sim +=1
+        self.slider_simulation.setValue(self.sim)
+
+        if (self.sim==self.spinBox.value()*int((10*np.pi*(2.))-1)):
+            self.timer.stop()
         
     def plot2(self):
-        prevdir = os.getcwd()
-        try:
-            os.chdir(os.path.expanduser('./Wavepackdisper'))
-            self.sim-=1
-            file=open('WfWd-%08d.txt'%(self.sim),'r')
-            globals()['lines%s' %self.sim]=file.readlines()
-            file.close()
-            x1=[]
-            x2=[]
-            x3=[]
-            for line in (globals()['lines%s' %self.sim]):
-                p=line.split()
-                x1.append(float(p[0]))
-                x2.append(float(p[1]))
-                x3.append(float(p[5]))
-            xv1=np.array(x1)
-            xv2=np.array(x2)
-            xv3=np.array(x3)
-                
-        finally:
-            os.chdir(prevdir)
-        if self.fig==None:
-            self.rmmpl()
-            self.fig=Figure()
-            self.addmpl(self.fig)    
-        self.fig.clear()
-        axf=self.fig.add_subplot(111)
-        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.plot(xv1,xv2,label='$R-Space$')
-        axf.plot(xv1,xv3,label='$K-Space$')
-        axf.legend()
-        axf.set_title('state at %s' %(self.sim))
-        self.canvas.draw()
+        self.sim -=1
+        self.slider_simulation.setValue(self.sim)
+
+        
         if (self.sim==1):
             self.timer.stop()
             
     def on(self):
         self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plot)
-        self.timer.start(250)
+        self.timer.start(75)
     
     def pause(self):
         self.timer.stop()
         
     def back1(self):
+        self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plot2)
         self.timer.start(75)
         
