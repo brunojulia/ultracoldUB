@@ -44,6 +44,7 @@ from gpe_fft_utilities import * # local folder utilities
 import numpy.linalg as lin
 from pylab import* 
 import time
+from Tkinter import *
 import math
 
 close('all')
@@ -110,7 +111,8 @@ for line in lines:
     p = line.split()
     x0=(float(p[0]))
     osci=(float(p[1])) 
-print (x0,osci)
+    soli=(float(p[2]))
+print (x0,osci,soli)
 #root = Tk()
 #De=Demo(root)
 #root.mainloop()
@@ -141,7 +143,7 @@ Dz = 2*Zmax/Npoint              # length step size
 Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
-Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
+Ninter = Ntime_fin/Ntime_out    # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gint))
 
 
@@ -203,11 +205,27 @@ def T_R_psi(t,Dt,psi): # Action of the time evolution operator over state c in R
     
     return np.exp( -1j*Dt*(Vpot_R + gint*(abs(psi)**2)) )*psi # return action on psi
 
-def node(x,n,x0):# initial wave function
+def node(x,n,x0,soli):# initial wave function
     global gint
-    fx=np.tanh((x-x0)*np.sqrt(gint)); # define the initial wf in R3
+    if (soli==0):
+        fx=np.exp(-(x**2)/2)
+    if (soli==1):
+        fx=np.tanh((x-x0)*np.sqrt(gint))
+    if (soli==2):
+        fx=np.tanh((x-x0)*np.sqrt(gint))*np.tanh((x+x0)*np.sqrt(gint)); # define the initial wf in R3
+    if (soli==3):
+        fx=np.tanh((x-x0)*np.sqrt(gint))*np.tanh((x+x0)*np.sqrt(gint))*np.tanh((x)*np.sqrt(gint))
+    if (soli==4):
+        fx=np.tanh((x-0.35)*np.sqrt(gint))*np.tanh((x+0.35)*np.sqrt(gint))*np.tanh((x-x0)*np.sqrt(gint))
+    if (soli==8):
+        fx=np.tanh((x-0.35)*np.sqrt(gint))*np.tanh((x+0.35)*np.sqrt(gint))*np.tanh((x-x0-0.35)*np.sqrt(gint))*np.tanh((x-x0+0.35)*np.sqrt(gint))
+    if (soli==6):
+        fx=np.tanh((x-0.7)*np.sqrt(gint))*np.tanh((x+0.7)*np.sqrt(gint))*np.tanh((x)*np.sqrt(gint))*np.tanh((x-x0)*np.sqrt(gint))
+    if (soli==12):
+        fx=np.tanh((x-x0-0.35)*np.sqrt(gint))*np.tanh((x-x0+0.35)*np.sqrt(gint))*np.tanh((x-0.7)*np.sqrt(gint))*np.tanh((x+0.7)*np.sqrt(gint))*np.tanh((x)*np.sqrt(gint))
+    if (soli==18):
+        fx=np.tanh((x-0.7)*np.sqrt(gint))*np.tanh((x+0.7)*np.sqrt(gint))*np.tanh((x)*np.sqrt(gint))*np.tanh((x-x0-0.7)*np.sqrt(gint))*np.tanh((x-x0+0.7)*np.sqrt(gint))*np.tanh((x-x0)*np.sqrt(gint))
     return fft(fx)/n;   # FFT to K3
-
 def normaliza(c): # normalization to 1
     norm = lin.norm(c)
     if ((norm-1.0)>1.0e-4): # check norm
@@ -221,7 +239,7 @@ def normaliza(c): # normalization to 1
 # In[8]:
 
 # initial wf: function defined at 'node', centered at x=x0
-c0=normaliza(node(zp,Npoint,x0)); # wf at t=0
+c0=normaliza(node(zp,Npoint,x0,soli)); # wf at t=0
 # evolve in time: parameters
 t0=0.0
 tevol=np.empty([Ninter+1])          # time vector
@@ -246,6 +264,8 @@ for i in range(1, Ntime_fin+1):
         j+=1
         tevol[j] = t
         energy_cicle[j,:] = Energy(c)
+        if (np.abs(energy_cicle[j,1]-energy_cicle[j-1,1])<(1e-4)):
+            break
 print("         final = %g %g %g %g %g"%(Energy(c)))
 
 
@@ -292,7 +312,7 @@ psi_sol=psi                  # we chance name variable
 #        print("Escribe un numero")
     
     
-Ntime_fin=int(osci*8800)     # total number of time steps
+Ntime_fin=int(osci*1000*pi*np.sqrt(2))     # total number of time steps
 Ntime_out = 100              # number of time steps for intermediate outputs
 Dtr=2.0e-3                   # real time step
 Dti=2.0e-3                   # imaginary time step
@@ -328,7 +348,7 @@ file=open('energies.txt','w')
 #file.write('#Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
 #file.write('#Tiempo\tEnergia media\tPotencial quimico\tEnergia cinetica\tEnergia potencial\tEnergia interna\n' )
 
-file3=open('min.txt','w')
+#file3=open('min.txt','w')
 #file3.write('#Tabla donde se representan la posicion del minimo del soliton y su valor asociado en funcion del tiempo.\n')
 #file3.write('#Tiempo\tPosicion del minimo\tValor del minimo\n')
 
@@ -350,7 +370,6 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         j+=1
         tevol[j] = t
 # Write energies from function Energy        
-        energi=(Energy(c))
         file.write('%s\t' %t)
         file.write('%g\t%g\t%g\t%g\t%g\n' %(Energy(c)))
 # Representation of intermediate solutions
@@ -379,31 +398,31 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        file2.write('\n\n')
         
 
-# Minus of density (soliton) 
+## Minus of density (soliton) 
         point= abs(x0/Dz)
-        rang=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
-        rang_2=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
-        
-        for i in range(len(z)):
-            if (i>(int((Npoint/2)-point-16)) and i<(int((Npoint/2)+point+16))):
-                rang[i-int((Npoint/2)-point-15)]=str((abs(psi)**2)[i])
-    
-        for i in range(len(rang)):
-            if (min(rang)==rang[i]):
-# Saves in a vector minus position/value and writes in a file. Also, writes the difference phase that creates soliton.
-                j+=0
-                pos_minus[j]=z[i+int((Npoint/2)-point-15)]
-                dif_phase=math.atan2(np.imag(psi[i+int((Npoint/2)-point)]),np.real(psi[i+int((Npoint/2)-point)]))-math.atan2(np.imag(psi[i+int((Npoint/2)-point-30)]),np.real(psi[i+int((Npoint/2)-point-30)]))
-#                dif_phase=np.angle(psi[i+int((Npoint/2)-point)])-np.angle(psi[i+int((Npoint/2)-point-30)])
-                val_minus[j]=min(rang)
-                file3.write('%s\t%s\t%s\n' %(t,pos_minus[j],val_minus[j]))
-                if dif_phase<0:
-                    dif_phase=dif_phase+(2.0*pi)
-                file4.write('%s\t%s\n' %(t,dif_phase))
+#        rang=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
+#        rang_2=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
+#        
+#        for i in range(len(z)):
+#            if (i>(int((Npoint/2)-point-16)) and i<(int((Npoint/2)+point+16))):
+#                rang[i-int((Npoint/2)-point-15)]=str((abs(psi)**2)[i])
+#    
+#        for i in range(len(rang)):
+#            if (min(rang)==rang[i]):
+## Saves in a vector minus position/value and writes in a file. Also, writes the difference phase that creates soliton.
+#                j+=0
+#                pos_minus[j]=z[i+int((Npoint/2)-point-15)]
+##                dif_phase=math.atan2(np.imag(psi[i+int((Npoint/2)-point)]),np.real(psi[i+int((Npoint/2)-point)]))-math.atan2(np.imag(psi[i+int((Npoint/2)-point-30)]),np.real(psi[i+int((Npoint/2)-point-30)]))
+#                val_minus[j]=min(rang)
+#                file3.write('%s\t%s\t%s\n' %(t,pos_minus[j],val_minus[j]))
+        dif_phase=math.atan2(np.imag(psi[int((Npoint/2)+point+20)]),np.real(psi[int((Npoint/2)+point+20)]))-math.atan2(np.imag(psi[int((Npoint/2)-point-20)]),np.real(psi[int((Npoint/2)-point-20)]))
+        if dif_phase<0:
+            dif_phase=dif_phase+(2.0*pi)
+        file4.write('%s\t%s\n' %(t,dif_phase))
         
 file.close()    
 file2.close()                
-file3.close()
+#file3.close()
 file4.close()   
 
 # Prints final energy (soliton)        
