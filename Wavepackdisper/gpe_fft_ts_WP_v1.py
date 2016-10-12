@@ -299,6 +299,8 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
     if(not(i%Ntime_out)):
         integral_x=0.0
         integral_x2=0.0
+        integral_xk=0.0
+        integral_xk2=0.0
         sigma=0.0
         j+=1
         tevol[j] = t
@@ -329,9 +331,12 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         for k in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c)**2,Npoint,0)[k]))
             integral_x +=((z[k])*(np.abs((psi[k])**2))*Dz)
-            integral_x2 +=((((z[j]))**2)*(np.abs((psi[j])**2))*Dz)
+            integral_xk +=((z[k])*(np.abs((c[k])**2))*Dk)
+            integral_x2 +=((((z[k]))**2)*(np.abs((psi[k])**2))*Dz)
+            integral_xk2 +=((((z[k]))**2)*(np.abs((c[k])**2))*Dk)
         sigma=np.sqrt(np.abs((integral_x2)-(integral_x**2)))
-        file3.write('%s\t%s\t%s\n' %(t,integral_x,sigma))
+        sigma_k=np.sqrt(np.abs((integral_xk2)-(integral_xk**2)))
+        file3.write('%s\t%s\t%s\t%s\t%s\n' %(t,integral_x,sigma,integral_xk,sigma_k))
 plt.show()
 file.close()
 file2.close()
