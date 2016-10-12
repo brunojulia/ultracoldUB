@@ -1,0 +1,56 @@
+\section{Soluciones a la ecuaci\'on de Schrodinger}
+En esta secci\'on estudiaremos soluciones a la ecuación de Schrodinger.
+\begin{align}
+i\hbar\frac{\partial}{\partial t}
+\Psi =\left(-\hbar^2/2m \,\vec{\nabla}^2+V_{\rm trap}(r) 
+\right)\Psi
+\label{eq:schr}
+\end{align}
+\subsection{Movimiento libre}
+Primero analizaremos la ec. ~\eqref{eq:schr} imponiendo que $V_{trap}=0$, por tanto nos queda una ecuaci\'on:
+\begin{align}
+i\hbar\frac{\partial}{\partial t}
+\Psi =\left(-\hbar^2/2m \,\vec{\nabla}^2 
+\right)\Psi
+\label{eq:schr_free}
+\end{align}
+ en este caso podemos hacer una analog\'ia al movimiento libre de una part\'cula. Podemos comprobar que dado este sistema el Hamiltoniano conmuta con el operador momento $p=-i\hbar\vec{\nabla}$, por lo tanto si hacemos la transformada de Fourier de nuestro paquetes de ondas debe ser un estado propio de nuestro sistema, por el cual no observaremos dispersi\'on.
+ \begin{align}
+ \Psi(k) =\sqrt{\frac{1}{2\pi}} \,\int_{-\infty}^{\infty}\Psi(x)e^{-ikx}dx
+ \label{eq:four}
+ \end{align}
+ 
+ En mec\'anica cu\'antica el valor medio de un operador $A$ se define como:
+ \begin{align}
+ \ <A>=\int_{-\infty}^{\infty}\Psi^{*}(x)A\Psi(x) dx
+ \label{eq:mean}
+ \end{align}
+ As\'i la dispersi\'on del operador $A$ la definimos como: $ \sigma=\sqrt{<A^2>-<A>^2}  $
+ \\
+ 
+\subsection{Oscilador arm\'onico}
+En este punto introduciremos un potencial externo a la ecuaci\'on de Schrodinger, que ser\'a el famoso potencial arm\'onico:  $V_{trap}=\dfrac{1}{2}mw^2x^2$.
+
+Nuestro objetivo ser\'a obtener las autofunciones y autovalores del Hamiltoniano, para ello resolvemos la ecuaci\'on ~\eqref{eq:schr}. No nos centraremos en el m\'etodo a seguir para encontrar esta soluciones, simplemente mencionamos que se pueden obtener llevando un desarrollo en serie de potencias. As\'i obtenemos la fam\'ilia de soluciones:
+
+ \begin{align}
+\psi_n(x)=\sqrt{\frac{1}{2^n n!}} (\dfrac{mw}{\pi\hbar})^{1/4}\exp(\dfrac{mwx^2}{2\hbar})H_n(\sqrt{\frac{mw}{\hbar}}x) \,\,\,\,\,\,\,\ n=0,1,2,...
+\label{eq:sol_schr}
+\end{align}
+
+donde $H_n$ son los polinomios de Hermite:
+
+\begin{align}
+H_n(x)=(-1)^n e^{x^2} \dfrac{d^n}{dx^n}e^{-x^2}
+\label{eq:herm}
+\end{align}
+
+Y obtenemos unos niveles de energ\'ia:
+
+\begin{align}
+E_n=\hbar w(n+\dfrac{1}{2})
+\label{eq:energ}
+\end{align}
+
+Este resultado es muy importante en la mec\'anica cu\'antica. Ya que nos muestra una cuantizaci\'on en la energ\'ia, as\' que tendremos distintos niveles de energ\'ia posibles en nuestro estado.
+\pagebreak

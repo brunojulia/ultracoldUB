@@ -1,0 +1,65 @@
+\section{Gross-Pitaevskii (r\'egimen No-lineal)}
+
+\subsection{Condensados de Bose-Einstein y ecuaci\'on de Gross-Pitaevskii}
+Los bosones est\'an caracterizados por no cumplir el principio de exclusi\'on de Pauli, es decir, distintos bosones pueden ocupar el mismo estado cu\'antico, totalmente opuesto a los fermiones. Cuando se tiene un sistema bos\'onico, y a \'este se le disminuye la temperatura hasta llegar cerca del 0 absoluto (-273.15 ºC) forman un nuevo estado de la materia llamado la condensaci\'on de Bose-Einstein. Se caracteriza por la ocupaci\'on ,de una gran parte de la fracci\'on de bosones, del estado cu\'antico fundamental. Este fen\'omeno nos lleva a tener un estado cu\'antico macr\'oscopico, donde podemos caracterizar nuestro sistema por una \'unica funci\'on de onda.
+\\
+
+Dado este sistema de $N$ bosones. Si ahora consideramos que la interacci\'on entre los bosones es de contacto entre dos cuerpos, y que la separaci\'on entre dos bosones es mayor que la \textit{scattering lenght}, podemos efectuar la siguiente aproximaci\'on:
+ 
+\begin{align}
+\psi(\mathbf{r_1,r_2,...,r_N})=\psi(\mathbf{r_1})\psi(\mathbf{r_2})...\psi(\mathbf{r_N})
+\label{eq:aprox}
+\end{align}
+
+Con esto podemos escribir nuestro Hamiltoniano de la forma siguiente:
+
+\begin{align}
+H=\sum_{i=1}^{N}(-\frac{\hbar}{2m}\frac{\partial^2}{\partial\mathbf{r_i^2}}+V_{trap}(\mathbf{r_i}))+\sum_{i<j}\frac{4\pi \hbar^2 a_s}{m}
+\delta(\mathbf{r_i-r_j})
+\label{eq:hamGP}
+\end{align}
+
+Donde $m$ es la masa de de un bos\'on, $a_s$ es la \textit{boson-boson scattering lenght} y $delta(\mathbf{r})$ es la delta de Dirac.
+
+En este punto podemos escribir la ecuaci\'on de Gross-Pitaevskii (independiente del tiempo):
+
+\begin{align}
+ \mu
+\Psi(\mathbf{r}) =\left(-\frac{\hbar^2}{2m} \,\vec{\nabla}^2+V_{\rm trap}(\mathbf{r})+g|\Psi(\mathbf{r})|^2 
+\right)\Psi(\mathbf{r})
+\label{eq:GP}
+\end{align}
+
+Donde $g=\frac{4\pi \hbar^2 a_s}{m}$ que es proporcional al \textit{scattering lenght} y  $\mu$ es el potencial qu\'imico. El cual se puede encontrar con la condici\'on de normalizaci\'on de la funci\'on de onda:
+
+\begin{align}
+N=\int |\Psi(\mathbf{r})|^2 d^3r
+\label{eq:norma}
+\end{align}
+
+Vemos como la ecuaci\'on de Gross-Pitaevskii es una ecuaci\'on diferencial no-lineal. Vemos que la no-linealidad la introduce el t\'ermino que va con $g$. Por tanto, vemos que para el caso $g=0$ recuperamos la ec. ~\eqref{eq:schr}, lo que nos lleva a que las soluciones de la ecuaci\'on de Gross-Pitaevskii son la continuaci\'on no-lineal de las de Schrodinger.
+
+\subsection{Aproximaci\'on Thomas-Fermi y solitones oscuros}
+Apartir de ahora supondremos un r\'egimen 1D. La primera soluci\'on que podemos hallar en la ec.~\eqref{eq:GP}  es haciendo la aproximaci\'on siguiente:
+Suponemos tener un gran n\'umero de part\'iculas, lo que lleva a que el t\'ermino interat\'omico se haga muy grande, as\'i podemos despreciar el t\'ermino cin\'etico. Una vez hecho esto, la ecuaci\'on a resolver es trivial, con soluci\'on:
+ 
+ \begin{align}
+ \psi(x)=\sqrt{\frac{\mu-V_{trap}(x)}{gN}}
+ \label{eq:TF}
+ \end{align}
+ 
+Otro tipo de soluci\'on a la ec.~\eqref{eq:GP}  son los solitones. Depende del tipo de interaci\'on, si es atractiva o repulsiva podemos tener solitones brillantes o oscuros, respectivamente. Para una interacci\'on repulsiva tenemos:
+
+ \begin{align}
+\psi(x)=\psi_0 \tanh{\frac{x}{\sqrt{2}\xi}}
+\label{eq:soliton}
+\end{align}
+
+Donde $\psi_0$ es la soluc\'on a la ec.~\eqref{eq:GP} sin solit\'on y $\xi=\frac{\hbar}{\sqrt{2mgN}}$ es la llamada \textit{healing length}
+\\
+
+Esta \'ultima soluci\'on tiene un especial inter\'es. Vemos que los solitones oscuros producen un punto de cero densidad. Estos objetos son un defecto topol\'ogico del sistema, se puede observar que producen un cambio en la funci\'on de onda. En concreto, producen un salto de fase $\pi$ en el punto donde se hallan.
+\\
+
+\subsection{Solitones Oscuros bajo un potencial arm\'onico}
+\subsection{P\'endulo de Newton cu\'antico}
