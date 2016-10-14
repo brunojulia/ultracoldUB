@@ -67,7 +67,7 @@ def Vpot(n, z):
     if(n==0):
         Vpot_R = Vpot_Rc
     elif(n==1):
-        Vpot_R = 0.5*whoz**2*z**2 + Vpot_Rc
+        Vpot_R = 0.5*(whoz**2)*(z**2) + Vpot_Rc
     elif(n==2):
         Vpot_R = 0.0*z
         for i in range(0,Npoint):
@@ -112,6 +112,11 @@ def Energy(c, Vpot_R, Ekin_K):
     em =  ek+ep+ei;
     chem_pot = em+ei;
     return em, chem_pot, ek, ep, ei
+    
+def velmean(c,Vpot_R,Ekin_K):
+    global Dk
+    vmean=sum(np.sqrt(2*Ekin_K)*abs(c)**2) 
+    return vmean
 
 def T_K(Dt, Ekin_K):
     """Time evolution operator in K space (for second order accuracy).
@@ -188,7 +193,7 @@ def integral(x,dz,z,i,f):
     """
     k = 0
     if len(x) != len(z):
-        print "Error: the function has not the same length as the grid"
+        print("Error: the function has not the same length as the grid")
     inte = 0.0
     for j in z:
         if j>=i and j<=f:

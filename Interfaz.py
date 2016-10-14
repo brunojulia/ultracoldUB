@@ -492,15 +492,27 @@ class BS(QMainWindow,Ui_MainWindow):
         self.ButtonPause.hide()
         self.harm.hide() #seguim amagant coses no necessaries pel moment
         self.none.hide()
+        self.info1.hide()
         self.wall.hide()
         self.label_5.hide()
         self.slider_simulation.hide()
+        
+        self.slider_simulation.valueChanged.connect(self.simulation)
+#        self.ButtonOn.clicked.connect(self.on)
+#        self.ButtonBack.clicked.connect(self.back)
+#        self.ButtonPause.clicked.connect(self.pause)
         
         #let's give the possible values to sliders
         self.horizontalSlider_4.setMinimum(-60)
         self.horizontalSlider_4.setMaximum(-20)
         self.horizontalSlider_4.setSingleStep(1)
         self.horizontalSlider_4.TicksBelow
+        
+        self.play_2.hide()
+        self.play.hide()
+        self.play.clicked.connect(self.juga)
+        self.tanca.clicked.connect(self.torna)
+        self.intenta.clicked.connect(self.grafica)
         
         self.btn_none.clicked.connect(self.V_none)
         self.btn_harm.clicked.connect(self.V_harm)
@@ -513,7 +525,7 @@ class BS(QMainWindow,Ui_MainWindow):
         self.fig=Figure()
         self.addmpl(self.fig)   
         
-        self.start.clicked.connect(self.start2) #despres definirem start1 que ens dona les dades inicials
+        self.start.clicked.connect(self.start2) #despres definirem start2 que ens dona les dades inicials
         self.back.clicked.connect(self.close)
         
     def addmpl(self,fig):
@@ -529,6 +541,19 @@ class BS(QMainWindow,Ui_MainWindow):
         self.mplvl.removeWidget(self.toolbar)
         self.toolbar.close()
         
+    def addmpl2(self,fig):
+        self.canvas=FigureCanvas(fig)
+        self.mplvl_2.addWidget(self.canvas)
+        self.canvas.draw()
+        self.toolbar=NavigationToolbar(self.canvas,self.mpl_window,coordinates=True)
+        self.mplvl_2.addWidget(self.toolbar)
+        
+    def rmmpl2(self,):
+        self.mplvl_2.removeWidget(self.canvas)
+        self.canvas.close()
+        self.mplvl_2.removeWidget(self.toolbar)
+        self.toolbar.close()
+        
     def addfig(self,name,fig):
         self.fig_dict[name]=fig
         self.mplfigs.addItem(name)
@@ -537,6 +562,13 @@ class BS(QMainWindow,Ui_MainWindow):
         text=item.text()
         self.rmmpl()
         self.addmpl(self.fig_dict[str(text)])
+        self.fig=None
+        
+    def delfig(self):
+        listItems=self.mplfigs.selectedItems()
+        if not listItems: return
+        for item in listItems:
+            self.mplfigs.takeItem(self.mplfigs.row(item))
         
     def V_none(self):
         file_pot=open('pot_input.txt','w')
@@ -568,12 +600,16 @@ class BS(QMainWindow,Ui_MainWindow):
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0))
             file_data.close()
             pot_file.close()
-#            subprocess.Popen('python gpe_bright_solitons.py',shell=True) #we run our code with the input already written
             subprocess.call('python gpe_bright_solitons.py',shell=True)
-#            if pot==0 or pot==2:
-#                time.sleep(80.0)
-#            elif pot==1:
-#                time.sleep(80.0*self.spinBox.value())
+            self.ButtonOn.show() 
+            self.ButtonBack.show()
+            self.ButtonPause.show()
+            self.slider_simulation.show()
+            self.label_5.show()
+            if pot==1:
+                self.play.show()
+            else:
+                self.play.hide()
             #let's read the ouput files to plot the data            
             energyfile=open('./bs_evolution/energies.dat','r')
             energy=energyfile.readlines()
@@ -586,27 +622,49 @@ class BS(QMainWindow,Ui_MainWindow):
             os.chdir(prevdir)
                         
         #meanvalues (1st line of the data file is information)
-        tmv=[] #time
-        mv=[]  #mean value
-        smv=[] #sigma
-        for i in xrange(1,len(meanval)):
+        tmv=[]  #time
+        mv=[]   #mean value
+        smv=[]  #sigma
+        vmean=[]#mean velocity
+        vrem=[] #mean velocity[t=i]- mean velocity[t=0]
+        velm=[]
+        for i in range(1,len(meanval)):
             tmv.append(float((meanval[i].split('\t'))[0]))
             mv.append(float((meanval[i].split('\t'))[1]))
             smv.append(float((meanval[i].split('\t'))[2]))
+            vmean.append(float((meanval[i].split('\t'))[3]))
+            vrem.append(float((meanval[i].split('\t'))[4]))
+#            vvalue=(float((meanval[i].split('\t'))[5]))
+#            velm.append(vvalue-float((meanval[1].split('\t'))[5]))
+            velm.append(float((meanval[i].split('\t'))[5]))
         fig1=Figure()
         figmv=fig1.add_subplot(111) #only one plot in the window
         atmv=np.array(tmv)
         amv=np.array(mv)
-        figmv.plot(atmv,amv)
+        asig=np.array(smv)
+        sigsalt=[]
+        for i in range(0,len(asig)):
+            if(not(i%10)):
+                sigsalt.append(asig[i])
+            else:
+                sigsalt.append(0.0)
+        sigsalt=np.array(sigsalt)
         if pot==1:
+            figmv.plot(atmv,amv)
             figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
-            figmv.axes.set_ylim([-36.0,36.0])
-        else:
+            figmv.axes.set_ylim([-34.0,34.0])
+        elif pot==2:
+#            figmv.axes.errorbar(atmv,amv,yerr=asig)
+            figmv.axes.errorbar(atmv,amv,yerr=sigsalt)
+            figmv.axes.set_xlim([0,20.0])
+            figmv.axes.set_ylim([-128.0,128.0])
+        elif pot==0:
+            figmv.plot(atmv,amv)
             figmv.axes.set_xlim([0,20.0])
             figmv.axes.set_ylim([-128.0,128.0])
         figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($s$)")
-        figmv.set_ylabel("Position")
+        figmv.set_xlabel("Time ($unitats!$)")
+        figmv.set_ylabel("Position ($unitats!$)")
             
         #energies
         ftime=[]
@@ -618,7 +676,7 @@ class BS(QMainWindow,Ui_MainWindow):
         lint=[]
         iint=[]
         rint=[]
-        for i in xrange(1,len(energy)):
+        for i in range(1,len(energy)):
             ftime.append(float((energy[i].split('\t'))[0]))
             etot.append(float((energy[i].split('\t'))[1]))
             chem.append(float((energy[i].split('\t'))[2]))
@@ -648,43 +706,197 @@ class BS(QMainWindow,Ui_MainWindow):
         else:
             pass
            
-        if pot==1:
-            allenergies=fig2.add_subplot(111)
-#            kinpot=fig2.add_subplot(122)
-            allenergies.plot(atime,aetot,label='$E_{tot}$')
-            allenergies.plot(atime,achem,label='$\mu$')
-            allenergies.plot(atime,aekin,label='$E_{kin}$')
-            allenergies.plot(atime,aepot,label='$E_{pot}$')
-            allenergies.plot(atime,aeint,label='$E_{int}$')
-            allenergies.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
- #           kinpot.plot(atime,aetot,label='$E_{tot}$')
- #           kinpot.plot(atime,aepot,label='$e_{pot}$')
- #           kinpot.plot(atime,aekin,label='$E_{kin}$')
- #           kinpot.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
-        else:
-            allenergies=fig2.add_subplot(111)
-            allenergies.plot(atime,aetot,label='$E_{tot}$')
-            allenergies.plot(atime,achem,label='$\mu$')
-            allenergies.plot(atime,aekin,label='$E_{kin}$')
-            allenergies.plot(atime,aepot,label='$E_{pot}$')
-            allenergies.plot(atime,aeint,label='$E_{int}$')
-            if pot==2:
-                integrals=fig3.add_subplot(111)
-                integrals.plot(atime,alint,label='left side')
-                integrals.plot(atime,aiint,label='inside')
-                integrals.plot(atime,arint,label='right side')
-          
-  #      self.delfig()
-  #      self.delfig()
+        allenergies=fig2.add_subplot(111)
+        allenergies.plot(atime,aetot,label='$E_{tot}$')
+        allenergies.plot(atime,achem,label='$\mu$')
+        allenergies.plot(atime,aekin,label='$E_{kin}$')
+        allenergies.plot(atime,aepot,label='$E_{pot}$')
+        allenergies.plot(atime,aeint,label='$E_{int}$')
+        allenergies.set_title("Energies")
+        allenergies.set_xlabel("Time ($unitats!$)")
+        allenergies.set_ylabel("Energy per particle ($unitats!$)")
+        allenergies.legend()
         if pot==2:
-  #          self.delfig()
+            integrals=fig3.add_subplot(111)
+            integrals.plot(atime,alint,label='left side')
+            integrals.plot(atime,aiint,label='inside')
+            integrals.plot(atime,arint,label='right side')
+            integrals.set_xlabel("Time ($unitats!$)")
+            integrals.set_title("Integrals of the wave function")
+            integrals.legend()
+        elif pot==1:    
+            allenergies.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
+            
+        fig4=Figure()
+        avelm=np.array(velm)
+        meanvelocity=fig4.add_subplot(111)
+        meanvelocity.plot(atmv,avelm)
+        meanvelocity.set_title("Mean velocity of the soliton")
+        meanvelocity.set_xlabel("Time ($unitats!$)")
+        meanvelocity.set_ylabel("<$|v|$> ($unitats!$)")
+        if pot==1:
+            meanvelocity.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
+            
+        fig7=Figure()
+        velpos=fig7.add_subplot(111)
+        velpos.plot(amv,avelm)
+        velpos.set_title("$<|v|>$ with $<x>$")
+        velpos.set_xlabel("Position ($unitats!$)")
+        velpos.set_ylabel("<$|v|$> ($unitats!$)")
+          
+        self.delfig()
+        self.delfig()
+        self.delfig()
+        self.delfig()
+        if pot==2:
             self.addfig("Integral",fig3)
+        elif pot==1:
+            self.addfig("Mean velocity with position",fig7)
         else:
             pass
         self.addfig("Position's mean value", fig1)
         self.addfig("Energies",fig2)
+        self.addfig("Velocity",fig4)
         
-
+        if pot==0 or pot==2:
+            self.slider_simulation.setMinimum(0)
+            self.slider_simulation.setMaximum(100)
+            self.slider_simulation.setSingleStep(1)
+        else:
+            self.slider_simulation.setMinimum(0)
+            self.slider_simulation.setMaximum(60)
+            self.slider_simulation.setSingleStep(1)
+            
+    def juga(self): #enables a window for play-plot
+        self.rmmpl()
+        self.mpl_window.hide()
+        fig=Figure()
+        self.addmpl2(fig)
+        self.play_2.show()
+       
+    def torna(self): #hides the play-plot window and returns to normal plots
+        self.rmmpl2()
+        self.play_2.hide()        
+        fig=Figure()
+        self.addmpl(fig)
+        self.mpl_window.show()
+        
+    def grafica(self): #play-plot
+        self.rmmpl()
+        figura=Figure()
+        self.addmpl2(figura)
+        prevdir=os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons'))
+            meanvalfile=open('./bs_evolution/meanvalues.dat','r')
+            meanval=meanvalfile.readlines()
+            meanvalfile.close()
+        finally:
+            os.chdir(prevdir)
+        tmv=[]
+        mv=[]
+        listcos=[]
+        for i in range(1,len(meanval)):
+            tmv.append(float((meanval[i].split('\t'))[0]))
+            mv.append(float((meanval[i].split('\t'))[1]))
+            listcos.append(float(self.A.value()*np.cos(self.w.value()*float((meanval[i].split('\t'))[0]))))
+        figmv=figura.add_subplot(111)
+        atmv=np.array(tmv)
+        amv=np.array(mv)
+        acos=np.array(listcos)
+        figmv.plot(atmv,amv)
+        figmv.plot(atmv,acos)
+        figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
+        figmv.axes.set_ylim([-34.0,34.0])
+        figmv.set_title("Position of the soliton")
+        figmv.set_xlabel("Time ($unitats!$)")
+        figmv.set_ylabel("Position ($unitats!$)")
+            
+    def simulation(self):
+        pot_file=open('pot_input.txt','r')
+        prevdir = os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons/bs_evolution'))
+            pot=int((pot_file.readlines())[0])
+            pot_file.close()
+            if pot==0 or pot==2:
+                i=self.slider_simulation.value()*200
+                data=open("WfBs-%08d.dat" %(i),'r')
+                lines=data.readlines()
+                listpos=[]
+                listphi=[]
+                listpot=[]
+                listconf=[]
+                for j in range(2,len(lines)):
+                    listpos.append(float((lines[j].split('\t'))[0]))
+                    listphi.append(float((lines[j].split('\t'))[1]))
+                    listpot.append(float((lines[j].split('\t'))[5]))
+                    listconf.append(float((lines[j].split('\t'))[6]))
+                posit=np.array(listpos)
+                phi2=np.array(listphi)
+                pote=np.array(listpot)
+                confin=np.array(listconf)
+                        
+                if self.fig==None:
+                    self.rmmpl()
+                    self.fig=Figure()
+                    self.addmpl(self.fig)
+                self.fig.clear()
+                state=self.fig.add_subplot(111)
+                state.set_xlabel("Position")
+                state.set_ylabel("Density $|\psi|^2$")
+                state.plot(posit,phi2)
+                state.plot(posit,pote,'g',label="Potential")
+                state.plot(posit,confin,'g')
+                state.set_ylim(0,0.3)
+                state.legend()
+                self.canvas.draw()
+            else:
+                names=open("namefiles.dat",'r')
+                listnames=names.readlines()
+                name=int(listnames[int(self.slider_simulation.value())])
+                data=open("WfBs-%08d.dat" %(name),'r')
+                lines=data.readlines()
+                listpos=[]
+                listphi=[]
+                listpot=[]
+                for j in range(2,len(lines)):
+                    listpos.append(float((lines[j].split('\t'))[0]))
+                    listphi.append(float((lines[j].split('\t'))[1]))
+                    listpot.append(float((lines[j].split('\t'))[5]))
+                posit=np.array(listpos)
+                phi2=np.array(listphi) 
+                pote=np.array(listpot)
+                if self.fig==None:
+                    self.rmmpl()
+                    self.fig=Figure()
+                    self.addmpl(self.fig)
+                self.fig.clear()
+                state=self.fig.add_subplot(111)
+                state.set_xlabel("Position")
+                state.set_ylabel("Density $|\psi|^2$")
+                state.plot(posit,phi2)
+                state.plot(posit,pote,'g',label="Potential")
+                if self.gn.value()==1:
+                    state.set_ylim(0,7.2)    
+                elif self.gn.value()==2:
+                    state.set_ylim(0,4)
+                elif self.gn.value()==3:
+                    state.set_ylim(0,2.2)
+                state.legend()
+                self.canvas.draw()
+        finally:
+            os.chdir(prevdir)
+                
+#    def on(self):
+        
+        
+#    def back(self):
+        
+        
+#    def pause(self):
+        
+        
     def close(self):
         self.hide()
         self.parent().show()
