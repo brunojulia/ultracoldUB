@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>588</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,7 +73,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>520</y>
+      <y>550</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -124,8 +124,8 @@
    <widget class="QPushButton" name="ButtonOn">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>480</y>
+      <x>270</x>
+      <y>490</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -137,8 +137,8 @@
    <widget class="QPushButton" name="ButtonBack">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>480</y>
+      <x>370</x>
+      <y>490</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -150,8 +150,8 @@
    <widget class="QPushButton" name="ButtonPause">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>480</y>
+      <x>470</x>
+      <y>490</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -220,9 +220,6 @@
        <string>Number of excitation:</string>
       </property>
      </widget>
-     <zorder>spinBox_3</zorder>
-     <zorder>label_7</zorder>
-     <zorder>interact_3</zorder>
     </widget>
     <widget class="QFrame" name="interact_2">
      <property name="geometry">
@@ -259,6 +256,12 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>12</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox">
@@ -342,16 +345,6 @@
        <string>Number of symmetric solitons:</string>
       </property>
      </widget>
-     <zorder>horizontalSlider</zorder>
-     <zorder>spinBox</zorder>
-     <zorder>label</zorder>
-     <zorder>label_2</zorder>
-     <zorder>label_3</zorder>
-     <zorder>spinBox_2</zorder>
-     <zorder>label_6</zorder>
-     <zorder>interact_3</zorder>
-     <zorder>interact_3</zorder>
-     <zorder>interact_3</zorder>
     </widget>
     <widget class="QLabel" name="label_13">
      <property name="geometry">
@@ -370,7 +363,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>10</y>
+       <y>0</y>
        <width>211</width>
        <height>231</height>
       </rect>
@@ -401,6 +394,12 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>12</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_4">
@@ -516,16 +515,6 @@
        <string>Initial position of solitons in motion</string>
       </property>
      </widget>
-     <zorder>horizontalSlider_2</zorder>
-     <zorder>spinBox_4</zorder>
-     <zorder>label_8</zorder>
-     <zorder>label_9</zorder>
-     <zorder>label_10</zorder>
-     <zorder>spinBox_5</zorder>
-     <zorder>label_11</zorder>
-     <zorder>spinBox_6</zorder>
-     <zorder>label_12</zorder>
-     <zorder>mplfigs</zorder>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
@@ -580,6 +569,373 @@
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="state" native="true">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>480</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <widget class="QRadioButton" name="radioButton_dens">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>111</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>density state</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_ph">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>121</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>phase state</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="mplwindow_2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>621</width>
+      <height>421</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <layout class="QVBoxLayout" name="mplvl_2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="game" native="true">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>419</y>
+      <width>621</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>601</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The dark solitons under an harmonic trap behave as a normal particle would do in an harmonic potential. We know that in such case the particle follows a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	x(t)=A cos(wt+B)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;with A being its amplitude, w its angular frequency and B an arbitrary phase.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Can you adjust the movement plotted from data to a function by introducing the coefficients A and w? Suppose B is 0.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_try">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>140</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Try</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_return">
+     <property name="geometry">
+      <rect>
+       <x>524</x>
+       <y>140</y>
+       <width>91</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Return to Plots</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="widget_osci" native="true">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>140</y>
+       <width>271</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <widget class="QDoubleSpinBox" name="spin_amplitude">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>0</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-6.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>6.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="spin_frequency">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>0</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <double>10.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_A">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>0</y>
+        <width>16</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>A:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_w">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>0</y>
+        <width>16</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>w:</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="widget_densi" native="true">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>140</y>
+       <width>331</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <widget class="QDoubleSpinBox" name="spin_mu">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>0</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>0.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="spin_gn">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>0</y>
+        <width>62</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <double>1000.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_A_2">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>0</y>
+        <width>21</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>µ:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_w_2">
+      <property name="geometry">
+       <rect>
+        <x>176</x>
+        <y>0</y>
+        <width>20</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>gN:</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QTextBrowser" name="textBrowser_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>601</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;In the Bose-Einstein condensation there is a regime called Thomas-Fermi approximation. This regime is characterized to have a chemical potential much bigger than the characteristic energy of the harmonic potential (hw). In this approximation we can write the wave function as follows:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	&lt;/span&gt;&lt;img src=&quot;file:///C:\Users\ivan\AppData\Local\Temp\msohtmlclip1\01\clip_image002.png&quot; width=&quot;97&quot; height=&quot;44&quot; /&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Where &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;is chemical potential, V&lt;/span&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;harm&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; is the harmonic potential, g is the coupling constant and N is the number of particles.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Can you adjust the movement plotted from data to a function by introducing the coefficients &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and gN?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <zorder>textBrowser</zorder>
+    <zorder>mplwindow_2</zorder>
+    <zorder>pushButton_try</zorder>
+    <zorder>pushButton_return</zorder>
+    <zorder>widget_osci</zorder>
+    <zorder>widget_densi</zorder>
+    <zorder>textBrowser_2</zorder>
+   </widget>
+   <widget class="QWidget" name="interact_game" native="true">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>480</y>
+      <width>211</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <widget class="QRadioButton" name="radioButton_oscil">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Oscillation</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_densi">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Density state</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_game">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>10</y>
+       <width>81</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Guess Function</string>
+     </property>
+    </widget>
+   </widget>
+   <zorder>mplwindow</zorder>
+   <zorder>mplfigs</zorder>
+   <zorder>back</zorder>
+   <zorder>slider_simulation</zorder>
+   <zorder>label_5</zorder>
+   <zorder>label_4</zorder>
+   <zorder>ButtonOn</zorder>
+   <zorder>ButtonBack</zorder>
+   <zorder>ButtonPause</zorder>
+   <zorder>start</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>state</zorder>
+   <zorder>mplwindow_2</zorder>
+   <zorder>game</zorder>
+   <zorder>interact_game</zorder>
+   <zorder>interact_3</zorder>
+   <zorder>textBrowser_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -655,7 +1011,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>811</x>
-     <y>212</y>
+     <y>202</y>
     </hint>
    </hints>
   </connection>
@@ -703,7 +1059,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>815</x>
-     <y>133</y>
+     <y>154</y>
     </hint>
    </hints>
   </connection>
@@ -751,7 +1107,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>685</x>
-     <y>136</y>
+     <y>157</y>
     </hint>
    </hints>
   </connection>
@@ -816,6 +1172,22 @@
     <hint type="destinationlabel">
      <x>811</x>
      <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>start</sender>
+   <signal>clicked()</signal>
+   <receiver>mplfigs</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>763</x>
+     <y>376</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>759</x>
+     <y>417</y>
     </hint>
    </hints>
   </connection>
