@@ -68,7 +68,7 @@ print(" Scattering length = %g"%(a_s))
 print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
 print(" Real time step = %g"%(Dtr))
 print(" Imaginary time = %g"%(Dti))
-print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
+print(" Intermediate solutions = %g"%(Ntime_fin//Ntime_out-1))
 
 
 # Derived quantities
@@ -82,7 +82,7 @@ Dz = 2*Zmax/Npoint              # length step size
 Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
-Ninter = Ntime_fin/Ntime_out    # Number of outputs with the intermediate states
+Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gint))
 
 
@@ -176,17 +176,19 @@ for i in range (0,int(2*Zmax/Dz)):
     file3.write("%s\n%s\n" %(c0.real[i],c0.imag[i]))
 file3.close()
 
-#cc = ifft(c0)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
-#psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
-#plot_density(z,psi,Zmax,0)
-#file4=open('WfDs_Lin-%08d.txt'%(0),'w')
-#for i in range (0,int(2*Zmax/Dz)):
-#    file4.write("%s\t%s\n" %(z[i],(abs(psi)**2)[i]))
-#file4.close()
+cc = ifft(c0)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
+psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+file4=open('WfDs_Lin-%08d.txt'%(0),'w')
+for i in range (0,int(2*Zmax/Dz)):
+    file4.write("%s\t%s\n" %(z[i],(abs(psi)**2)[i]))
+file4.close()
   
 for N in range (1,750): 
     # evolve in time: parameters
     t0=0.0
+    sigma=0.0
+    integral_x=0.0
+    integral_x2=0.0
     tevol=np.empty([Ninter+1])          # time vector
     energy_cicle=np.empty([Ninter+1,5]) # put the energies in a matrix
     energy_cicle[0,:] = Energy(c0)      # Energies at t=0
@@ -221,17 +223,21 @@ for N in range (1,750):
     cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
     psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
     
+    integral_x =Dz*sum(z*np.abs(psi)**2)
+    integral_x2 =Dz*sum(z**2*np.abs(psi)**2)
+    sigma=np.sqrt(np.abs((integral_x2)-(integral_x**2)))
     file3=open('wf.txt','w')
     for i in range (0,int(2*Zmax/Dz)):
         file3.write("%s\n%s\n" %(c.real[i],c.imag[i]))
     file3.close()
+    file2.write ("%s\t%s\t%.14e\t%.14e\t%.14e\t%.14e\t%.14e\n"%(a_s,gint,energy_cicle[j,1],sigma,energy_cicle[j,2],energy_cicle[j,3],energy_cicle[j,4]))     
+    
 #    plot_density(z,psi,Zmax,t)
     if (not(N%10)):
         file4=open('WfDs_Lin-%08d.txt'%(N/10),'w')
         for i in range (0,int(2*Zmax/Dz)):
             file4.write("%s\t%s\n" %(z[i],(abs(psi)**2)[i]))
 #    plot_density(z,psi,Zmax,t)      
-    file2.write ("%s\t%s\t%.14e\t%.14e\n"%(a_s,gint,energy_cicle[j,1],energy_cicle[j,0]))     
     a_s+=0.0002
     gint = 2*a_s*Nparticle*NormWF
     
