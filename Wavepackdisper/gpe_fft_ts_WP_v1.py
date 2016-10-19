@@ -125,7 +125,7 @@ print(" Scattering length = %g"%(a_s))
 print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
 print(" Real time step = %g"%(Dtr))
 print(" Imaginary time = %g"%(Dti))
-print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
+print(" Intermediate solutions = %g"%(Ntime_fin//Ntime_out-1))
 
 
 # Derived quantities
@@ -139,7 +139,7 @@ Dz = 2*Zmax/Npoint              # length step size
 Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
-Ninter = Ntime_fin/Ntime_out    # Number of outputs with the intermediate states
+Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gint))
 
 
@@ -245,6 +245,12 @@ t=0.0
 
 #psi_sol=changeFFTposition(psi_sol,Npoint,1)
 c0=normaliza(state(zp,Npoint,x0)) # initial wave function
+cc = ifft(c0)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
+psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
+file4=open('WfWd-%08d.txt'%(0),'w')
+for k in range (0,int(2*Zmax/Dz)):
+    file4.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c0)**2,Npoint,0)[k]))
+file4.close()
 
 print("Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint")
 print("         initial = %g %g %g %g %g"%(Energy(c0)))
@@ -330,10 +336,10 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for k in range (0,int(2*Zmax/Dz)):
             file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c)**2,Npoint,0)[k]))
-            integral_x +=((z[k])*(np.abs((psi[k])**2))*Dz)
-            integral_xk +=((z[k])*(np.abs((c[k])**2))*Dk)
-            integral_x2 +=((((z[k]))**2)*(np.abs((psi[k])**2))*Dz)
-            integral_xk2 +=((((z[k]))**2)*(np.abs((c[k])**2))*Dk)
+        integral_x =Dz*sum(z*np.abs(psi)**2)
+        integral_xk =sum(kp*np.abs(c)**2)
+        integral_x2 =Dz*sum(z**2*np.abs(psi)**2)
+        integral_xk2 =sum(kp**2*np.abs(c)**2)
         sigma=np.sqrt(np.abs((integral_x2)-(integral_x**2)))
         sigma_k=np.sqrt(np.abs((integral_xk2)-(integral_xk**2)))
         file3.write('%s\t%s\t%s\t%s\t%s\n' %(t,integral_x,sigma,integral_xk,sigma_k))

@@ -44,7 +44,6 @@ from gpe_fft_utilities import * # local folder utilities
 import numpy.linalg as lin
 from pylab import* 
 import time
-from Tkinter import *
 import math
 
 close('all')
@@ -129,7 +128,7 @@ print(" Scattering length = %g"%(a_s))
 print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
 print(" Real time step = %g"%(Dtr))
 print(" Imaginary time = %g"%(Dti))
-print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
+print(" Intermediate solutions = %g"%(Ntime_fin//Ntime_out-1))
 
 
 # Derived quantities
@@ -143,7 +142,7 @@ Dz = 2*Zmax/Npoint              # length step size
 Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
-Ninter = Ntime_fin/Ntime_out    # Number of outputs with the intermediate states
+Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
 print(" Characteristic interaction energy = %g"%(gint))
 
 
@@ -292,7 +291,10 @@ psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
 #plot_density(z,psi,Zmax,t)    
 #plot_phase(z,psi,Zmax,t)  
 #plot_real_imag(z,psi,Zmax,t)
-
+file4=open('WfDs-%08d.txt'%(0),'w')
+for i in range (0,int(2*Zmax/Dz)):
+    file4.write("%s\t%s\t%s\n" %(z[i],(abs(psi)**2)[i],np.angle(psi)[i]))
+file4.close()
 
 # New data block for real time evolution
 #___________________________________________________________________________________________
@@ -312,12 +314,12 @@ psi_sol=psi                  # we chance name variable
 #        print("Escribe un numero")
     
     
-Ntime_fin=int(osci*1000*pi*np.sqrt(2))     # total number of time steps
+Ntime_fin=int(osci*1000*pi*2*np.sqrt(2))     # total number of time steps
 Ntime_out = 100              # number of time steps for intermediate outputs
-Dtr=2.0e-3                   # real time step
-Dti=2.0e-3                   # imaginary time step
+Dtr=1.0e-3                   # real time step
+Dti=1.0e-3                   # imaginary time step
 Dt = Dtr-1j*Dti              # complex time
-Ninter = Ntime_fin/Ntime_out # Number of outputs with the intermediate states
+Ninter = Ntime_fin//Ntime_out # Number of outputs with the intermediate states
 
 # Choose initial wave function and evolve in imaginary time:
 # __________________________________________________________________________________________
@@ -387,17 +389,6 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
 #        f4.show()
         psi*=np.exp(1j*pi/3) # This is useful to plot the wave function phase.
       
-
-# Writes wave function        
-        file2=open('WfDs-%08d.txt'%(j),'w')
-#        file2.write('Tiempo=%s\n' %(t))
-#        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
-#        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
-        for i in range (0,int(2*Zmax/Dz)):
-            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(np.angle(psi))[i],psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
-#        file2.write('\n\n')
-        
-
 ## Minus of density (soliton) 
         point= abs(x0/Dz)
 #        rang=np.empty([int((Npoint/2)+point+16)-int((Npoint/2)-point-15)])
@@ -419,6 +410,16 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         if dif_phase<0:
             dif_phase=dif_phase+(2.0*pi)
         file4.write('%s\t%s\n' %(t,dif_phase))
+        
+        # Writes wave function        
+        file2=open('WfDs-%08d.txt'%(j),'w')
+#        file2.write('Tiempo=%s\n' %(t))
+#        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
+#        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
+        for i in range (0,int(2*Zmax/Dz)):
+            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(math.atan2(np.imag(psi[i]),np.real(psi[i]))),psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
+#        file2.write('\n\n')
+        
         
 file.close()    
 file2.close()                
