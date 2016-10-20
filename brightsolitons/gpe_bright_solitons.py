@@ -92,6 +92,6 @@ Vpot_R = changeFFTposition(Vpot_R,Npoint,1) # K3
 
 # evolution (real time)
 t0=0.0
-c = evolution(t0, Dtr, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, 0,1)
+c = evolution(t0, Dtr, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, 0,1,oscil)
 
 end = time.time()
