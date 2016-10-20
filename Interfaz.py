@@ -8,9 +8,9 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
+import math
 Ui_MainWindow,QMainWindow=loadUiType('Main.ui')
 
-import time
 class Main(QMainWindow,Ui_MainWindow):
     def __init__(self):
         super(Main,self).__init__()
@@ -23,7 +23,29 @@ class Main(QMainWindow,Ui_MainWindow):
         scene.addPixmap(QPixmap('initial.png'))
         self.DS.setScene(scene)
     
+        scene2=QGraphicsScene()        
+        scene2.addPixmap(QPixmap('initialbs.png').scaled(141,91))
+        self.BS.setScene(scene2)
+    
         self.DS.show()
+        
+        self.eng.clicked.connect(self.english)
+        self.spa.clicked.connect(self.spanish)
+        
+        if self.eng.isChecked()==False and self.spa.isChecked()==False:
+            lang=open('language.txt','w')
+            lang.write('1')   #english by default in case the user does not introduce a language        
+            lang.close()
+        
+    def english(self):        
+        lang=open('language.txt','w')
+        lang.write('1')           
+        lang.close()
+    
+    def spanish(self):        
+        lang=open('language.txt','w')
+        lang.write('2')           
+        lang.close()
         
     def darkbutton(self):
         self.hide()
@@ -56,6 +78,7 @@ class Main(QMainWindow,Ui_MainWindow):
 Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 import os
 import subprocess
+import time
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
@@ -72,9 +95,6 @@ class DS(QMainWindow,Ui_MainWindow):
         self.interact.hide()
         self.interact_2.hide()
         self.interact_3.hide()
-        self.interact_game.hide()
-        self.game.hide()
-        self.state.hide()
         self.start.clicked.connect(self.start1)
         self.back.clicked.connect(self.close)
         self.ButtonOn.clicked.connect(self.on)
@@ -87,11 +107,6 @@ class DS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.hide()
         self.horizontalSlider.valueChanged.connect(self.initial)
         self.slider_simulation.valueChanged.connect(self.simulation)
-        
-        self.pushButton_game.clicked.connect(self.game_call)
-        self.pushButton_try.clicked.connect(self.graph_try)
-        self.pushButton_return.clicked.connect(self.game_return)
-        self.mplwindow_2.hide()
         
         file=open('position_0.txt','r')
         lines=file.readlines()
@@ -172,38 +187,20 @@ class DS(QMainWindow,Ui_MainWindow):
         self.mplvl.addWidget(self.toolbar)        
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
-        
-    def rmmpl(self):
-        self.mplvl.removeWidget(self.toolbar)
-        self.canvas.close()        
-        self.mplvl.removeWidget(self.canvas)
-        self.canvas.close()
 
-    def addmpl2(self,fig):
-        self.canvas=FigureCanvas(fig)
-        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
-        self.mplvl_2.addWidget(self.toolbar)        
-        self.mplvl_2.addWidget(self.canvas)
-        self.canvas.draw()
-        
-    def rmmpl2(self):
-        self.mplvl_2.removeWidget(self.toolbar)
-        self.canvas.close()        
-        self.mplvl_2.removeWidget(self.canvas)
-        self.canvas.close()
-        
+
     def plot(self):
         self.sim +=1
         self.slider_simulation.setValue(self.sim)
         
         if (self.radioButton.isChecked()==True):
-            if (self.sim==74):
+            if (self.sim==75):
                 self.timer.stop()
         if (self.radioButton_2.isChecked()==True):
-            if (self.sim==self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
+            if (self.sim==self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))-1):
                 self.timer.stop()
         if (self.radioButton_3.isChecked()==True):
-            if (self.sim==self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
+            if (self.sim==self.spinBox_4.value()*int((10*np.pi*np.sqrt(2.)))-1):
                 self.timer.stop()
             
     def plot2(self):
@@ -211,7 +208,7 @@ class DS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setValue(self.sim)
 
         
-        if (self.sim==0):
+        if (self.sim==1):
             self.timer.stop()
             
     def on(self):
@@ -227,252 +224,17 @@ class DS(QMainWindow,Ui_MainWindow):
         self.timer.timeout.connect(self.plot2)
         self.timer.start(75)
 
-    def game_call(self):
-        if (self.radioButton.isChecked()==True):
-            if (self.radioButton_densi.isChecked()==True):
-                self.widget_osci.hide()
-                time1=74
-                self.widget_densi.show()
-                self.textBrowser_2.show()
-                self.textBrowser.hide()
-                self.mplwindow.hide()
-                self.start.hide()
-                self.mplfigs.hide()
-                self.rmmpl()
-                self.rmmpl2()
-                
-                
-                prevdir = os.getcwd()
-                try:
-                    os.chdir(os.path.expanduser('./darksolitons'))
-                    for i in range(0,time1+1):
-                        file=open('WfDs_Lin-%08d.txt'%(i),'r')
-                        globals()['lines%s' %i]=file.readlines()
-                        file.close()
-        #               
-        #            
-                        if self.sim==i:                    
-                            x1=[]
-                            x2=[]
-                            for line in (globals()['lines%s' %(i)]):
-                                p=line.split()
-                                x1.append(float(p[0]))
-                                x2.append(float(p[1]))
-                            globals()['xv1_lin%s' %(i)]=np.array(x1)
-                            globals()['xv2_lin%s' %(i)]=np.array(x2)
-                finally:
-                        os.chdir(prevdir)
-                
-                    
-                fig4=Figure()
-                axf=fig4.add_subplot(111)
-                axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-                axf.plot(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)])
-                axf.set_title('state at %s' %np.real(self.sim/10.))
-                self.canvas.draw()
-                self.addmpl2(fig4)
-                
-        if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
-            
-            if (self.radioButton_oscil.isChecked()==True):
-                self.rmmpl()
-                self.textBrowser_2.hide()
-                self.textBrowser.show()
-                self.rmmpl2()
-                self.mplwindow.hide()
-                self.widget_osci.show()
-                self.widget_densi.hide()
-                self.start.hide()
-                self.mplfigs.hide()
-                self.addmpl2(self.fig3)
-                    
-            if (self.radioButton_densi.isChecked()==True):
-                if (self.radioButton_2.isChecked()==True):
-                    time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
-    
-                if (self.radioButton_3.isChecked()==True):
-                    time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
-                    
-                self.widget_osci.hide()
-                self.widget_densi.show()
-                self.textBrowser_2.show()
-                self.textBrowser.hide()
-                self.mplwindow.hide()
-                self.start.hide()
-                self.mplfigs.hide()
-                self.rmmpl()
-                self.rmmpl2()
-                prevdir = os.getcwd()
-                try:
-                    os.chdir(os.path.expanduser('./darksolitons'))
-                    for i in range(0,time1+1):
-                        file=open('WfDs-%08d.txt'%(i),'r')
-                        globals()['lines%s' %i]=file.readlines()
-                        file.close()
-        #               
-        #            
-                        if self.sim==i:                    
-                            x1=[]
-                            x2=[]
-                            for line in (globals()['lines%s' %(i)]):
-                                p=line.split()
-                                x1.append(float(p[0]))
-                                x2.append(float(p[1]))
-                            globals()['xv1_%s' %(i)]=np.array(x1)
-                            globals()['xv2_%s' %(i)]=np.array(x2)
-                finally:
-                        os.chdir(prevdir)
-                 
-                    
-                fig3=Figure()
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
-                ax1f3.plot(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)])
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
-                self.addmpl2(fig3)                           
-                
-                
-        self.game.show()
-        self.mplwindow_2.show()
-        
-    def graph_try(self):
-        if (self.radioButton.isChecked()==True):
-            if (self.radioButton_densi.isChecked()==True):
-                self.rmmpl()
-                self.rmmpl2()
-                
-                xv3=np.abs(np.sqrt((self.spin_mu.value()-0.5*globals()['xv1_lin%s' %(self.sim)]**2)/self.spin_gn.value()))**2.            
-                
-                fig5=Figure()
-                self.addmpl2(fig5)
-                ax1f3=fig5.add_subplot(111)
-                ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
-                ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)])
-                ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3)
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
-                self.canvas.draw() 
-                
-        if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
-            if (self.radioButton_oscil.isChecked()==True):
-                if (self.radioButton_2.isChecked()==True):
-                    time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
-    
-                if (self.radioButton_3.isChecked()==True):
-                    time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
-                
-                self.rmmpl2()
-                psi_time=np.empty([512,time1])
-                prevdir = os.getcwd()
-                try:
-                    os.chdir(os.path.expanduser('./darksolitons'))
-                    for i in range (0,time1+1):
-                        file=open('WfDs-%08d.txt'%(i),'r')
-                        globals()['lines%s' %i]=file.readlines()
-                        file.close()
-                        x1=[]
-                        x2=[]
-                        for line in globals()['lines%s' %i]:
-                            p=line.split()
-                            x1.append(float(p[0]))
-                            x2.append(float(p[1]))
-                        xv1=np.array(x1)
-                        xv2=np.array(x2)
-                        psi_time[:,i-1]=xv2
-                finally:
-                    os.chdir(prevdir)
-                
-                fig3=Figure()
-                self.addmpl2(fig3)
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_xlabel('$T*w_{ho}$',fontsize=17)
-                ax1f3.set_xlim(0,(time1-1)/10.)
-                
-                x=np.arange(0,time1+1)/10.
-                y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
-                
-                ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
-                ax1f3.plot(x,y)            
-                ax1f3.set_title('evolution condensate')
-                self.canvas.draw()
-            
-            if (self.radioButton_densi.isChecked()==True):
-                self.rmmpl2()
-                
-                xv3=np.abs(np.sqrt((self.spin_mu.value()-0.5*globals()['xv1_%s' %(self.sim)]**2)/self.spin_gn.value()))**2.            
-                
-                fig3=Figure()
-                self.addmpl2(fig3)
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_xlabel('density $|\psi|^2$',fontsize=14)
-                ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
-                ax1f3.plot(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)])
-                ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3)
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
-                self.canvas.draw()    
-            
-            
-    def game_return(self):
-        self.rmmpl2()
-        self.rmmpl2()
-        self.mplwindow_2.hide()
-        self.game.hide()
-        self.fig=Figure()
-        self.addmpl(self.fig)
-        self.mplwindow.show()
-        self.start.show()
-        self.mplfigs.show()
 
     def start1(self):
-        dialog = QtGui.QDialog()    
-        progressBar = Ui_porcessProgress()
-        progressBar.setupUi(dialog)
-        dialog.show()
-        diff = 0
-        
         if (self.radioButton.isChecked()==True):
-            self.state.hide()
-            self.interact_game.show()
-            self.radioButton_oscil.hide()
-            self.pushButton_game.show()
             self.sim=0
             prevdir = os.getcwd()
             try:
                 os.chdir(os.path.expanduser('./darksolitons'))
-                for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfDs"):
-                             os.remove((os.path.join(root, file)))
-                             
                 file=open('input_2.txt','w')  
                 file.write ('%s' %(self.spinBox_3.value()))
                 file.close()
-                subprocess.Popen('python gpe_fft_ts_LN_v1.py',shell=True)
-                time1=75
-                
-                progressBar.porcessProgressBar.setMaximum(time1)
-                diff=0
-                while diff<time1:
-                    diff=0
-                    for root, dirs, files in os.walk(os.getcwd()):
-                        for file in files:
-                            if file.startswith("WfDs_Lin"):
-                                diff +=1
-                                
-                        if (diff<2):
-                            progressBar.label.setText('Starting with Schrodinger equation...')
-                        if (diff<time1-10) and (diff>2):
-                            progressBar.label.setText('Imaginary time method in progress, adding non-lineality...')
-                        if (diff<time1) and (diff>time1-5):
-                            progressBar.label.setText('Writing results ...')
-                        progressBar.porcessProgressBar.setValue(diff)                     
-                        QApplication.processEvents()
-                        
+                subprocess.call('python gpe_fft_ts_LN_v1.py',shell=True)
                 print (os.getcwd())
                 print ("READY")
                 self.label_5.show()
@@ -483,161 +245,48 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.slider_simulation.setMinimum(0)
                 self.slider_simulation.setMaximum(74)
                 self.slider_simulation.setSingleStep(1)
-                time.sleep(2)
+                self.slider_simulation.setValue(self.sim)
                 file = open('lin.txt', 'r')
                 lines = file.readlines()
                 file.close()
-                file2 = open('WfDs_Lin-%08d.txt'%(0))
-                lines2 = file2.readlines()
-                file2.close()
             finally:
-                os.chdir(prevdir)   
-                
+                os.chdir(prevdir)                
             x2 = []
             y2 = []
-            
-            for line in lines2:
-                p2 = line.split()
-                x2.append(float(p2[0]))
-                y2.append(float(p2[1]))
-                
-                
-            xv2 = np.array(x2)
-            yv2 = np.array(y2)
-            
-            
-            self.rmmpl()
-            self.fig=Figure()
-            axf=self.fig.add_subplot(111)
-            axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-            axf.plot(xv2,yv2)
-            axf.set_title('state at %s' %np.real(0/10.))
-            self.addmpl(self.fig)
-            
-            
-            
-            x2 = []
-            y2 = []
-            z2 = []
-            c2 = []
-            v2 = []
-            b2 = []
             for line in lines:
                 p2 = line.split()
                 x2.append(float(p2[1]))
                 y2.append(float(p2[2]))
-                b2.append(float(p2[3]))
-                z2.append(float(p2[4]))
-                c2.append(float(p2[5]))
-                v2.append(float(p2[6]))
-                
             xv2 = np.array(x2)
             yv2 = np.array(y2)
-            zv2 = np.array(z2)
-            cv2 = np.array(c2)
-            vv2 = np.array(v2)
-            bv2 = np.array(b2)
-            
             fig1=Figure()
             ax1f1=fig1.add_subplot(111)
             ax1f1.set_ylabel('$\mu/hw$',fontsize=14)
             ax1f1.set_xlabel('$g_{int}$',fontsize=17)        
             ax1f1.plot(xv2,yv2, 'b.-')
             ax1f1.set_title('non-linear continuation')     
-            
-            
-            
-            fig2=Figure()
-            ax1f2=fig2.add_subplot(111)
-            ax1f2.set_ylabel('$E_{cin}/hw$',fontsize=14)
-            ax1f2.set_xlabel('$g_{int}$',fontsize=17)        
-            ax1f2.plot(xv2,zv2, 'b.-')
-            ax1f2.set_title('non-linear continuation')     
-            
-            
-            fig3=Figure()
-            ax1f3=fig3.add_subplot(111)
-            ax1f3.set_ylabel('$E_{pot}/hw$',fontsize=14)
-            ax1f3.set_xlabel('$g_{int}$',fontsize=17)        
-            ax1f3.plot(xv2,cv2, 'b.-')
-            ax1f3.set_title('non-linear continuation')     
-            
-            fig4=Figure()
-            ax1f4=fig4.add_subplot(111)
-            ax1f4.set_ylabel('$E_{int}/hw$',fontsize=14)
-            ax1f4.set_xlabel('$g_{int}$',fontsize=17)        
-            ax1f4.plot(xv2,vv2, 'b.-')
-            ax1f4.set_title('non-linear continuation')
-            
-            fig5=Figure()
-            ax1f5=fig5.add_subplot(111)
-            ax1f5.set_ylabel('$x/a_{ho}$',fontsize=14)
-            ax1f5.set_xlabel('$g_{int}$',fontsize=17)        
-            ax1f5.plot(xv2,bv2, 'b.-')
-            ax1f5.set_title('non-linear continuation')
-            
             self.delfig()
-            self.delfig()
-            self.delfig()
-            self.delfig()
-            self.addfig('CHEMICAL POTENTIAL',fig1)
-            self.addfig('KINETIC ENERGY',fig2)
-            self.addfig('POTENTIAL ENERGY',fig3)
-            self.addfig('INTERACTION ENERGY',fig4)
-            self.addfig('ATOMIC CLOUD LENGTH',fig5)
-            self.slider_simulation.setValue(0)
-        
+            self.addfig('CHEMICAL POTENTIAL',fig1)   
+                
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
             self.sim=0
-            self.radioButton_dens.setChecked(True)
             if (self.radioButton_2.isChecked()==True):
-                time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
-
+                time=self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))
             if (self.radioButton_3.isChecked()==True):
-                time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
-            self.interact_game.show()
-            self.radioButton_oscil.show()
-            psi_time=np.empty([512,time1])
+                time=self.spinBox_4.value()*int((10*np.pi*np.sqrt(2.)))
+            psi_time=np.empty([512,time])
             prevdir = os.getcwd()
             try:
                 os.chdir(os.path.expanduser('./darksolitons'))
-                for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfDs"):
-                             os.remove((os.path.join(root, file)))
-                         
                 file=open('input.txt','w')  
                 if (self.radioButton_2.isChecked()==True):
                     file.write ('%s\t%s\t%s' %(self.horizontalSlider.value()/10.0,self.spinBox.value(),self.spinBox_2.value()))
                 if (self.radioButton_3.isChecked()==True):
                     file.write ('%s\t%s\t%s' %(self.horizontalSlider_2.value()/10.0,self.spinBox_4.value(),self.spinBox_5.value()*self.spinBox_6.value()*2))
                 file.close()
-                
-                subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
-                progressBar.porcessProgressBar.setMaximum(time1)
-                diff=0
-                while diff<time1+1:
-                    diff=0
-                    for root, dirs, files in os.walk(os.getcwd()):
-                        for file in files:
-                            if file.startswith("WfDs"):
-                                diff +=1
-                        
-                        if (diff<10):
-                            progressBar.label.setText('Imaginary time method in progress...')
-                        if (diff<time1-10) and (diff>10):
-                            progressBar.label.setText('Evolution in real time in progress...')
-                        if (diff<time1) and (diff>time1-10):
-                            progressBar.label.setText('Writing results ...')
-                                                
-                        progressBar.porcessProgressBar.setValue(diff)                     
-                        QApplication.processEvents()
-                  
+                subprocess.call('python gpe_fft_ts_DS_v1.py',shell=True)
                 print (os.getcwd())
                 print ("READY")
-                self.state.show()
-                self.interact_game.show()
                 self.label_5.show()
                 self.ButtonOn.show()
                 self.ButtonBack.show()
@@ -645,25 +294,22 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.slider_simulation.show()
                 self.slider_simulation.setMinimum(0)
                 if (self.radioButton_2.isChecked()==True):
-                    self.slider_simulation.setMaximum(self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))-1)
+                    self.slider_simulation.setMaximum(self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))-1)
                 if (self.radioButton_3.isChecked()==True):
-                    self.slider_simulation.setMaximum(self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))-1)
+                    self.slider_simulation.setMaximum(self.spinBox_4.value()*int((10*np.pi*np.sqrt(2.)))-1)
                 self.slider_simulation.setSingleStep(1)
+                self.slider_simulation.setValue(self.sim)
             
-                time.sleep(2)
                 file = open('energies.txt', 'r')
                 lines = file.readlines()
                 file.close()
                 file2=open('phase.txt','r')
                 lines2=file2.readlines()
                 file2.close()
-                file4=open('WfDs-%08d.txt'%(0),'r')
-                lines4=file4.readlines()
-                file4.close()
 #                file3=open('min.txt','r')
 #                lines3=file3.readlines()
 #                file3.close()
-                for i in range (0,time1+1):
+                for i in range (1,time+1):
                     file=open('WfDs-%08d.txt'%(i),'r')
                     globals()['lines%s' %i]=file.readlines()
                     file.close()
@@ -679,34 +325,12 @@ class DS(QMainWindow,Ui_MainWindow):
             finally:
                 os.chdir(prevdir)
             
-            x2 = []
-            y2 = []
-            
-            for line in lines4:
-                p2 = line.split()
-                x2.append(float(p2[0]))
-                y2.append(float(p2[1]))
-                
-                
-            xv2 = np.array(x2)
-            yv2 = np.array(y2)
-            
-            self.rmmpl()
-            self.fig=Figure()
-            axf4=self.fig.add_subplot(111)
-            axf4.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf4.set_ylabel('density $|\psi|^2$',fontsize=14)
-            axf4.plot(xv2,yv2)
-            axf4.set_title('state at %s' %np.real(0/10.))
-            self.addmpl(self.fig)            
-            
-            self.fig3=Figure()
-            ax1f3=self.fig3.add_subplot(111)
+            fig3=Figure()
+            ax1f3=fig3.add_subplot(111)
             ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
             ax1f3.set_xlabel('$T*w_{ho}$',fontsize=17)
-            ax1f3.set_xlim(0,(time1-1)/10.)
-            
-            ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
+            ax1f3.set_xlim(0,time-1)
+            ax1f3.pcolor(range(0,time+1),xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
             ax1f3.set_title('evolution condensate')
             
             
@@ -724,7 +348,6 @@ class DS(QMainWindow,Ui_MainWindow):
             ax1f1.set_ylabel('PHASE',fontsize=14)
             ax1f1.set_xlabel('$T/t_{ho}$',fontsize=17)        
             ax1f1.plot(xv2,yv2, 'b.-')
-            ax1f1.set_ylim(0,2*np.pi)
             ax1f1.set_title('Phase difference produced by soliton')
           
     
@@ -733,101 +356,64 @@ class DS(QMainWindow,Ui_MainWindow):
             x1 = []
             y1 = []
             z1 = []
-            c1 = []
-            v1 = []
-            b1 = []
             for line in lines:
                 p = line.split()
                 x1.append(float(p[0]))
                 y1.append(float(p[1]))
-                z1.append(float(p[2]))       
-                c1.append(float(p[3]))
-                v1.append(float(p[4]))
-                b1.append(float(p[5]))
+                z1.append(float(p[2]))                            
             xv = np.array(x1)
             yv = np.array(y1)
             zv = np.array(z1)
-            cv = np.array(c1)
-            vv = np.array(v1)
-            bv = np.array(b1)
             
             fig2=Figure()
-            ax1f2=fig2.add_subplot(111)
+            ax1f2=fig2.add_subplot(121)
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
             ax1f2.set_ylabel('$E/hw$',fontsize=17)
             ax1f2.plot(xv,yv, 'b.-')
             ax1f2.set_title('Medium Energy')
             
-            fig=Figure()
-            ax2f2=fig.add_subplot(111)
+            ax2f2=fig2.add_subplot(122)
             ax2f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f2.set_ylabel('$E/hw$',fontsize=17)
             ax2f2.plot(xv,zv, 'r.-')
             ax2f2.set_title('Chemical Potential')
+           
             
-            fig4=Figure()
-            ax2f4=fig4.add_subplot(111)
-            ax2f4.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f4.set_ylabel('$E/hw$',fontsize=17)
-            ax2f4.plot(xv,cv, 'r.-')
-            ax2f4.set_title('Kinetic energy')
             
-            fig5=Figure()
-            ax2f5=fig5.add_subplot(111)
-            ax2f5.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f5.set_ylabel('$E/hw$',fontsize=17)
-            ax2f5.plot(xv,vv, 'r.-')
-            ax2f5.set_title('Potential energy')
+#            x3 = []
+#            y3 = []
+#            for line in lines3:
+#                p3 = line.split()
+#                x3.append(float(p3[0]))
+#                y3.append(float(p3[1]))
+#            xv3 = np.array(x3)
+#            yv3 = np.array(y3)
+#            
+#            fig3=Figure()
+#            ax1f3=fig3.add_subplot(111)
+#            ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
+#            ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
+#            ax1f3.plot(xv3,yv3,'b.-')
+#            ax1f3.set_title('Soliton Position')
+    
             
-            fig6=Figure()
-            ax2f6=fig6.add_subplot(111)
-            ax2f6.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f6.set_ylabel('$E/hw$',fontsize=17)
-            ax2f6.plot(xv,bv, 'r.-')
-            ax2f6.set_title('Interaction energy')
-              
-            self.slider_simulation.setValue(0)
             
-            if (self.radioButton_2.isChecked()==True):
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.addfig('PHASE',fig1)
-                self.addfig('MEDIUM ENERGY',fig2)
-                self.addfig('CHEMICAL POTENTIAL',fig)     
-                self.addfig('KINETIC ENERGY',fig4)
-                self.addfig('POTENTIAL ENERGY',fig5)
-                self.addfig('INTERACTION ENERGY',fig6)
-                self.addfig('DENSITY MAP',self.fig3)
-                
-            if (self.radioButton_3.isChecked()==True):
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.delfig()
-                self.addfig('MEDIUM ENERGY',fig2)
-                self.addfig('CHEMICAL POTENTIAL',fig)
-                self.addfig('KINETIC ENERGY',fig4)
-                self.addfig('POTENTIAL ENERGY',fig5)
-                self.addfig('INTERACTION ENERGY',fig6)
-                self.addfig('DENSITY MAP',self.fig3)
-                
+            self.delfig()
+            self.delfig()
+            self.delfig()
+            self.addfig('PHASE',fig1)
+            self.addfig('ENERGY',fig2)
+            self.addfig('MINUS',fig3)
+        
                 
     def simulation(self):
         if (self.radioButton.isChecked()==True):
             value=self.slider_simulation.value()
-            time1=74
+            time=74
             self.sim=value
             prevdir = os.getcwd()
             try:
                 os.chdir(os.path.expanduser('./darksolitons'))
-                for i in range(0,time1+1):
+                for i in range(1,time+1):
                     file=open('WfDs_Lin-%08d.txt'%(i),'r')
                     globals()['lines%s' %i]=file.readlines()
                     file.close()
@@ -851,24 +437,23 @@ class DS(QMainWindow,Ui_MainWindow):
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                         axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-                        axf.set_ylim([0,0.6])
                         axf.plot(xv1,xv2)
-                        axf.set_title('state at %s' %np.real(i/10.))
+                        axf.set_title('state at %s' %(i))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)
                 
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
             if (self.radioButton_2.isChecked()==True):
-                time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time=self.spinBox.value()*int((10*np.pi*np.sqrt(2.)))
             if (self.radioButton_3.isChecked()==True):
-                time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time=self.spinBox_4.value()*int((10*np.pi*np.sqrt(2.)))
             value=self.slider_simulation.value()
             self.sim=value
             prevdir = os.getcwd()
             try:
                 os.chdir(os.path.expanduser('./darksolitons'))
-                for i in range(0,time1+1):
+                for i in range(1,time+1):
                     file=open('WfDs-%08d.txt'%(i),'r')
                     globals()['lines%s' %i]=file.readlines()
                     file.close()
@@ -880,11 +465,7 @@ class DS(QMainWindow,Ui_MainWindow):
                         for line in (globals()['lines%s' %i]):
                             p=line.split()
                             x1.append(float(p[0]))
-#                            x2.append(float(p[2]))
-                            if (self.radioButton_dens.isChecked()==True):
-                                x2.append(float(p[1]))
-                            if (self.radioButton_ph.isChecked()==True):
-                                x2.append(float(p[2]))
+                            x2.append(float(p[1]))
                         xv1=np.array(x1)
                         xv2=np.array(x2)
                         
@@ -896,14 +477,20 @@ class DS(QMainWindow,Ui_MainWindow):
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                         axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-                        if (self.radioButton_ph.isChecked()==True):
-                            axf.set_xlim([-8.5,8.5])
                         axf.plot(xv1,xv2)
-                        axf.set_title('state at %s' %(i/10.))
+                        axf.set_title('state at %s' %(i))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)
             
+            
+    def rmmpl(self):
+        self.mplvl.removeWidget(self.toolbar)
+        self.canvas.close()        
+        self.mplvl.removeWidget(self.canvas)
+        self.canvas.close()
+        
+                
     def close(self):
         self.hide()
         self.parent().show()
@@ -917,12 +504,16 @@ class DS(QMainWindow,Ui_MainWindow):
         else:
             event.ignore()
  
-
  
 Ui_MainWindow,QMainWindow=loadUiType('BS.ui')
 class BS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
+        global language
         QtGui.QWidget.__init__(self,parent)
+        lang=open('language.txt','r')
+        lang2=lang.readlines()
+        language=int(lang2[0])
+        lang.close()
         self.setupUi(self)
         self.ButtonOn.hide() #amaguem tots els sliders o botons no necessaris pel moment
         self.ButtonBack.hide()
@@ -933,11 +524,15 @@ class BS(QMainWindow,Ui_MainWindow):
         self.wall.hide()
         self.label_5.hide()
         self.slider_simulation.hide()
+        self.moment.hide()
+        self.playmoment.hide()
+        
+        self.playmoment.clicked.connect(self.play2)
         
         self.slider_simulation.valueChanged.connect(self.simulation)
-#        self.ButtonOn.clicked.connect(self.on)
-#        self.ButtonBack.clicked.connect(self.back)
-#        self.ButtonPause.clicked.connect(self.pause)
+        self.ButtonOn.clicked.connect(self.on)
+        self.ButtonBack.clicked.connect(self.backsim)
+        self.ButtonPause.clicked.connect(self.pause)
         
         #let's give the possible values to sliders
         self.horizontalSlider_4.setMinimum(-60)
@@ -945,32 +540,88 @@ class BS(QMainWindow,Ui_MainWindow):
         self.horizontalSlider_4.setSingleStep(1)
         self.horizontalSlider_4.TicksBelow
         
+        prevdir=os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons'))
+            example=open('pinta.dat','r')
+            lines=example.readlines()
+            x=[]
+            phi2=[]
+            for i in range(0,len(lines)):
+                x.append(float(lines[i].split('\t')[0]))
+                phi2.append(float(lines[i].split('\t')[1]))
+            example.close()
+            ax=np.array(x)
+            aphi=np.array(phi2)
+        finally:
+            os.chdir(prevdir)
+            
+        self.fig=Figure()        
+        figini=self.fig.add_subplot(111)
+        figini.set_xlabel("Position ($x/a_{ho}$)")
+        figini.set_ylabel("Density $|\psi|^2$")
+        figini.set_title("An example of bright soliton")
+        figini.plot(ax,aphi)
+        self.addmpl(self.fig)        
+        
         self.play_2.hide()
         self.play.hide()
         self.play.clicked.connect(self.juga)
         self.tanca.clicked.connect(self.torna)
         self.intenta.clicked.connect(self.grafica)
         
-        self.btn_none.clicked.connect(self.V_none)
-        self.btn_harm.clicked.connect(self.V_harm)
-        self.btn_wall.clicked.connect(self.V_wall)
+#        self.btn_none.clicked.connect(self.V_none)
+#        self.btn_harm.clicked.connect(self.V_harm)
+#        self.btn_wall.clicked.connect(self.V_wall)
+        
+        self.btn_none.clicked.connect(self.initial)
+        self.btn_harm.clicked.connect(self.initial)
+        self.btn_wall.clicked.connect(self.initial)
 
         self.fig_dict={}
         
         self.mplfigs.itemClicked.connect(self.changefig)
 
-        self.fig=Figure()
-        self.addmpl(self.fig)   
-        
         self.start.clicked.connect(self.start2) #despres definirem start2 que ens dona les dades inicials
         self.back.clicked.connect(self.close)
         
+    def initial(self):
+        global language
+        #let's show the initial state
+        prevdir=os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons'))
+            example=open('pinta.dat','r')
+            lines=example.readlines()
+            x=[]
+            phi2=[]
+            for i in range(0,len(lines)):
+                x.append(float(lines[i].split('\t')[0]))
+                phi2.append(float(lines[i].split('\t')[1]))
+            example.close()
+            ax=np.array(x)
+            aphi=np.array(phi2)
+        finally:
+            os.chdir(prevdir)
+        
+        if self.fig==None:
+            self.rmmpl()            
+            self.fig=Figure()
+            self.addmpl(self.fig)
+        self.fig.clear()
+        figini=self.fig.add_subplot(111)
+        figini.set_xlabel("Position ($x/a_{ho}$)")
+        figini.set_ylabel("Density $|\psi|^2$")
+        figini.set_title("An example of bright soliton")
+        figini.plot(ax,aphi)
+        self.canvas.draw()
+        
     def addmpl(self,fig):
         self.canvas=FigureCanvas(fig)
-        self.mplvl.addWidget(self.canvas)
-        self.canvas.draw()
+        self.mplvl.addWidget(self.canvas)        
         self.toolbar=NavigationToolbar(self.canvas,self.mpl_window,coordinates=True)
         self.mplvl.addWidget(self.toolbar)
+        self.canvas.draw()
         
     def rmmpl(self,):
         self.mplvl.removeWidget(self.canvas)
@@ -1007,28 +658,38 @@ class BS(QMainWindow,Ui_MainWindow):
         for item in listItems:
             self.mplfigs.takeItem(self.mplfigs.row(item))
         
-    def V_none(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(0))
-        file_pot.close()
-        
-    def V_harm(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(1))
-        file_pot.close()
-        
-    def V_wall(self):
-        file_pot=open('pot_input.txt','w')
-        file_pot.write('%d' %(2))
-        file_pot.close()
-        
+#    def V_none(self):
+#        file_pot=open('pot_input.txt','w')
+#        file_pot.write('%d' %(0))
+#        file_pot.close()
+                
+#    def V_harm(self):
+#        file_pot=open('pot_input.txt','w')
+#        file_pot.write('%d' %(1))
+#        file_pot.close()
+                
+#    def V_wall(self):
+#        file_pot=open('pot_input.txt','w')
+#        file_pot.write('%d' %(2))
+#        file_pot.close()
+                
     def start2(self):
-        pot_file=open('pot_input.txt','r')
+        self.timer=QtCore.QTimer(self)
+        self.sim=0
+        global language
+#        pot_file=open('pot_input.txt','r')
         prevdir=os.getcwd()
         try:
             os.chdir(os.path.expanduser('./brightsolitons'))
-            pot=int((pot_file.readlines())[0])
+#            pot=int((pot_file.readlines())[0])
+            if (self.btn_none.isChecked()==True):
+                pot=0
+            if (self.btn_harm.isChecked()==True):
+                pot=1
+            if (self.btn_wall.isChecked()==True):
+                pot=2
             file_data=open('input.txt','w')
+            self.slider_simulation.setValue(self.sim)
             if pot==0:           
                 file_data.write('%d \t %d \t %f \t %f \t %d' %(0,self.gn.value(),self.horizontalSlider.value(),self.horizontalSlider_2.value(),self.yes_no.value()))
             elif pot==1:
@@ -1036,7 +697,7 @@ class BS(QMainWindow,Ui_MainWindow):
             elif pot==2:
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0))
             file_data.close()
-            pot_file.close()
+#            pot_file.close()
             subprocess.call('python gpe_bright_solitons.py',shell=True)
             self.ButtonOn.show() 
             self.ButtonBack.show()
@@ -1047,6 +708,10 @@ class BS(QMainWindow,Ui_MainWindow):
                 self.play.show()
             else:
                 self.play.hide()
+            if pot==0:
+                self.playmoment.show()
+            else:
+                self.playmoment.hide()
             #let's read the ouput files to plot the data            
             energyfile=open('./bs_evolution/energies.dat','r')
             energy=energyfile.readlines()
@@ -1093,15 +758,15 @@ class BS(QMainWindow,Ui_MainWindow):
         elif pot==2:
 #            figmv.axes.errorbar(atmv,amv,yerr=asig)
             figmv.axes.errorbar(atmv,amv,yerr=sigsalt)
-            figmv.axes.set_xlim([0,20.0])
+            figmv.axes.set_xlim([0,math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value()))])
             figmv.axes.set_ylim([-128.0,128.0])
         elif pot==0:
             figmv.plot(atmv,amv)
             figmv.axes.set_xlim([0,20.0])
             figmv.axes.set_ylim([-128.0,128.0])
         figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($unitats!$)")
-        figmv.set_ylabel("Position ($unitats!$)")
+        figmv.set_xlabel("Time ($t/ \omega$)")
+        figmv.set_ylabel("Position ($x/a_{ho}$)")
             
         #energies
         ftime=[]
@@ -1150,15 +815,15 @@ class BS(QMainWindow,Ui_MainWindow):
         allenergies.plot(atime,aepot,label='$E_{pot}$')
         allenergies.plot(atime,aeint,label='$E_{int}$')
         allenergies.set_title("Energies")
-        allenergies.set_xlabel("Time ($unitats!$)")
-        allenergies.set_ylabel("Energy per particle ($unitats!$)")
+        allenergies.set_xlabel("Time ($t/ \omega$)")
+        allenergies.set_ylabel("Energy per particle ($E/ \hbar \omega$)")
         allenergies.legend()
         if pot==2:
             integrals=fig3.add_subplot(111)
             integrals.plot(atime,alint,label='left side')
             integrals.plot(atime,aiint,label='inside')
             integrals.plot(atime,arint,label='right side')
-            integrals.set_xlabel("Time ($unitats!$)")
+            integrals.set_xlabel("Time ($t/ \omega$)")
             integrals.set_title("Integrals of the wave function")
             integrals.legend()
         elif pot==1:    
@@ -1169,17 +834,17 @@ class BS(QMainWindow,Ui_MainWindow):
         meanvelocity=fig4.add_subplot(111)
         meanvelocity.plot(atmv,avelm)
         meanvelocity.set_title("Mean velocity of the soliton")
-        meanvelocity.set_xlabel("Time ($unitats!$)")
-        meanvelocity.set_ylabel("<$|v|$> ($unitats!$)")
+        meanvelocity.set_xlabel("Time ($t/ \omega$)")
+        meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
         if pot==1:
             meanvelocity.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
             
         fig7=Figure()
         velpos=fig7.add_subplot(111)
         velpos.plot(amv,avelm)
-        velpos.set_title("$<|v|>$ with $<x>$")
-        velpos.set_xlabel("Position ($unitats!$)")
-        velpos.set_ylabel("<$|v|$> ($unitats!$)")
+        velpos.set_title("Velocity with position")
+        velpos.set_xlabel("Position ($x/ a_{ho}$)")
+        velpos.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
           
         self.delfig()
         self.delfig()
@@ -1195,16 +860,21 @@ class BS(QMainWindow,Ui_MainWindow):
         self.addfig("Energies",fig2)
         self.addfig("Velocity",fig4)
         
-        if pot==0 or pot==2:
+        if pot==0:
             self.slider_simulation.setMinimum(0)
             self.slider_simulation.setMaximum(100)
             self.slider_simulation.setSingleStep(1)
+        if pot==2:
+            self.slider_simulation.setMinimum(0)
+            self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))
+            self.slider_simulation.setSingleStep(1)
         else:
             self.slider_simulation.setMinimum(0)
-            self.slider_simulation.setMaximum(60)
+            self.slider_simulation.setMaximum(60*self.spinBox.value())
             self.slider_simulation.setSingleStep(1)
             
     def juga(self): #enables a window for play-plot
+        global language
         self.rmmpl()
         self.mpl_window.hide()
         fig=Figure()
@@ -1212,13 +882,16 @@ class BS(QMainWindow,Ui_MainWindow):
         self.play_2.show()
        
     def torna(self): #hides the play-plot window and returns to normal plots
+        global language        
         self.rmmpl2()
         self.play_2.hide()        
         fig=Figure()
         self.addmpl(fig)
         self.mpl_window.show()
+        self.fig=None
         
     def grafica(self): #play-plot
+        global language
         self.rmmpl()
         figura=Figure()
         self.addmpl2(figura)
@@ -1245,18 +918,25 @@ class BS(QMainWindow,Ui_MainWindow):
         figmv.plot(atmv,acos)
         figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
         figmv.axes.set_ylim([-34.0,34.0])
-        figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($unitats!$)")
-        figmv.set_ylabel("Position ($unitats!$)")
+        figmv.set_xlabel("Time ($t/ \omega$)")
+        figmv.set_ylabel("Position ($x/ a_{ho}$)")
             
     def simulation(self):
-        pot_file=open('pot_input.txt','r')
+        global language
+#        pot_file=open('pot_input.txt','r')
+        self.sim=self.slider_simulation.value()
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./brightsolitons/bs_evolution'))
-            pot=int((pot_file.readlines())[0])
-            pot_file.close()
-            if pot==0 or pot==2:
+#            pot=int((pot_file.readlines())[0])
+#            pot_file.close()
+            if (self.btn_none.isChecked()==True):
+                pot=0
+            if (self.btn_harm.isChecked()==True):
+                pot=1
+            if (self.btn_wall.isChecked()==True):
+                pot=2
+            if pot==0:
                 i=self.slider_simulation.value()*200
                 data=open("WfBs-%08d.dat" %(i),'r')
                 lines=data.readlines()
@@ -1280,12 +960,52 @@ class BS(QMainWindow,Ui_MainWindow):
                     self.addmpl(self.fig)
                 self.fig.clear()
                 state=self.fig.add_subplot(111)
-                state.set_xlabel("Position")
+                state.set_xlabel("Position ($x/ a_{ho}$)")
                 state.set_ylabel("Density $|\psi|^2$")
                 state.plot(posit,phi2)
                 state.plot(posit,pote,'g',label="Potential")
                 state.plot(posit,confin,'g')
                 state.set_ylim(0,0.3)
+                if (self.yes_no.value()==1):
+                    state.set_xlim(-100,100)
+                else:
+                    state.set_xlim(-128,128)
+                state.legend()
+                self.canvas.draw()
+            elif pot==2:
+                i=self.slider_simulation.value()*200
+                data=open("WfBs-%08d.dat" %(i),'r')
+                lines=data.readlines()
+                listpos=[]
+                listphi=[]
+                listpot=[]
+                listconf=[]
+                for j in range(2,len(lines)):
+                    listpos.append(float((lines[j].split('\t'))[0]))
+                    listphi.append(float((lines[j].split('\t'))[1]))
+                    listpot.append(float((lines[j].split('\t'))[5]))
+                    listconf.append(float((lines[j].split('\t'))[6]))
+                posit=np.array(listpos)
+                phi2=np.array(listphi)
+                pote=np.array(listpot)
+                confin=np.array(listconf)
+                        
+                if self.fig==None:
+                    self.rmmpl()
+                    self.fig=Figure()
+                    self.addmpl(self.fig)
+                self.fig.clear()
+                state=self.fig.add_subplot(111)
+                state.set_xlabel("Position ($x/ a_{ho}$)")
+                state.set_ylabel("Density $|\psi|^2$")
+                state.plot(posit,phi2)
+                state.plot(posit,pote,'g',label="Potential")
+                state.plot(posit,confin,'g')
+                state.set_ylim(0,0.3)
+                if (self.yes_no.value()==1):
+                    state.set_xlim(-100,100)
+                else:
+                    state.set_xlim(-128,128)
                 state.legend()
                 self.canvas.draw()
             else:
@@ -1310,30 +1030,115 @@ class BS(QMainWindow,Ui_MainWindow):
                     self.addmpl(self.fig)
                 self.fig.clear()
                 state=self.fig.add_subplot(111)
-                state.set_xlabel("Position")
-                state.set_ylabel("Density $|\psi|^2$")
-                state.plot(posit,phi2)
-                state.plot(posit,pote,'g',label="Potential")
+                potential=state.twinx()
+                state.plot(posit,phi2,'b')
+                potential.plot(posit,pote,'g')
+                state.set_xlabel("Position ($x/ a_{ho}$)")
+                state.set_ylabel("Density $|\psi|^2$", color='b')
+                potential.set_ylabel("Potential ($V/ \hbar \omega$)", color='g')
+#                state.plot(posit,phi2)
+#                state.plot(posit,pote,'g',label="Potential")
+                state.set_xlim(self.horizontalSlider_3.value()-7,-self.horizontalSlider_3.value()+7)
                 if self.gn.value()==1:
                     state.set_ylim(0,7.2)    
                 elif self.gn.value()==2:
                     state.set_ylim(0,4)
                 elif self.gn.value()==3:
                     state.set_ylim(0,2.2)
-                state.legend()
                 self.canvas.draw()
         finally:
             os.chdir(prevdir)
                 
-#    def on(self):
+    def on(self):
+        self.timer=QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plotsim)
+        self.timer.start(75)
         
+    def backsim(self):
+        self.timer=QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plotsim2)
+        self.timer.start(75)
         
-#    def back(self):
+    def pause(self):
+#        self.timer=QtCore.QTimer(self)   #it gives some problems
+        self.timer.stop()
         
+    def plotsim(self):
+        self.sim=self.sim+1
+        self.slider_simulation.setValue(self.sim)
         
-#    def pause(self):
+        if (self.btn_none.isChecked()==True):
+            if (self.sim==100):
+                self.timer.stop()
+        if (self.btn_harm.isChecked()==True):
+            if (self.sim==(60*self.spinBox.value())):
+                self.timer.stop()
+        if (self.btn_wall.isChecked()==True):
+            if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
+                self.timer.stop()
         
+    def plotsim2(self):
+        self.sim=self.sim-1
+        self.slider_simulation.setValue(self.sim)
         
+        if (self.sim==0):
+            self.timer.stop()
+            
+    def play2(self):
+        global language
+        if language==1:
+            self.expltext.setPlainText('Linear momentum \n \nLinear momentum is a derived quantity' + 
+            ' from other magnitudes or properties from the particle we are working with; in '+
+            'particular it is related with velocity following the relation:\n \n'+ '\t \t $\vect{p} = m \vect{v} $ \n \n'+
+            'In this case here, we have the soliton confined in a box, so once the soliton hits a wall '+
+            'it will go back as a ball hitting a wall would do.' + 'During this process, both energy and linear ' + 
+            'momentum are conserved, so in the end we have (for the whole system) the same energy and total linear momentum.\n\n' +  'How can we '+
+            'understand that? Imagine the previous example, we have two "particles": the ball (1) and the wall (2). '+
+            'Imagine that the ball has a mass $m$ and the wall, as a normal wall, is still and cannot change its place. '+
+            'In an ideal case, if you threw the ball against the wall with a velocity $v$ it would hit the wall and come back '+
+            'to you with the same velocity module. This situation corresponds to an elastic collision, though it may not seem at '+
+            "first sight, let's see how to understand it: \n \n"+'\t     \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} '+
+            '\vect{p_{f,2}}\n\n' + 'We can consider a wall with a very huge mass compared to the one of the ball (imagine it as infinity), so as we '+
+            'see in our daily life, a wall hitted by a ball does not move, right? So we could suppose that the velocity of the wall '+
+            'is both in the begining and end zero, and thus also the momentum.' + '\n\nSo taking into account the previous '+
+            'equation we could think that momentum is not conserved because in one side we have the initial momentum and on the '+
+            'other side we have the same value but negative (because the ball changed its direction to the opposed one), so the '+
+            'equality would not be true.'+' However, this is a bit tricky, because '+
+            'this is not what happens in reality: the wall really absorbes the momentum during the change, but as it has infinite '+
+            'mass, the observer is not able to appreciate a change in the wall, so we assume v=0, but it is not true. Thus, we '+
+            'can see that the momentum is conserved, with an absorption of momentum by the wall given by:\n\n '+
+            '\t   $\Delta{vect{p_{wall}}}=2|vect{p_{i,wall}}}|=2|vect{p_{f,wall}}}|' + '\n\nGiven that we now know that '+
+            'both momentum and energy are conserved, we can justify it is an elastic collision.' + 'You can go now to '+
+            'the plots of energy and velocity to check that this is shown there, that both magnitudes are conserved.')
+        if language==2:
+            self.expltext.setPlainText('Momento lineal \n \nEl momento lineal es una cantidad derivada' + 
+            ' de otras magnitudes o propiedades de la partícula con la que tratamos; concretamente '+
+            'se la relaciona con la velocidad a través de la siguiente expresión:\n \n'+ '\t \t $\vect{p} = m \vect{v} $ \n \n'+
+            'En este caso que tratamos aquí tenemos el solitón confinado en una pared, así, cuando el solitón '+ 
+            'llega a la pared y choca contra ésta, rebota y sigue su camino en sentido contrario, tal y como esperaríamos que '+
+            'hiciera una pelota al chocar contra una pared. Durante este proceso tanto la energía total como el momento lineal se '+
+            'conservan, y por lo tanto presentan el mismo valor para el conjunto del sistema al inicio y al final del proceso .\n' +  '¿Como podemos '+
+            'interpretar eso? Tomemos como ejemplo el caso expuesto sobre la pelota y la pared; en este caso tenemos '+
+            'dos "partículas": la pelota (1) y la pared (2). Imaginemos ahora que la pelota tiene una masa $m$ '+
+            'y la pared, como se espera, está quieta y no puede cambiar su posición. En un caso ideal, si lanzáramos una '+
+            'pelota contra una pared con una velocidad $v$ ésta chocaría contra la pared y volvería hacia el lanzador con '+
+            'una velocidad del mismo valor absoluto. Esta situación se corresponde con un choque elástico, aunque puede '+
+            'no parecerlo a primeras, veámoslo mejor: \n \n'+'\t     \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} '+
+            '\vect{p_{f,2}}\n\n' + 'Podemos considerar una pared con una masa muy mayor a la de la pelota (incluso podemos '+
+            'suponer que la pared presenta una masa infinita) y tal y como vemos en nuestro día a día aunque una pelota '+
+            'golpee una pared, esta última no se mueve, con lo que tendríamos que la pared tiene velocidad cero, y por lo '+
+            'tanto, su momento también es cero.'+ '\nConsiderando pues la anterior ecuación podríamos pensar que el momento '+
+            'no se conserva puesto que en un lado tenemos el momento inicial y en el otro lado tenemos el mismo valor pero '+
+            'cambiado de signo (porqué la pelota ha cambiado su sentido aunque no su dirección ni valor absoluto de velocidad), '+
+            'y por lo tanto la igualdad ya no se cumpliría. No obstante, esto no es del todo cierto, porqué no es lo que sucede en '+
+            'realidad: de hecho, la pared absorbe momento lineal durante el proceso, pero al tener una masa infinita, el observador no '+
+            'se percaa del cambio tan pequeño en la velocidad y se asume $v=0$, aunque como se ha dicho no es estrictamente cierto. '+
+            'Por lo tanto, el momento lineal se conserva, y la absorción de momento por parte de la pared viene dada por:\n\n '+
+            '\t   $\Delta{vect{p_{wall}}}=2|vect{p_{i,wall}}}|=2|vect{p_{f,wall}}}|' + '\n\nAhora ya sabemos que tanto la energía '+
+            'como el momento lineal se conservan, así que podemos afirmar que efectivamente se trata de un choque elástico. '+
+            'Puedes ahora comprovar en los gráficos de energía y velocidad que la energía total se conserva y que el módulo de la '+
+            'velocidad al inicio y al final (ambos lejos de la pared) son iguales.')
+            
     def close(self):
         self.hide()
         self.parent().show()
@@ -1360,9 +1165,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.ButtonBack.hide()
         self.ButtonPause.hide()
         self.label_5.hide()
-        self.interact_game.hide()
-        self.game.hide()
-        
+
         self.start.clicked.connect(self.start1)
         self.back.clicked.connect(self.close)
         self.ButtonOn.clicked.connect(self.on)
@@ -1377,19 +1180,9 @@ class WD(QMainWindow,Ui_MainWindow):
         self.mplfigs.itemClicked.connect(self.changefig)
         self.fig=Figure()
         self.addmpl(self.fig)
-        
-        self.pushButton_game.clicked.connect(self.game_call)
-        self.pushButton_try.clicked.connect(self.graph_try)
-        self.pushButton_return.clicked.connect(self.game_return)
-        self.mplwindow_2.hide()
 
 
     def start1(self):
-        dialog = QtGui.QDialog()    
-        progressBar = Ui_porcessProgress()
-        progressBar.setupUi(dialog)
-        dialog.show()
-        diff = 0
         self.sim=0
         self.true1=0
         prevdir = os.getcwd()
@@ -1402,33 +1195,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.true1=0
             file.write ('%s\t%s\t%s\t%s' %(self.horizontalSlider.value(),self.true1,self.spinBox.value(),self.spinBox_2.value()))
             file.close()
-            
-            time1=self.spinBox.value()*int((10*np.pi*2.0))-1
-            subprocess.Popen('python gpe_fft_ts_WP_v1.py',shell=True)
-            for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfWd"):
-                             os.remove((os.path.join(root, file)))
-                             
-            progressBar.porcessProgressBar.setMaximum(time1)
-            diff=0
-            while diff<time1+1:
-                diff=0
-                for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfWd"):
-                            diff +=1
-                    
-                    if (diff<10):
-                        progressBar.label.setText('Initiation of the progress...')
-                    if (diff<time1-10) and (diff>10):
-                        progressBar.label.setText('Solving Schrodinger equation...')
-                    if (diff<time1) and (diff>time1-10):
-                        progressBar.label.setText('Writing results ...')
-                                            
-                    progressBar.porcessProgressBar.setValue(diff)                     
-                    QApplication.processEvents()
-                        
+            subprocess.call('python gpe_fft_ts_WP_v1.py',shell=True)
             print (os.getcwd())
             print ("READY")
             self.label_5.show()
@@ -1440,12 +1207,8 @@ class WD(QMainWindow,Ui_MainWindow):
             self.slider_simulation.setMinimum(0)
             self.slider_simulation.setMaximum(self.spinBox.value()*int((10*np.pi*2.0))-1)
             self.slider_simulation.setSingleStep(1)
-            if (self.radioButton.isChecked()==True):
-                self.interact_game.show()
-            if (self.radioButton_2.isChecked()==True):
-                self.interact_game.hide()
-            time.sleep(2)
-            
+            self.slider_simulation.setValue(self.sim)
+        
             file = open('energies.txt', 'r')
             lines = file.readlines()
             file.close()
@@ -1453,42 +1216,10 @@ class WD(QMainWindow,Ui_MainWindow):
             file2 = open('mean_value.txt','r')
             lines2 = file2.readlines()
             file2.close()
-            
-            file4=open('WfWd-%08d.txt'%(0),'r')
-            lines4=file4.readlines()
-            file4.close()
 
         finally:
             os.chdir(prevdir)
-            
-        x1=[]
-        x2=[]
-        x3=[]
-        for line in lines4:
-            p=line.split()
-            x1.append(float(p[0]))
-            x2.append(float(p[1]))
-            x3.append(float(p[5]))
-        xv1=np.array(x1)
-        xv2=np.array(x2)
-        xv3=np.array(x3)
-        
-        
-        self.rmmpl()
-        self.fig=Figure()
-        axf=self.fig.add_subplot(111)
-        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.plot(xv1,xv2,label='R-Space')
-        axf.plot(xv1,xv3,label='K-Space')
-        axf.set_xlim([-20,20])
-        if (self.true1==0):
-            axf.set_ylim(0,0.6)
-        axf.set_title('state at %s' %(0))
-        axf.legend()
-        self.addmpl(self.fig)
-        
- 
+                    
         x1 = []
         y1 = []
         z1 = []
@@ -1534,8 +1265,8 @@ class WD(QMainWindow,Ui_MainWindow):
         iv = np.array(i1)
         jv = np.array(j1)
         
-        self.fig2=Figure()
-        ax1f2=self.fig2.add_subplot(111)
+        fig2=Figure()
+        ax1f2=fig2.add_subplot(111)
         ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
         ax1f2.set_ylabel('$x/a_{ho}$',fontsize=17)
         ax1f2.plot(xv,yv, 'b.-',label='$R-Space$')
@@ -1546,7 +1277,7 @@ class WD(QMainWindow,Ui_MainWindow):
         fig3=Figure()
         ax2f3=fig3.add_subplot(111)
         ax2f3.set_xlabel('$T/t_{ho}$',fontsize=17)
-        ax2f3.set_ylabel('$x/a_{ho}$',fontsize=17)
+        ax2f3.set_ylabel('$(-)$',fontsize=17)
         ax2f3.plot(xv,zv, 'b.-',label='$R-Space$')
         ax2f3.plot(xv,jv, 'y.-',label='$k-Space$')
         ax2f3.legend()
@@ -1556,18 +1287,17 @@ class WD(QMainWindow,Ui_MainWindow):
         self.delfig()
         self.delfig()
         self.addfig('ENERGY',fig)
-        self.addfig('MEAN VALUE X',self.fig2)
+        self.addfig('MEAN VALUE X',fig2)
         self.addfig('DISPERSION', fig3)
-        self.slider_simulation.setValue(0)
-        
+    
     def simulation(self):
-        time1=self.spinBox.value()*int((10*np.pi*2.0))-1
+        time=self.spinBox.value()*int((10*np.pi*2.0))-1
         value=self.slider_simulation.value()
         self.sim=value
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser('./Wavepackdisper'))
-            for i in range(0,time1+1):
+            for i in range(1,time+1):
                 file=open('WfWd-%08d.txt'%(i),'r')
                 globals()['lines%s' %i]=file.readlines()
                 file.close()
@@ -1597,110 +1327,17 @@ class WD(QMainWindow,Ui_MainWindow):
                     axf.set_ylabel('density $|\psi|^2$',fontsize=14)
                     axf.plot(xv1,xv2,label='R-Space')
                     axf.plot(xv1,xv3,label='K-Space')
-                    axf.set_xlim([-20,20])
-                    if (self.true1==0):
-                        axf.set_ylim(0,0.6)
                     axf.set_title('state at %s' %(i))
                     axf.legend()
                     self.canvas.draw()
         finally:
             os.chdir(prevdir)
-    
-    def game_call(self):
-        if (self.radioButton.isChecked()==True):
             
-            if (self.radioButton_oscil.isChecked()==True):
-                self.rmmpl()
-                self.textBrowser.show()
-                self.rmmpl2()
-                self.mplwindow.hide()
-                self.widget_osci.show()
-                self.start.hide()
-                self.mplfigs.hide()
-                prevdir = os.getcwd()
-                try:
-                    os.chdir(os.path.expanduser('./Wavepackdisper'))
-                    file2 = open('mean_value.txt','r')
-                    lines2 = file2.readlines()
-                    file2.close()
-                    x1 = []
-                    y1 = []
-                    for line in lines2:
-                        p = line.split()
-                        x1.append(float(p[0]))
-                        y1.append(float(p[1]))                        
-                    xv = np.array(x1)
-                    yv = np.array(y1)
-                finally:
-                    os.chdir(prevdir)
-                fig3=Figure()
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
-                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.plot(xv,yv, 'r.-',label='$R-Space$')                
-                ax1f3.set_title('Mean value x')
-                ax1f3.legend()
-                self.addmpl2(fig3)
-
-        self.game.show()
-        self.mplwindow_2.show()
-        
-    def graph_try(self):
-        if (self.radioButton.isChecked()==True):
-            if (self.radioButton_oscil.isChecked()==True):
-                time1=self.spinBox.value()*int((10*np.pi*2.0))-1
-                self.rmmpl2()
-                prevdir = os.getcwd()
-                try:
-                    os.chdir(os.path.expanduser('./Wavepackdisper'))
-                    file2 = open('mean_value.txt','r')
-                    lines2 = file2.readlines()
-                    file2.close()
-                    x1 = []
-                    y1 = []
-                    for line in lines2:
-                        p = line.split()
-                        x1.append(float(p[0]))
-                        y1.append(float(p[1]))                        
-                    xv = np.array(x1)
-                    yv = np.array(y1)
-                finally:
-                    os.chdir(prevdir)
-                
-                fig3=Figure()
-                self.addmpl2(fig3)
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
-                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                
-                x=np.arange(0,time1+1)/10.
-                y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
-                
-                ax1f3.plot(xv,yv, 'r.-',label='$R-Space$')                
-                ax1f3.plot(x,y)            
-                ax1f3.set_title('Mean value x')
-                ax1f3.legend()
-                self.canvas.draw()
-                
-    def game_return(self):
-        self.rmmpl2()
-        self.rmmpl2()
-        self.mplwindow_2.hide()
-        self.game.hide()
-        self.fig=Figure()
-        self.addmpl(self.fig)
-        self.mplwindow.show()
-        self.start.show()
-        self.mplfigs.show()
-
-        
     def plot(self):
         self.sim +=1
         self.slider_simulation.setValue(self.sim)
-        
-        
+
         if (self.sim==self.spinBox.value()*int((10*np.pi*(2.))-1)):
-            self.sim=self.sim-1
             self.timer.stop()
         
     def plot2(self):
@@ -1708,7 +1345,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setValue(self.sim)
 
         
-        if (self.sim==0):
+        if (self.sim==1):
             self.timer.stop()
             
     def on(self):
@@ -1753,19 +1390,6 @@ class WD(QMainWindow,Ui_MainWindow):
         self.mplvl.removeWidget(self.canvas)
         self.canvas.close()
         
-    def addmpl2(self,fig):
-        self.canvas=FigureCanvas(fig)
-        self.toolbar=NavigationToolbar(self.canvas,self,coordinates=True)
-        self.mplvl_2.addWidget(self.toolbar)        
-        self.mplvl_2.addWidget(self.canvas)
-        self.canvas.draw()
-        
-    def rmmpl2(self):
-        self.mplvl_2.removeWidget(self.toolbar)
-        self.canvas.close()        
-        self.mplvl_2.removeWidget(self.canvas)
-        self.canvas.close()
-        
     def close(self):
         self.hide()
         self.parent().show()
@@ -1778,33 +1402,6 @@ class WD(QMainWindow,Ui_MainWindow):
             event.accept()
         else:
             event.ignore()
- 
-
-class Ui_porcessProgress(object):
-    def setupUi(self, porcessProgress):
-        porcessProgress.setObjectName("porcessProgress")
-        porcessProgress.setWindowModality(QtCore.Qt.ApplicationModal)
-        porcessProgress.resize(329, 81)
-        porcessProgress.setMinimumSize(QtCore.QSize(329, 81))
-        porcessProgress.setMaximumSize(QtCore.QSize(329, 81))
-        porcessProgress.setModal(True)
-        self.verticalLayout = QtGui.QVBoxLayout(porcessProgress)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.label = QtGui.QLabel(porcessProgress)
-        self.label.setObjectName("label")
-        self.verticalLayout.addWidget(self.label)
-        self.porcessProgressBar = QtGui.QProgressBar(porcessProgress)
-        self.porcessProgressBar.setMaximum(10)
-        self.porcessProgressBar.setProperty("value", 10)
-        self.porcessProgressBar.setTextVisible(False)
-        self.porcessProgressBar.setObjectName("porcessProgressBar")
-        self.verticalLayout.addWidget(self.porcessProgressBar)
-        porcessProgress.setWindowTitle(QtGui.QApplication.translate("porcessProgress", "Please wait...", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("porcessProgress", " in progress...", None, QtGui.QApplication.UnicodeUTF8))
-        QtCore.QMetaObject.connectSlotsByName(porcessProgress)
-        
-        
-        
         
 if __name__=='__main__':
     import sys

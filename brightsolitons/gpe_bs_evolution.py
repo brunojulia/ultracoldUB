@@ -12,7 +12,7 @@ import sys
 # Evolution
 # ------------------------------------------------------------------------------
 
-def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
+def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
     """Calculates the evolution of the wavefunction c.
        t0         initial time
        Dt         time step (either imaginary or real)
@@ -24,6 +24,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
        Ekin_K     kinetic energy (FFT order)
        write_ev   writes data into files if 0
        plots      plots data if 0
+       oscil      gives the number of oscillation under harmonic potential
+                  otherwise (no external potential or barrier) is 0.
     Global variables:
        Ntime_out  number of time steps for intermediate outputs
        Ntime_fin  total number of time steps
@@ -164,7 +166,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                 fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4]))
 
             # writes
-            if V_ext!=1:        
+            if V_ext==0:        
                 if(not(i%50)):
                     
                     # adds elements to lists tmeanval and meanval for later outputs
@@ -184,7 +186,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                if(not(i%100)):
+                if(not(i%200)):
                     if(write_ev==0):
                         fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
                         fpsi.write(header_format %(header_variables))
@@ -192,6 +194,36 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                         for k in range(0,Npoint-1):
                             fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
                         fpsi.close()
+                        
+            elif V_ext==2:        
+                if(not(i%50)):
+                    
+                    # adds elements to lists tmeanval and meanval for later outputs
+                    if(not(i%50)):
+                        l+=1
+                        integral=0
+                        integral2=0
+                        integral3=0
+                        for k in range(0,Npoint-1):
+                            integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
+                            integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
+                            integral3=integral3+(np.sqrt(2*Ekin_K[k])*(np.abs((psi[k])**2))*Dz)
+                        meanval[l]=integral
+                        tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
+                        sigma[l]=np.sqrt((integral2)-(integral**2))
+                        vmean[l]=integral3
+                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
+
+                # writes a file for each timestep
+                if(not(i%200)):
+                    if(write_ev==0):
+                        fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
+                        fpsi.write(header_format %(header_variables))
+                        format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
+                        for k in range(0,Npoint-1):
+                            fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
+                        fpsi.close()
+                        
             elif V_ext==1:
                 if(not(i%50)):
                     # adds elements to lists tmeanval and meanval for later outputs
@@ -211,7 +243,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                    if(not(i%500)):
+                    if(not(i%(500//oscil))):
                         if(write_ev==0):
                             number_name_file.append(round(tevol[j],2)*1000)
                             fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
