@@ -12,7 +12,7 @@ import sys
 # Evolution
 # ------------------------------------------------------------------------------
 
-def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
+def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
     """Calculates the evolution of the wavefunction c.
        t0         initial time
        Dt         time step (either imaginary or real)
@@ -24,6 +24,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
        Ekin_K     kinetic energy (FFT order)
        write_ev   writes data into files if 0
        plots      plots data if 0
+       oscil      gives the number of oscillation under harmonic potential
+                  otherwise (no external potential or barrier) is 0.
     Global variables:
        Ntime_out  number of time steps for intermediate outputs
        Ntime_fin  total number of time steps
@@ -39,7 +41,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
        xb         position of the barrier
        wb         width of the barrier
        hb         height of the barrier
-       wall_h       height of the walls
+       wall_h     height of the walls
     Returns the final wavefunction.
     If write_ev == 0:
        the wavefunction (psi) and related magnitudes are written on a file for
@@ -184,7 +186,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                if(not(i%100)):
+                if(not(i%200)):
                     if(write_ev==0):
                         fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
                         fpsi.write(header_format %(header_variables))
@@ -211,7 +213,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                    if(not(i%500)):
+                    if(not(i%(500//oscil))):
                         if(write_ev==0):
                             number_name_file.append(round(tevol[j],2)*1000)
                             fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')

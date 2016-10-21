@@ -1,6 +1,7 @@
 # coding: utf-8
 import numpy as np
 from gpe_bs_utilities import *
+import math
 pi=np.pi
 
 
@@ -53,14 +54,23 @@ if V_ext==1:
     Dtr=float(time_final/float(Ntime_fin))
     Npoint = 2**10                      # Number of grid points (min. 2**8)
     velocity=0.0
-else:
+elif V_ext==0:
     Zmax = 2.0**7    
     Dtr = 1.0e-3                        # real time step (min. 1.0e-2)
     Dti = 1.0e-1                        # imaginary time step
     time_final = 20.0                   # final time
     Ntime_fin = int(time_final/Dtr)     # total number of time steps
     Npoint = 2**10                      # Number of grid points (min. 2**8)
-
+    oscil=0                             # Set number of oscillations to zero, no harmonic potential
+elif V_ext==2:
+    Zmax = 2.0**7    
+    Dtr = 1.0e-3                        # real time step (min. 1.0e-2)
+    Dti = 1.0e-1                        # imaginary time step
+    time_final = float(math.ceil(-2.0*x0/velocity))  # final time
+    Ntime_fin = int(time_final/Dtr)     # total number of time steps
+    Npoint = 2**10                      # Number of grid points (min. 2**8)
+    oscil=0                             # set number of oscillations to zero, no harmonic potential
+    
 #Zmax = 2.0**7                       # Grid half length
 Nparticle = 20e+3                   # Number of particles
 Ntime_out = 50                      # number of time steps for intermediate outputs
