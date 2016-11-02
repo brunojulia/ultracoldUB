@@ -42,6 +42,36 @@ pi=np.pi
 
 start = time.time()
 
+# Print data block
+# ------------------------------------------------------------------------------
+
+print("\nInitial data:")
+print(" Number of particles = %g"%(Nparticle))
+print(" Harmonic oscillator angular frequency = %g"%(whoz))
+print(" Domain half length = %g"%(Zmax))
+print(" Number of grid points = %g"%(Npoint))
+print(" Scattering length = %g"%(a_s))
+print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
+print(" Real time step = %g"%(Dtr))
+print(" Imaginary time = %g"%(Dti))
+print(" Intermediate solutions = %g"%(Ntime_fin/Ntime_out-1))
+
+
+# Print derived quantities and parameters of the initial wavefunction
+# ------------------------------------------------------------------------------
+
+print("\nInitial wavefunction parameters:")
+print(" Characteristic interaction energy = %g"%(gint/NormWF))
+print(" Healing length = %g" %(xi))
+print(" Position of the soliton = %g"%(x0))
+if wall != 0:
+    print(" Height of the walls = %g"%(wall_h))
+if hb != 0.0:
+    print(" Position of the potential barrier = %g" %(xb))
+    print(" Height of the potential barrier = %g" %(hb))
+    print(" Width of the potential barrier = %g" %(wb*2.0))
+print(" Initial velocity of the soliton = %g \n" %(v))
+
 
 # Grid definitions: physical and momentum space; kinetic energy in K space
 # ------------------------------------------------------------------------------
