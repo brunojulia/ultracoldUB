@@ -67,9 +67,11 @@ def Vpot(n, z):
     if(n==0):
         Vpot_R = Vpot_Rc
     elif(n==1):
-        Vpot_R = 0.5*(whoz**2)*(z**2) + Vpot_Rc
+#        Vpot_R = 0.5*(whoz**2)*(z**2) + Vpot_Rc
+        Vpot_R = 0.5*(whoz**2)*(z**2)
     elif(n==2):
         Vpot_R = 0.0*z
+        Vpot_0 = 0.0*z
         for i in range(0,Npoint):
             if m*(z[i]-xbr) > tol_arg:
                 barrier_exp1 = tol_exp
@@ -79,7 +81,7 @@ def Vpot(n, z):
                 barrier_exp2 = tol_exp
             else:
                 barrier_exp2 = np.exp(m*(z[i]-xbl))
-            Vpot_R[i] = Vpot_Rc[i] + hb/(1.0+barrier_exp1) - hb/(1.0+barrier_exp2)
+            Vpot_R[i] = Vpot_0[i] + hb/(1.0+barrier_exp1) - hb/(1.0+barrier_exp2)
     else:
         Vpot_R = Vpot_Rc
     return Vpot_R,Vpot_Rc

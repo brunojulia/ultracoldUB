@@ -73,6 +73,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
         fe = open('energies_imag.dat', 'w')
     else: #real time evolution
         fn = open('normalization_real.dat', 'w')
+        print "(Real time evolution)"
         if (write_ev==0):
             fe = open('./%s/energies.dat' % dir, 'w')
         else:
@@ -112,6 +113,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
     tevol[0]=t0
     energy_cicle[0,:] = Energy(c, Vpot_R, Ekin_K)
     velm=velmean(c, Vpot_R, Ekin_K) 
+    print("Energies:          Emed    mu    Ekin    Epot    Eint")
+    print("         initial = %g %g %g %g %g"%(Energy(c0, Vpot_R, Ekin_K)))
 
     # wavefunction
     cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
@@ -223,6 +226,10 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                                 fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
                             fpsi.close()
                             
+    print("         final   = %g %g %g %g %g"%(Energy(c, Vpot_R, Ekin_K)))
+    print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
+    print("  E(final) - E(initial) = %g"%(np.abs(energy_cicle[Ninter,0]-energy_cicle[0,0])))
+    
     format_name = "%d" + "\n"
     if V_ext==1:
         anoms=np.array(number_name_file)
