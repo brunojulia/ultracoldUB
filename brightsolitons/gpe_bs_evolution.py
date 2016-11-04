@@ -73,7 +73,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
         fe = open('energies_imag.dat', 'w')
     else: #real time evolution
         fn = open('normalization_real.dat', 'w')
-        print "(Real time evolution)"
+        print( "(Real time evolution)")
         if (write_ev==0):
             fe = open('./%s/energies.dat' % dir, 'w')
         else:
@@ -86,10 +86,16 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
 
     # define vectors for the energies, time and % of the wf (matrix)
     tevol=np.empty([Ninter+1])
-    tmeanval=np.empty(Ntime_fin//50 + 1)
-    meanval=np.empty(Ntime_fin//50 + 1)   #x mean value (from integral <x>)
-    sigma=np.empty(Ntime_fin//50 + 1)
-    vmean=np.empty(Ntime_fin//50 + 1)
+    if oscil==0:
+        tmeanval=np.empty(Ntime_fin//50 + 1)
+        meanval=np.empty(Ntime_fin//50 + 1)   #x mean value (from integral <x>)
+        sigma=np.empty(Ntime_fin//50 + 1)
+        vmean=np.empty(Ntime_fin//50 + 1)
+    elif oscil!=0:
+        tmeanval=np.empty(oscil*60 + 1)
+        meanval=np.empty(oscil*60 + 1)   #x mean value (from integral <x>)
+        sigma=np.empty(oscil*60 + 1)
+        vmean=np.empty(oscil*60 + 1)
     energy_cicle=np.empty([Ninter+1,5])
     wave_function = np.empty([Ninter+1,3])
     number_name_file=[]
@@ -169,11 +175,32 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                 fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4]))
 
             # writes
-            if V_ext!=1:        
-                if(not(i%50)):
+            if V_ext==0:        
+                if(not(i%Ntime_out)):
+                # writes a file for each timestep
+                    fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
+                    fpsi.write(header_format %(header_variables))
+                    format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
+                    l+=1
+                    integral=0
+                    integral2=0
+                    integral3=0
+                    for k in range(0,Npoint-1):
+                        fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
+                        integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
+                        integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
+                        integral3=integral3+(np.sqrt(2*Ekin_K[k])*(np.abs((psi[k])**2))*Dz)
+                    meanval[l]=integral
+                    tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
+                    sigma[l]=np.sqrt((integral2)-(integral**2))
+                    vmean[l]=integral3
+                    rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))                  
+                    fpsi.close()
+            elif V_ext==2:        
+                if(not(i%Ntime_out)):
                     
                     # adds elements to lists tmeanval and meanval for later outputs
-                    if(not(i%50)):
+                    if(not(i%Ntime_out)):
                         l+=1
                         integral=0
                         integral2=0
@@ -189,8 +216,9 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                if(not(i%200)):
+                if(not(i%Ntime_out)):
                     if(write_ev==0):
+                        number_name_file.append(round(tevol[j],2)*1000)
                         fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
                         fpsi.write(header_format %(header_variables))
                         format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
@@ -198,9 +226,9 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                             fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
                         fpsi.close()
             elif V_ext==1:
-                if(not(i%50)):
+                if(not(i%Ntime_out)):
                     # adds elements to lists tmeanval and meanval for later outputs
-                    if(not(i%50)):
+                    if(not(i%Ntime_out)):
                         l+=1
                         integral=0
                         integral2=0
@@ -216,22 +244,28 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                         rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
 
                 # writes a file for each timestep
-                    if(not(i%(500//oscil))):
-                        if(write_ev==0):
-                            number_name_file.append(round(tevol[j],2)*1000)
-                            fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
-                            fpsi.write(header_format %(header_variables))
-                            format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
-                            for k in range(0,Npoint-1):
-                                fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
-                            fpsi.close()
+     #           if oscil==1:
+     #               valor=500
+     #           elif oscil==2:
+     #               valor=250
+     #           elif oscil==3:
+     #               valor=150  #tricky
+                if(not(i%(Ntime_out))):
+                    if(write_ev==0):
+                        number_name_file.append(round(tevol[j],2)*1000)
+                        fpsi = open('./%s/%s-%08d.dat' %(dir,name,round(tevol[j],2)*1000), 'w')
+                        fpsi.write(header_format %(header_variables))
+                        format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
+                        for k in range(0,Npoint-1):
+                            fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
+                        fpsi.close()
                             
     print("         final   = %g %g %g %g %g"%(Energy(c, Vpot_R, Ekin_K)))
     print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
     print("  E(final) - E(initial) = %g"%(np.abs(energy_cicle[Ninter,0]-energy_cicle[0,0])))
     
     format_name = "%d" + "\n"
-    if V_ext==1:
+    if V_ext==1 or V_ext==2:
         anoms=np.array(number_name_file)
         noms=open('./bs_evolution/namefiles.dat','w')
         for i in range(0,len(number_name_file)):
