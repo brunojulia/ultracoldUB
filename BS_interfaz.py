@@ -126,6 +126,12 @@ class BS(QMainWindow,Ui_MainWindow):
         figini.set_title("An example of bright soliton")
         figini.plot(ax,aphi)
         self.canvas.draw()
+        self.slider_simulation.hide()
+        self.ButtonOn.hide()
+        self.ButtonBack.hide()
+        self.ButtonPause.hide()
+        self.value_sim.hide()
+        self.label_5.hide()
         
     def addmpl(self,fig):
         self.canvas=FigureCanvas(fig)
@@ -197,18 +203,32 @@ class BS(QMainWindow,Ui_MainWindow):
             
             if (self.btn_none.isChecked()==True):
                 pot=0
+                if self.none_20.isChecked()==True:
+                    tempss=20.0
+                elif self.none_40.isChecked()==True:
+                    tempss=40.0
+                elif self.none_40.isChecked()==False or self.none_20.isChecked()==False:
+                    tempss=20.0
             if (self.btn_harm.isChecked()==True):
                 pot=1
             if (self.btn_wall.isChecked()==True):
                 pot=2
+                if self.wall_1.isChecked()==True:
+                    tempss=1.0
+                elif self.wall_2.isChecked()==True:
+                    tempss=2.0
+                elif self.wall_3.isChecked()==True:
+                    tempss=3.0
+                elif self.wall_1.isChecked()==False or self.wall_2.isChecked()==False:
+                    tempss=1.0
             file_data=open('input.txt','w')
 #            self.slider_simulation.setValue(self.sim)
             if pot==0:           
-                file_data.write('%d \t %d \t %f \t %f \t %d' %(0,self.gn.value(),self.horizontalSlider.value(),self.horizontalSlider_2.value(),self.yes_no.value()))
+                file_data.write('%d \t %d \t %f \t %f \t %d \t %f' %(0,self.gn.value(),self.horizontalSlider.value(),self.horizontalSlider_2.value(),self.yes_no.value(),tempss))
             elif pot==1:
                 file_data.write('%d \t %d \t %f \t %d \t %d' %(1,self.gn.value(),self.horizontalSlider_3.value(),self.spinBox.value(),0))
             elif pot==2:
-                file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0))
+                file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0, tempss))
             file_data.close()
             
             subprocess.Popen('python gpe_bright_solitons.py',shell=True)
@@ -237,7 +257,11 @@ class BS(QMainWindow,Ui_MainWindow):
                 os.chdir(prev)
                     
             if (self.btn_harm.isChecked()==True):
-                time1=60*self.spinBox.value()+1              
+  #              if self.spinBox.value()==1 or self.spinBox.value()==2:
+  #                  time1=60*self.spinBox.value()+1
+  #              elif self.spinBox.value()==3:
+  #                  time1=201
+                time1=60*self.spinBox.value()+1                
                 progressBar.porcessProgressBar.setMaximum(time1)
                 diff=0
                 prev=os.getcwd()
@@ -282,13 +306,14 @@ class BS(QMainWindow,Ui_MainWindow):
                         QApplication.processEvents()
                 os.chdir(prev)
             
-            time.sleep(8)
+            time.sleep(3)
             
             self.ButtonOn.show() 
             self.ButtonBack.show()
             self.ButtonPause.show()
             self.slider_simulation.show()
             self.label_5.show()
+            self.value_sim.show()
             if pot==1:
                 self.play.show()
             else:
@@ -341,11 +366,11 @@ class BS(QMainWindow,Ui_MainWindow):
         elif pot==2:
 #            figmv.axes.errorbar(atmv,amv,yerr=asig)
             figmv.axes.errorbar(atmv,amv,yerr=sigsalt)
-            figmv.axes.set_xlim([0,math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value()))])
+       #     figmv.axes.set_xlim([0,math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value()))])
             figmv.axes.set_ylim([-128.0,128.0])
         elif pot==0:
             figmv.plot(atmv,amv)
-            figmv.axes.set_xlim([0,20.0])
+       #     figmv.axes.set_xlim([0,20.0])
             figmv.axes.set_ylim([-128.0,128.0])
         figmv.set_title("Position of the soliton")
         figmv.set_xlabel("Time ($t/ \omega$)")
@@ -398,7 +423,7 @@ class BS(QMainWindow,Ui_MainWindow):
         allenergies.plot(atime,aepot,label='$E_{pot}$')
         allenergies.plot(atime,aeint,label='$E_{int}$')
         allenergies.set_title("Energies")
-        allenergies.set_xlabel("Time Time ($t/ \omega$)")
+        allenergies.set_xlabel("Time ($t/ \omega$)")
         allenergies.set_ylabel("Energy per particle ($E/ \hbar \omega$)")
         allenergies.legend()
         if pot==2:
@@ -443,20 +468,26 @@ class BS(QMainWindow,Ui_MainWindow):
         self.addfig("Energies",fig2)
         self.addfig("Velocity",fig4)
         
-        if pot==0:
+        if self.btn_none.isChecked()==True:
             self.slider_simulation.setMinimum(0)
             self.slider_simulation.setMaximum(100)
             self.slider_simulation.setSingleStep(1)
-        if pot==2:
+        elif self.btn_wall.isChecked()==True:
             self.slider_simulation.setMinimum(0)
-            self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))
+      #      if self.wall_1.isChecked()==True:
+      #          self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))
+      #      elif self.wall_2.isChecked()==True:
+      #          self.slider_simulation.setMaximum(10*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))
+      #      else:
+      #          self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))            
+            self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))            
             self.slider_simulation.setSingleStep(1)
         else:
             self.slider_simulation.setMinimum(0)
-            self.slider_simulation.setMaximum(60)
+            self.slider_simulation.setMaximum(60*self.spinBox.value())
             self.slider_simulation.setSingleStep(1)
             
-        self.slider_simulation.setValue(self.sim)
+        self.slider_simulation.setValue(0)
             
     def juga(self): #enables a window for play-plot
         global language
@@ -523,7 +554,12 @@ class BS(QMainWindow,Ui_MainWindow):
             if (self.btn_wall.isChecked()==True):
                 pot=2
             if pot==0:
-                i=self.slider_simulation.value()*200
+                if self.none_20.isChecked()==True:
+                    i=self.slider_simulation.value()*200
+                elif self.none_40.isChecked()==True:
+                    i=self.slider_simulation.value()*400
+                else:
+                    i=self.slider_simulation.value()*200
                 data=open("WfBs-%08d.dat" %(i),'r')
                 lines=data.readlines()
                 listpos=[]
@@ -560,8 +596,12 @@ class BS(QMainWindow,Ui_MainWindow):
                 state.legend()
                 self.canvas.draw()
             elif pot==2:
-                i=self.slider_simulation.value()*200
-                data=open("WfBs-%08d.dat" %(i),'r')
+           #     i=self.slider_simulation.value()*200
+           #     data=open("WfBs-%08d.dat" %(i),'r')
+                names=open("namefiles.dat",'r')
+                listnames=names.readlines()
+                name=int(listnames[int(self.slider_simulation.value())])
+                data=open("WfBs-%08d.dat" %(name),'r')
                 lines=data.readlines()
                 listpos=[]
                 listphi=[]
@@ -676,11 +716,24 @@ class BS(QMainWindow,Ui_MainWindow):
             if (self.sim==100):
                 self.timer.stop()
         if (self.btn_harm.isChecked()==True):
+       #     if (self.spinBox.value()==1) or (self.spinBox.value()==2):
+       #         if (self.sim==(60*self.spinBox.value())):
+       #             self.timer.stop()
+       #     elif (self.spinBox.value()==3):
+       #         if (self.sim==200):
+       #             self.timer.stop()
             if (self.sim==(60*self.spinBox.value())):
-                self.timer.stop()
+                    self.timer.stop()
         if (self.btn_wall.isChecked()==True):
-            if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
-                self.timer.stop()
+            if self.wall_1.isChecked()==True:
+                if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
+                    self.timer.stop()
+            elif self.wall_2.isChecked()==True:
+                if (self.sim==(10*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
+                    self.timer.stop()
+            else:
+                if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
+                    self.timer.stop()
         
     def plotsim2(self):
         self.sim=self.sim-1
@@ -702,7 +755,7 @@ class BS(QMainWindow,Ui_MainWindow):
             'Imagine that the ball has a mass $m$ and the wall, as a normal wall, is still and cannot change its place. '+
             'In an ideal case, if you threw the ball against the wall with a velocity $v$ it would hit the wall and come back '+
             'to you with the same velocity module. This situation corresponds to an elastic collision, though it may not seem at '+
-            "first sight, let's see how to understand it: \n \n"+'\t     \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} '+
+            "first sight, let's see how to understand it: \n \n"+r"\t    $ \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} $"+
             '\vect{p_{f,2}}\n\n' + 'We can consider a wall with a very huge mass compared to the one of the ball (imagine it as infinity), so as we '+
             'see in our daily life, a wall hitted by a ball does not move, right? So we could suppose that the velocity of the wall '+
             'is both in the begining and end zero, and thus also the momentum.' + '\n\nSo taking into account the previous '+

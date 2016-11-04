@@ -19,6 +19,7 @@ if V_ext==0:    #no external potential
     int_str=int(values[1])
     velocity=float(values[3])
     def_w=int(values[4])
+    simtime=float(values[5])
 #    print V_ext,int_str,x0,velocity,def_w  #to check if it works or not
 elif V_ext==1:  #harmonic trap
     int_str=int(values[1])
@@ -33,6 +34,7 @@ elif V_ext==2:  #wall
     def_w=int(values[4])
     barrier_w=int(values[5])
     barrier_h=float(values[6])
+    simtime=float(values[7])
 #    print V_ext,int_str,x0,velocity,def_w,barrier_w,barrier_h
     
 if int_str == 1:
@@ -50,30 +52,34 @@ if V_ext==1:
     Zmax=2.0**5
     time_final=float(oscil)*freq
     Dti=1.0e-1                      # imaginary time step (not used)
-    Ntime_fin=int(3.0e4)            # supposed as in the original one for total time=20 and Dtr=10^-3
+    Ntime_fin=int(3.0e3*oscil)            # supposed as in the original one for total time=20 and Dtr=10^-3
     Dtr=float(time_final/float(Ntime_fin))
+  #  Dtr=2.0e-3
+  #  Ntime_fin=int(time_final/Dtr)
     Npoint = 2**10                      # Number of grid points (min. 2**8)
     velocity=0.0
+    Ntime_out = 50                     # number of time steps for intermediate outputs
 elif V_ext==0:
     Zmax = 2.0**7    
-    Dtr = 1.0e-3                        # real time step (min. 1.0e-2)
+    Dtr = 2.0e-3                        # real time step (min. 1.0e-2)
     Dti = 1.0e-1                        # imaginary time step
-    time_final = 20.0                   # final time
+    time_final = simtime                   # final time
     Ntime_fin = int(time_final/Dtr)     # total number of time steps
     Npoint = 2**10                      # Number of grid points (min. 2**8)
     oscil=0                             # Set number of oscillations to zero, no harmonic potential
+    Ntime_out = 100*simtime//20                      # number of time steps for intermediate outputs
 elif V_ext==2:
     Zmax = 2.0**7    
-    Dtr = 1.0e-3                        # real time step (min. 1.0e-2)
+    Dtr = 2.0e-3                        # real time step (min. 1.0e-2)
     Dti = 1.0e-1                        # imaginary time step
-    time_final = float(math.ceil(-2.0*x0/velocity))  # final time
+    time_final = simtime*float(math.ceil(-2.0*x0/velocity))  # final time
     Ntime_fin = int(time_final/Dtr)     # total number of time steps
     Npoint = 2**10                      # Number of grid points (min. 2**8)
     oscil=0                             # set number of oscillations to zero, no harmonic potential
+    Ntime_out = 100*int(simtime)        # number of time steps for intermediate outputs
     
 #Zmax = 2.0**7                       # Grid half length
 Nparticle = 20e+3                   # Number of particles
-Ntime_out = 50                      # number of time steps for intermediate outputs
 
 # Derived quantities and parameters of the initial wavefunction (bright soliton)
 # ------------------------------------------------------------------------------
