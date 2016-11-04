@@ -119,18 +119,6 @@ print (x0,osci,soli)
 #osci=De.name2
 # Print evolution data:
 
-print("Initial data:")
-print(" Number of particles = %g"%(Nparticle))
-print(" Harmonic oscillator angular frequency = %g"%(whoz))
-print(" Domain half length = %g"%(Zmax))
-print(" Number of grid points = %g"%(Npoint))
-print(" Scattering length = %g"%(a_s))
-print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
-print(" Real time step = %g"%(Dtr))
-print(" Imaginary time = %g"%(Dti))
-print(" Intermediate solutions = %g"%(Ntime_fin//Ntime_out-1))
-
-
 # Derived quantities
 # _________________________________________________________________________________________
 
@@ -143,8 +131,33 @@ Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
 Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
-print(" Characteristic interaction energy = %g"%(gint))
+file=open('output_eng.txt','w')
+file.write("Initial data:\n")
+file.write(" Number of particles = %g\n"%(Nparticle))
+file.write(" Harmonic oscillator angular frequency = %g\n"%(whoz))
+file.write(" Domain half length = %g\n"%(Zmax))
+file.write(" Number of grid points = %g\n"%(Npoint))
+file.write(" Scattering length = %g\n"%(a_s))
+file.write(" Total time of evolution = %g\n"%(Ntime_fin*Dtr))
+file.write(" Real time step = %g\n"%(Dtr))
+file.write(" Imaginary time step = %g\n"%(Dti))
+file.write(" Intermediate solutions = %g\n"%(Ntime_fin//Ntime_out-1))
+file.write(" Initial characteristic interaction energy = %g"%(gint))
+file.close()
 
+file2=open('output_sp.txt','w')
+file2.write("Datos iniciales:\n")
+file2.write(" Numero de particulas = %g\n"%(Nparticle))
+file2.write(" Frecuencia angular del oscilador armonico = %g\n"%(whoz))
+file2.write(" Mitad de la longitud del dominio = %g\n"%(Zmax))
+file2.write(" Numero de puntos en la red = %g\n"%(Npoint))
+file2.write(" Longitud de dispersion = %g\n"%(a_s))
+file2.write(" Tiempo total de la evolucion = %g\n"%(Ntime_fin*Dtr))
+file2.write(" Paso real de tiempo = %g\n"%(Dtr))
+file2.write(" Paso imaginario de tiempo = %g\n"%(Dti))
+file2.write(" Soluciones intermedias = %g\n"%(Ntime_fin//Ntime_out-1))
+file2.write(" Energia caracteristica de interaccion initial = %g"%(gint))
+file2.close()
 
 # Grid definitions: physical and momentum space
 # __________________________________________________________________________________________

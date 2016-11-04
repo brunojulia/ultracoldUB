@@ -204,7 +204,7 @@
        </rect>
       </property>
       <property name="maximum">
-       <number>2</number>
+       <number>0</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_7">
@@ -225,7 +225,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>20</y>
        <width>211</width>
        <height>161</height>
       </rect>
@@ -277,7 +277,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10</number>
+       <number>5</number>
       </property>
      </widget>
      <widget class="QLabel" name="label">
@@ -415,7 +415,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10</number>
+       <number>5</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_8">
@@ -467,7 +467,7 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>1</number>
+       <number>2</number>
       </property>
       <property name="maximum">
        <number>3</number>
@@ -861,13 +861,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Can you adjust the movement plotted from data to a function by introducing the coefficients &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and gN?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <zorder>textBrowser</zorder>
-    <zorder>mplwindow_2</zorder>
-    <zorder>pushButton_try</zorder>
-    <zorder>pushButton_return</zorder>
-    <zorder>widget_osci</zorder>
-    <zorder>widget_densi</zorder>
-    <zorder>textBrowser_2</zorder>
    </widget>
    <widget class="QWidget" name="interact_game" native="true">
     <property name="geometry">
@@ -918,24 +911,6 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <zorder>mplwindow</zorder>
-   <zorder>mplfigs</zorder>
-   <zorder>back</zorder>
-   <zorder>slider_simulation</zorder>
-   <zorder>label_5</zorder>
-   <zorder>label_4</zorder>
-   <zorder>ButtonOn</zorder>
-   <zorder>ButtonBack</zorder>
-   <zorder>ButtonPause</zorder>
-   <zorder>start</zorder>
-   <zorder>groupBox</zorder>
-   <zorder>groupBox_2</zorder>
-   <zorder>state</zorder>
-   <zorder>mplwindow_2</zorder>
-   <zorder>game</zorder>
-   <zorder>interact_game</zorder>
-   <zorder>interact_3</zorder>
-   <zorder>textBrowser_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -14,18 +14,24 @@ from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 import time
-
+pause_spr = False
+on_spr = True
+back_spr = False  
 Ui_MainWindow,QMainWindow=loadUiType('WD.ui')
 class WD(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         QtGui.QWidget.__init__(self,parent)
         self.setupUi(self)
+        self.file=open('output.txt','a')
         self.ButtonBack.clicked.connect(self.back1)
+        self.radioButton.setChecked(True)
         self.sim=0
         self.true1=0
         
@@ -62,6 +68,7 @@ class WD(QMainWindow,Ui_MainWindow):
         progressBar = Ui_porcessProgress()
         progressBar.setupUi(dialog)
         dialog.show()
+        self.file.write('...Nuevo proceso...\n')
         diff = 0
         self.sim=0
         self.true1=0
@@ -77,6 +84,7 @@ class WD(QMainWindow,Ui_MainWindow):
             file.close()
             
             time1=self.spinBox.value()*int((10*np.pi*2.0))-1
+            start_sub=time.time()
             subprocess.Popen('python gpe_fft_ts_WP_v1.py',shell=True)
             for root, dirs, files in os.walk(os.getcwd()):
                     for file in files:
@@ -102,6 +110,11 @@ class WD(QMainWindow,Ui_MainWindow):
                     progressBar.porcessProgressBar.setValue(diff)                     
                     QApplication.processEvents()
                         
+            if (self.true1==1):
+                self.file.write('Posición inicial del paquete de ondas=%s\nPotential armónico: YES\nExcitación del estado=%s\nNúmero de oscilaciones=%s\n\n' %(self.horizontalSlider.value(),self.spinBox_2.value(),self.spinBox.value()))
+            if (self.true1==0):
+                self.file.write('Posición inicial del paquete de ondas=%s\nPotential armónico: NO\nExcitación del estado=%s\nNúmero de oscilaciones=%s\n\n' %(self.horizontalSlider.value(),self.spinBox_2.value(),self.spinBox.value()))
+            end_sub=time.time()            
             print (os.getcwd())
             print ("READY")
             self.label_5.show()
@@ -115,9 +128,14 @@ class WD(QMainWindow,Ui_MainWindow):
             self.slider_simulation.setSingleStep(1)
             if (self.radioButton.isChecked()==True):
                 self.interact_game.show()
+                self.radioButton_oscil.setChecked(True)
             if (self.radioButton_2.isChecked()==True):
                 self.interact_game.hide()
             time.sleep(2)
+            
+            file=open('output_sp.txt','r')
+            self.file.write('%s\n' %file.read())
+            self.file.write('Durada de la computación=%s\n\n' %(end_sub-start_sub))
             
             file = open('energies.txt', 'r')
             lines = file.readlines()
@@ -152,8 +170,8 @@ class WD(QMainWindow,Ui_MainWindow):
         axf=self.fig.add_subplot(111)
         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
         axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.plot(xv1,xv2,label='R-Space')
-        axf.plot(xv1,xv3,label='K-Space')
+        axf.fill_between(xv1,0,xv2,label='R-Space',facecolor='blue')
+        axf.fill_between(xv1,0,xv3,label='K-Space',facecolor='green')
         axf.set_xlim([-20,20])
         if (self.true1==0):
             axf.set_ylim(0,0.6)
@@ -268,8 +286,8 @@ class WD(QMainWindow,Ui_MainWindow):
                     axf=self.fig.add_subplot(111)
                     axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                     axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-                    axf.plot(xv1,xv2,label='R-Space')
-                    axf.plot(xv1,xv3,label='K-Space')
+                    axf.fill_between(xv1,0,xv2,label='R-Space',facecolor='blue')
+                    axf.fill_between(xv1,0,xv3,label='K-Space',facecolor='green')
                     axf.set_xlim([-20,20])
                     if (self.true1==0):
                         axf.set_ylim(0,0.6)
@@ -290,6 +308,8 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.widget_osci.show()
                 self.start.hide()
                 self.mplfigs.hide()
+                self.spin_amplitude.setValue(3.)
+                self.spin_frequency.setValue(0.5)
                 prevdir = os.getcwd()
                 try:
                     os.chdir(os.path.expanduser('./Wavepackdisper'))
@@ -340,21 +360,116 @@ class WD(QMainWindow,Ui_MainWindow):
                 finally:
                     os.chdir(prevdir)
                 
-                fig3=Figure()
+#                fig3=Figure()
+#                self.addmpl2(fig3)
+#                ax1f3=fig3.add_subplot(111)
+#                ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
+#                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
+#                
+#                x=np.arange(0,time1+1)/10.
+#                y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
+#                
+#                ax1f3.plot(xv,yv, 'r.-',label='$R-Space$')                
+#                ax1f3.plot(x,y)            
+#                ax1f3.set_title('Mean value x')
+#                ax1f3.legend()
+#                self.canvas.draw()
+                
+                tf_sim =  time1/10.
+                def simData():
+                    L=self.spin_amplitude.value()
+                    t_max =  time1/10.
+                    dt = 0.05
+                    w = self.spin_frequency.value()
+                    y = 0.0
+                    t = 0.0
+                    while t <= t_max and t >= 0:
+                        if on_spr and not back_spr and not pause_spr:
+                            y = L*np.sin(w*t+np.pi/2.)
+                            t = t + dt
+                        if back_spr and not on_spr and not pause_spr:
+                            y = L*np.sin(w*t+np.pi/2.)
+                            t = t - dt
+                        yield y, t
+                        
+                def onClick(event):
+                    global pause_spr, on_spr, back_spr
+                    back_spr ^= True
+                    on_spr ^= True
+                    
+                def init():
+                    line.set_data([], [])
+                    line2.set_data([], [])
+                    line3.set_data([], [])
+                    line4.set_data([], [])
+                    for j in range (0,11):
+                        globals() ['line_%s' %(j)].set_data([], [])
+                    time_text.set_text('')
+                    return line, time_text
+                
+                def simPoints(simData):
+                    y, t = simData[0], simData[1]
+                    if self.spin_amplitude.value()>=0:
+                        ori = -self.spin_amplitude.value()-1.
+                    if self.spin_amplitude.value()<=0:
+                        ori = self.spin_amplitude.value()-1.
+                    time_text.set_text(time_template%(t))
+                    thisy = [ori, y]
+                
+                    line.set_data(0,thisy)
+                    for j in range (3,9):
+                        globals() ['line_%s' %(j)].set_data([((-1)**(j-1))*0.5,((-1)**j)*0.5],[(j-1.)*((y-ori)/10.)+ori,((y-ori)/10.)*j+ori])
+                    line_0.set_data([0.,0.5],[((((y-ori)/10.)*1.+ori)+(((y-ori)/10.)*2.+ori))/2.,((y-ori)/10.)*2.+ori])
+                    line_1.set_data([0.5,0.],[((y-ori)/10.)*8.+ori,((((y-ori)/10.)*8.+ori)+(((y-ori)/10.)*9.+ori))/2.])
+                    line2.set_data([1.,-1.],[ori,ori])  
+                    line3.set_data([t,y])
+                    tf = np.arange(0.0, t, 0.05)
+                    line4.set_data([tf,self.spin_amplitude.value()*np.cos(tf*self.spin_frequency.value())])
+                    time_text.set_text(time_template % (t))
+                    return line, line2, line3, time_text,line_0, line_1, line_2, line_3, line_4, line_5, line_6, line_7, line_8, line_9, line4
+#                gs=0
+                ax=0
+                ax2=0
+#                import matplotlib.gridspec as gridspec 
+                fig3 = plt.figure()
+#                rcParams.update({'figure.autolayout': True})
+#                gs = gridspec.GridSpec(10, 10)
+#                ax = fig3.add_subplot(gs[:,03], xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
+#                ax2 = fig3.add_subplot(gs[:,4:])
+                ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
+                ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.horizontalSlider.value(), self.horizontalSlider.value()))
+#                ax = fig3.add_subplot(121)   
+#                ax2 = fig3.add_subplot(122)
+                ax.set_title('Muelle')
+                ax.set_xticks(np.arange(-1., 2., 1.))
+                ax.set_xlim(-1,1)
+                if self.spin_amplitude.value()>=0:
+                    ax.set_ylim(-self.spin_amplitude.value()-2.,self.spin_amplitude.value()+2.)
+                if self.spin_amplitude.value()<=0:
+                    ax.set_ylim(self.spin_amplitude.value()-2.,-self.spin_amplitude.value()+2.)
+                
+                
+                ax2.set_xlabel('t(s)',fontsize=13)        
+                ax2.set_ylabel('x(m)',fontsize=13)
+                ax2.plot(xv,yv, 'r.-')                
+                ax2.set_title('Mean value x')
                 self.addmpl2(fig3)
-                ax1f3=fig3.add_subplot(111)
-                ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
-                ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
                 
-                x=np.arange(0,time1+1)/10.
-                y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
+                line, = ax.plot([], [], 'o-', lw=2)
+                line2, = ax.plot([], [], 'g-', lw=2)
+                line3, = ax2.plot([], [], 'o-', lw=2)
+                line4, = ax2.plot([], [], 'b-', lw=2)
+                for j in range (0,11):
+                    globals() ['line_%s' %(j)], = ax.plot([], [], 'b-', lw=2)
+                time_template = 'time = %.1fs'
+                time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
                 
-                ax1f3.plot(xv,yv, 'r.-',label='$R-Space$')                
-                ax1f3.plot(x,y)            
-                ax1f3.set_title('Mean value x')
-                ax1f3.legend()
+                fig3.canvas.mpl_connect('button_press_event', onClick)
+                self.ani = animation.FuncAnimation(fig3, simPoints, simData,
+                                              interval=25, blit=True, init_func=init, repeat=False)
+                
+                #ani.save('muelle.mp4', fps=15)
                 self.canvas.draw()
-                
     def game_return(self):
         self.rmmpl2()
         self.rmmpl2()
@@ -365,7 +480,6 @@ class WD(QMainWindow,Ui_MainWindow):
         self.mplwindow.show()
         self.start.show()
         self.mplfigs.show()
-
         
     def plot(self):
         self.sim +=1
@@ -441,6 +555,7 @@ class WD(QMainWindow,Ui_MainWindow):
         
     def close(self):
         self.hide()
+        self.file.close()
         self.parent().show()
         
     def closeEvent(self, event):
@@ -449,9 +564,10 @@ class WD(QMainWindow,Ui_MainWindow):
 
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
+            self.file.close()
         else:
             event.ignore()
-            
+ 
 class Ui_porcessProgress(object):
     def setupUi(self, porcessProgress):
         porcessProgress.setObjectName("porcessProgress")

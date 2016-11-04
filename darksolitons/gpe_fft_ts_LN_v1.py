@@ -217,7 +217,7 @@ for N in range (1,750):
             j+=1
             tevol[j] = t
             energy_cicle[j,:] = Energy(c)
-        if (np.abs(energy_cicle[j,1]-energy_cicle[j-1,1])<(1e-4)):
+        if (np.abs(energy_cicle[j,1]-energy_cicle[j-1,1])<(1e-9)):
                     break
 #    print (energy_cicle[j,1],energy_cicle[j,0])
     cc = ifft(c)*Npoint*NormWF**0.5      # FFT from K3 to R3 and include the wf norm
