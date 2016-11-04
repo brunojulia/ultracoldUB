@@ -116,18 +116,6 @@ Ntime_out = 100              # number of time steps for intermediate outputs
 
 # Print evolution data:
 
-print("Initial data:")
-print(" Number of particles = %g"%(Nparticle))
-print(" Harmonic oscillator angular frequency = %g"%(whoz))
-print(" Domain half length = %g"%(Zmax))
-print(" Number of grid points = %g"%(Npoint))
-print(" Scattering length = %g"%(a_s))
-print(" Total time of evolution = %g"%(Ntime_fin*Dtr))
-print(" Real time step = %g"%(Dtr))
-print(" Imaginary time = %g"%(Dti))
-print(" Intermediate solutions = %g"%(Ntime_fin//Ntime_out-1))
-
-
 # Derived quantities
 # _________________________________________________________________________________________
 
@@ -140,8 +128,31 @@ Dk = pi/Zmax                    # momentum step size
 Kmax = Dk*(Npoint//2)           # maximum momentum
 Dt = Dtr-1j*Dti                 # complex time
 Ninter = Ntime_fin//Ntime_out    # Number of outputs with the intermediate states
-print(" Characteristic interaction energy = %g"%(gint))
 
+
+file=open('output_eng.txt','w')
+file.write("Initial data:\n")
+file.write(" Number of particles = %g\n"%(1))
+file.write(" Harmonic oscillator angular frequency = %g\n"%(whoz))
+file.write(" Domain half length = %g\n"%(Zmax))
+file.write(" Number of grid points = %g\n"%(Npoint))
+file.write(" Scattering length = %g\n"%(0))
+file.write(" Total time of evolution in real time = %g\n"%(Ntime_fin*Dtr))
+file.write(" Real time step = %g\n"%(Dtr))
+file.write(" Intermediate solutions = %g\n"%(Ntime_fin//Ntime_out-1))
+file.close()
+
+file=open('output_sp.txt','w')
+file.write("Datos iniciales:\n")
+file.write(" Numero de particulas = %g\n"%(1))
+file.write(" Frecuencia angulas del oscilador armonico = %g\n"%(whoz))
+file.write(" Mitad de la longitud del dominio = %g\n"%(Zmax))
+file.write(" Numero de puntos en la red = %g\n"%(Npoint))
+file.write(" Longitud de dispersion inicial = %g\n"%(0))
+file.write(" Tiempo total de la evolucion en tiempo real = %g\n"%(Ntime_fin*Dtr))
+file.write(" Paso real de tiempo = %g\n"%(Dti))
+file.write(" Soluciones intermedias = %g\n"%(Ntime_fin//Ntime_out-1))
+file.close()
 
 # Grid definitions: physical and momentum space
 # __________________________________________________________________________________________
@@ -252,9 +263,15 @@ for k in range (0,int(2*Zmax/Dz)):
     file4.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[k],(abs(psi)**2)[k],(np.angle(psi))[k],psi.real[k],psi.imag[k],changeFFTposition(abs(c0)**2,Npoint,0)[k]))
 file4.close()
 
-print("Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint")
-print("         initial = %g %g %g %g %g"%(Energy(c0)))
+file=open('output_eng.txt','a')
+file.write(" Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint\n")
+file.write("         initial = %g %g %g %g %g\n"%(Energy(c0)))
+file.close()
 
+file=open('output_sp.txt','a')
+file.write(" Energias en la evolucion de tiempo real:          Emed    mu    Ecin    Epot    Eint\n")
+file.write("         inicial = %g %g %g %g %g\n"%(Energy(c0)))
+file.close()
 # evolution in time: parameters
 t0=0.0
 c=c0
@@ -348,4 +365,10 @@ file.close()
 file2.close()
 file3.close()
 # Prints final energy
-print("         final = %g %g %g %g %g"%(Energy(c)))
+file=open('output_eng.txt','a')
+file.write("         final = %g %g %g %g %g"%(Energy(c)))
+file.close()
+
+file=open('output_sp.txt','a')
+file.write("         final = %g %g %g %g %g"%(Energy(c)))
+file.close()
