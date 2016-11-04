@@ -15,6 +15,7 @@ import math
 Ui_MainWindow,QMainWindow=loadUiType('Main.ui')
 
 import time
+from datetime import datetime
 class Main(QMainWindow,Ui_MainWindow):
     def __init__(self):
         super(Main,self).__init__()
@@ -35,6 +36,11 @@ class Main(QMainWindow,Ui_MainWindow):
         
         self.eng.clicked.connect(self.english)
         self.spa.clicked.connect(self.spanish)
+        
+        self.file = open('output.txt','w')
+        self.file.close()
+        self.file = open('output.txt','a')
+        self.file.write('Bienvenido a UltracoldUB. Estamos a: %s \n' %(str(datetime.now())))
         
         if self.eng.isChecked()==False and self.spa.isChecked()==False:
             lang=open('language.txt','w')
@@ -64,16 +70,43 @@ class Main(QMainWindow,Ui_MainWindow):
         self.bright_window.raise_()   
         
     def dispersionbutton(self):
+        self.file = open('output.txt','a')
+        self.file.write('#################')
+        self.file.write('Interfaz seleccionada: Dark Solitons')
+        self.file.write('#################\n\n')
+        self.file.close()
+        self.hide()
+        self.dark_window = DS(self)
+        self.dark_window.show()
+        self.dark_window.raise_()
+    
+    def brightbutton(self):
+        self.file = open('output.txt','a')
+        self.file.write('#################')
+        self.file.write('Interfaz seleccionada: Bright Solitons')
+        self.file.write('#################\n\n')
+        self.hide()
+        self.bright_window = BS(self)
+        self.bright_window.show()
+        self.bright_window.raise_()   
+        
+    def dispersionbutton(self):
+        self.file = open('output.txt','a')
+        self.file.write('#################')
+        self.file.write('Interfaz seleccionada: Wave Pack Dispersions')
+        self.file.write('#################\n\n')
+        self.file.close()
         self.hide()
         self.dispersion_window = WD(self)
         self.dispersion_window.show()
-        self.dispersion_window.raise_()   
+        self.dispersion_window.raise_()  
         
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'EXIT',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
+            self.file.close()
             event.accept()
         else:
             event.ignore()
