@@ -19,7 +19,7 @@ import matplotlib.animation as animation
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT)
 pause_spr = False
 on_spr = True
 back_spr = False  
@@ -59,6 +59,11 @@ class DS(QMainWindow,Ui_MainWindow):
         self.pushButton_return.clicked.connect(self.game_return)
         self.mplwindow_2.hide()
         
+        self.timer1=QtCore.QTimer(self)
+        self.timer2=QtCore.QTimer(self)
+        
+        self.ani_co=0
+        
         file=open('position_0.txt','r')
         lines=file.readlines()
         file.close()
@@ -74,11 +79,10 @@ class DS(QMainWindow,Ui_MainWindow):
         self.fig=Figure()
         axf=self.fig.add_subplot(111)
         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.fill_between(xv,xv1,0.10,label='Numerical solution',facecolor='black')
+        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+        axf.fill_between(xv,xv1,0.10,facecolor='black')
         axf.set_ylim(0.,0.1)
-        axf.legend()
-        axf.set_title('condensate')
+        axf.set_title('An example of dark soliton')
         self.addmpl(self.fig) 
 
     def initial(self):
@@ -106,7 +110,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.fig.clear()
                 ax1f2=self.fig.add_subplot(111)
                 ax1f2.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f2.set_ylabel('density $|\psi|^2$',fontsize=14)
+                ax1f2.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 ax1f2.fill_between(xv1,globals()['xv%s' %i],0.10,facecolor='black')
                 ax1f2.set_ylim(0.,0.1)
                 ax1f2.set_title('initial state')
@@ -117,10 +121,12 @@ class DS(QMainWindow,Ui_MainWindow):
         self.rmmpl()
         self.addmpl(self.fig_dict[str(text)])
         self.fig=None
+        self.timer1.stop()
+        self.timer2.stop()
         
     def addfig(self,name,fig):
         self.fig_dict[name]=fig
-        self.mplfigs.addItem(name)
+        self.mplfigs.addItem(name)       
         
     def delfig(self):
         listItems=self.mplfigs.selectedItems()
@@ -137,7 +143,7 @@ class DS(QMainWindow,Ui_MainWindow):
         
     def rmmpl(self):
         self.mplvl.removeWidget(self.toolbar)
-        self.canvas.close()        
+        self.toolbar.close()        
         self.mplvl.removeWidget(self.canvas)
         self.canvas.close()
 
@@ -150,7 +156,7 @@ class DS(QMainWindow,Ui_MainWindow):
         
     def rmmpl2(self):
         self.mplvl_2.removeWidget(self.toolbar)
-        self.canvas.close()        
+        self.toolbar.close()        
         self.mplvl_2.removeWidget(self.canvas)
         self.canvas.close()
         
@@ -160,13 +166,14 @@ class DS(QMainWindow,Ui_MainWindow):
         
         if (self.radioButton.isChecked()==True):
             if (self.sim==74):
-                self.timer.stop()
-        if (self.radioButton_2.isChecked()==True):
+                self.timer1.stop()
             if (self.sim==self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
-                self.timer.stop()
+                self.timer1.stop()
         if (self.radioButton_3.isChecked()==True):
             if (self.sim==self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
-                self.timer.stop()
+                self.timer1.stop()
+                
+                
             
     def plot2(self):
         self.sim -=1
@@ -174,22 +181,37 @@ class DS(QMainWindow,Ui_MainWindow):
 
         
         if (self.sim==0):
-            self.timer.stop()
+            self.timer2.stop()
             
     def on(self):
-        self.timer=QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot)
-        self.timer.start(75)
+        if self.timer2==None:
+            self.timer1=QtCore.QTimer(self)
+            self.timer1.timeout.connect(self.plot)
+            self.timer1.start(75)
+        else:
+            self.timer1=QtCore.QTimer(self)
+            self.timer1.timeout.connect(self.plot)
+            self.timer2.stop()
+            self.timer1.start(75)
     
     def pause(self):
-        self.timer.stop()
+        self.timer1.stop()
+        self.timer2.stop()
         
     def back1(self):
-        self.timer=QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot2)
-        self.timer.start(75)
-
+        if self.timer1==None:
+            self.timer2=QtCore.QTimer(self)
+            self.timer2.timeout.connect(self.plot2)
+            self.timer2.start(75)
+        else:
+            self.timer2=QtCore.QTimer(self)
+            self.timer2.timeout.connect(self.plot2)
+            self.timer1.stop()
+            self.timer2.start(75)
+            
     def game_call(self):
+        self.timer1.stop()
+        self.timer2.stop()
         if (self.radioButton.isChecked()==True):
             if (self.radioButton_densi.isChecked()==True):
                 self.widget_osci.hide()
@@ -231,7 +253,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 fig4=Figure()
                 axf=fig4.add_subplot(111)
                 axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+                axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 axf.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 axf.set_title('state at %s' %np.real(self.sim/10.))
                 axf.set_ylim(0.,0.6)
@@ -297,7 +319,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 fig3=Figure()
                 ax1f3=fig3.add_subplot(111)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
                 ax1f3.set_ylim(0.,0.1)
@@ -322,10 +344,10 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.addmpl2(fig5)
                 ax1f3=fig5.add_subplot(111)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 ax1f3.set_ylim(0.,0.6)                
-                ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3)
+                ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3,'y-',lw=2)
                 ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
                 self.canvas.draw() 
                 
@@ -377,6 +399,9 @@ class DS(QMainWindow,Ui_MainWindow):
                     self.canvas.draw()
                 
                 if (self.radioButton_2.isChecked()==True) and (self.spinBox_2.value()==1):
+                    self.ani_co += 1
+                    if self.ani_co>1:
+                        self.ani.event_source.stop()
                     tf_sim =  time1/10.
                     def simData():
                         L=self.spin_amplitude.value()
@@ -412,9 +437,9 @@ class DS(QMainWindow,Ui_MainWindow):
                     def simPoints(simData):
                         y, t = simData[0], simData[1]
                         if self.spin_amplitude.value()>=0:
-                            ori = -self.spin_amplitude.value()-1.
+                            ori = -self.spin_amplitude.value()-3.
                         if self.spin_amplitude.value()<=0:
-                            ori = self.spin_amplitude.value()-1.
+                            ori = self.spin_amplitude.value()-3.
                         time_text.set_text(time_template%(t))
                         thisy = [ori, y]
                     
@@ -438,22 +463,21 @@ class DS(QMainWindow,Ui_MainWindow):
     #                gs = gridspec.GridSpec(10, 10)
     #                ax = fig3.add_subplot(gs[:,03], xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
     #                ax2 = fig3.add_subplot(gs[:,4:])
-                    ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
-                    ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-15., 15.))
+                    ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-10,10))
+                    ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
     #                ax = fig3.add_subplot(121)   
     #                ax2 = fig3.add_subplot(122)
                     ax.set_title('Muelle')
                     ax.set_xticks(np.arange(-1., 2., 1.))
                     ax.set_xlim(-1,1)
-                    if self.spin_amplitude.value()>=0:
-                        ax.set_ylim(-self.spin_amplitude.value()-2.,self.spin_amplitude.value()+2.)
-                    if self.spin_amplitude.value()<=0:
-                        ax.set_ylim(self.spin_amplitude.value()-2.,-self.spin_amplitude.value()+2.)
+#                    if self.spin_amplitude.value()>=0:
+#                        ax.set_ylim(-self.spin_amplitude.value()-2.,self.spin_amplitude.value()+2.)
+#                    if self.spin_amplitude.value()<=0:
+#                        ax.set_ylim(self.spin_amplitude.value()-2.,-self.spin_amplitude.value()+2.)
   
                     ax2.set_xlabel('$T*w_{ho}$',fontsize=17)        
                     ax2.set_ylabel('$x/a_{ho}$',fontsize=17)
                     ax2.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
-                               
                     ax2.set_title('evolution condensate')
                     self.addmpl2(fig3)
                     
@@ -487,12 +511,12 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.addmpl2(fig3)
                 ax1f3=fig3.add_subplot(111)
                 ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_xlabel('density $|\psi|^2$',fontsize=14)
+                ax1f3.set_xlabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_ylim(0.,0.1)                  
-                ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3)
+                ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3,'y-',lw=2)
                 ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
                 self.canvas.draw()    
             
@@ -509,11 +533,14 @@ class DS(QMainWindow,Ui_MainWindow):
         self.mplfigs.show()
 
     def start1(self):
+        self.timer1.stop()
+        self.timer2.stop()
         dialog = QtGui.QDialog()    
         progressBar = Ui_porcessProgress()
         progressBar.setupUi(dialog)
         dialog.show()
         diff = 0
+
         
         if (self.radioButton.isChecked()==True):
             self.file.write('...Módulo seleccionado: Lineal continuation...\n\n' )
@@ -584,7 +611,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.fig=Figure()
             axf=self.fig.add_subplot(111)
             axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+            axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
             axf.fill_between(xv2,yv2,0.6,facecolor='black')
             axf.set_title('state at %s' %np.real(0/10.))
             self.addmpl(self.fig)
@@ -781,7 +808,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.fig=Figure()
             axf4=self.fig.add_subplot(111)
             axf4.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf4.set_ylabel('density $|\psi|^2$',fontsize=14)
+            axf4.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
             axf4.fill_between(xv2,yv2,0.1,facecolor='black')
             axf4.set_ylim(0.,0.10)
             axf4.set_title('state at %s' %np.real(0/10.))
@@ -842,36 +869,25 @@ class DS(QMainWindow,Ui_MainWindow):
             ax1f2=fig2.add_subplot(111)
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
             ax1f2.set_ylabel('$E/hw$',fontsize=17)
-            ax1f2.plot(xv,yv, 'b.-')
-            ax1f2.set_title('Medium Energy')
+            ax1f2.plot(xv,yv, 'r.-' , label='Mean Energy')
             
-            fig=Figure()
-            ax2f2=fig.add_subplot(111)
-            ax2f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f2.set_ylabel('$E/hw$',fontsize=17)
-            ax2f2.plot(xv,zv, 'r.-')
-            ax2f2.set_title('Chemical Potential')
+            ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
+            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.plot(xv,zv, 'g.-', label='Chemical Potential')
             
-            fig4=Figure()
-            ax2f4=fig4.add_subplot(111)
-            ax2f4.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f4.set_ylabel('$E/hw$',fontsize=17)
-            ax2f4.plot(xv,cv, 'r.-')
-            ax2f4.set_title('Kinetic energy')
+            ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
+            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.plot(xv,cv, 'y.-', label='Kinetic energy')
             
-            fig5=Figure()
-            ax2f5=fig5.add_subplot(111)
-            ax2f5.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f5.set_ylabel('$E/hw$',fontsize=17)
-            ax2f5.plot(xv,vv, 'r.-')
-            ax2f5.set_title('Potential energy')
+            ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
+            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.plot(xv,vv, 'b.-',label='Potential energy')
             
-            fig6=Figure()
-            ax2f6=fig6.add_subplot(111)
-            ax2f6.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax2f6.set_ylabel('$E/hw$',fontsize=17)
-            ax2f6.plot(xv,bv, 'r.-')
-            ax2f6.set_title('Interaction energy')
+            ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
+            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.plot(xv,bv, 'm.-', label='Interaction energy')
+            
+            ax1f2.legend()
               
             self.slider_simulation.setValue(0)
             
@@ -884,11 +900,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.delfig()
                 self.delfig()
                 self.addfig('PHASE',fig1)
-                self.addfig('MEDIUM ENERGY',fig2)
-                self.addfig('CHEMICAL POTENTIAL',fig)     
-                self.addfig('KINETIC ENERGY',fig4)
-                self.addfig('POTENTIAL ENERGY',fig5)
-                self.addfig('INTERACTION ENERGY',fig6)
+                self.addfig('ENERGY',fig2)
                 self.addfig('DENSITY MAP',self.fig3)
                 
             if (self.radioButton_3.isChecked()==True):
@@ -898,11 +910,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.delfig()
                 self.delfig()
                 self.delfig()
-                self.addfig('MEDIUM ENERGY',fig2)
-                self.addfig('CHEMICAL POTENTIAL',fig)
-                self.addfig('KINETIC ENERGY',fig4)
-                self.addfig('POTENTIAL ENERGY',fig5)
-                self.addfig('INTERACTION ENERGY',fig6)
+                self.addfig('ENERGY',fig2)
                 self.addfig('DENSITY MAP',self.fig3)
                 
                 
@@ -937,7 +945,7 @@ class DS(QMainWindow,Ui_MainWindow):
                         self.fig.clear()
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+                        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                         axf.set_ylim([0,0.6])
                         axf.fill_between(xv1,xv2,0.6,facecolor='black')
                         axf.set_title('state at %s' %np.real(i/10.))
@@ -982,9 +990,10 @@ class DS(QMainWindow,Ui_MainWindow):
                         self.fig.clear()
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
+                        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
                         if (self.radioButton_ph.isChecked()==True):
                             axf.set_xlim([-8.5,8.5])
+                            axf.set_ylim(-4.,4.)
                             axf.plot(xv1,xv2)
                         if (self.radioButton_dens.isChecked()==True):
                             axf.fill_between(xv1,xv2,0.1,facecolor='black')
@@ -1008,7 +1017,12 @@ class DS(QMainWindow,Ui_MainWindow):
             event.accept()
         else:
             event.ignore()
-            
+ 
+class NavigationToolbar(NavigationToolbar2QT):
+    # only display the buttons we need
+    toolitems = [t for t in NavigationToolbar2QT.toolitems if
+                 t[0] in ('Home','Pan', 'Zoom', 'Save','Back','Forward')]
+                 
 class Ui_porcessProgress(object):
     def setupUi(self, porcessProgress):
         porcessProgress.setObjectName("porcessProgress")

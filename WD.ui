@@ -155,7 +155,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Number of oscilations:</string>
+      <string>Number of oscillations:</string>
      </property>
     </widget>
     <widget class="QPushButton" name="start">
