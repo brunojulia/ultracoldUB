@@ -19,7 +19,7 @@ import matplotlib.animation as animation
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT)
 import time
 pause_spr = False
 on_spr = True
@@ -54,16 +54,23 @@ class WD(QMainWindow,Ui_MainWindow):
         self.slider_simulation.valueChanged.connect(self.simulation)
         self.fig_dict={}
         self.mplfigs.itemClicked.connect(self.changefig)
-        self.fig=Figure()
+        self.fig=plt.figure()
         self.addmpl(self.fig)
         
         self.pushButton_game.clicked.connect(self.game_call)
         self.pushButton_try.clicked.connect(self.graph_try)
         self.pushButton_return.clicked.connect(self.game_return)
         self.mplwindow_2.hide()
-
+        
+        self.timer1=QtCore.QTimer(self)
+        self.timer2=QtCore.QTimer(self)
+        
+        self.ani_co=0
+        
 
     def start1(self):
+        self.timer1.stop()
+        self.timer2.stop()
         dialog = QtGui.QDialog()    
         progressBar = Ui_porcessProgress()
         progressBar.setupUi(dialog)
@@ -166,12 +173,12 @@ class WD(QMainWindow,Ui_MainWindow):
         
         
         self.rmmpl()
-        self.fig=Figure()
+        self.fig=plt.figure()
         axf=self.fig.add_subplot(111)
         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-        axf.fill_between(xv1,0,xv2,label='R-Space',facecolor='blue')
-        axf.fill_between(xv1,0,xv3,label='K-Space',facecolor='green')
+        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+        axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
+        axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
         axf.set_xlim([-20,20])
         if (self.true1==0):
             axf.set_ylim(0,0.6)
@@ -229,26 +236,18 @@ class WD(QMainWindow,Ui_MainWindow):
         ax1f2=self.fig2.add_subplot(111)
         ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
         ax1f2.set_ylabel('$x/a_{ho}$',fontsize=17)
-        ax1f2.plot(xv,yv, 'b.-',label='$R-Space$')
-        ax1f2.plot(xv,iv, 'y.-',label='$k-Space$')
-        ax1f2.legend()
-        ax1f2.set_title('Mean value x')
-        
-        fig3=Figure()
-        ax2f3=fig3.add_subplot(111)
-        ax2f3.set_xlabel('$T/t_{ho}$',fontsize=17)
-        ax2f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-        ax2f3.plot(xv,zv, 'b.-',label='$R-Space$')
-        ax2f3.plot(xv,jv, 'y.-',label='$k-Space$')
-        ax2f3.legend()
-        ax2f3.set_title('Mean value x dispersion')
+        ax1f2.plot(xv,yv, 'b.',label='$R-Space:<x> $')
+        ax1f2.plot(xv,iv, 'y--',label='$k-Space:<k>$')
+        ax1f2.plot(xv,zv, 'b--',label='$R-Space:dispersion$')
+        ax1f2.plot(xv,jv, 'y.',label='$k-Space:dispersion$')
 
+        ax1f2.legend(loc='best')
+        
         self.delfig()        
         self.delfig()
         self.delfig()
         self.addfig('ENERGY',fig)
         self.addfig('MEAN VALUE X',self.fig2)
-        self.addfig('DISPERSION', fig3)
         self.slider_simulation.setValue(0)
         
     def simulation(self):
@@ -280,14 +279,14 @@ class WD(QMainWindow,Ui_MainWindow):
                     
                     if self.fig==None:
                         self.rmmpl()
-                        self.fig=Figure()
+                        self.fig=plt.figure()
                         self.addmpl(self.fig)
                     self.fig.clear()
                     axf=self.fig.add_subplot(111)
                     axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                    axf.set_ylabel('density $|\psi|^2$',fontsize=14)
-                    axf.fill_between(xv1,0,xv2,label='R-Space',facecolor='blue')
-                    axf.fill_between(xv1,0,xv3,label='K-Space',facecolor='green')
+                    axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                    axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
+                    axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
                     axf.set_xlim([-20,20])
                     if (self.true1==0):
                         axf.set_ylim(0,0.6)
@@ -298,6 +297,8 @@ class WD(QMainWindow,Ui_MainWindow):
             os.chdir(prevdir)
     
     def game_call(self):
+        self.timer1.stop()
+        self.timer2.stop()
         if (self.radioButton.isChecked()==True):
             
             if (self.radioButton_oscil.isChecked()==True):
@@ -341,6 +342,9 @@ class WD(QMainWindow,Ui_MainWindow):
     def graph_try(self):
         if (self.radioButton.isChecked()==True):
             if (self.radioButton_oscil.isChecked()==True):
+                self.ani_co += 1
+                if self.ani_co>1:
+                    self.ani.event_source.stop()
                 time1=self.spinBox.value()*int((10*np.pi*2.0))-1
                 self.rmmpl2()
                 prevdir = os.getcwd()
@@ -437,7 +441,7 @@ class WD(QMainWindow,Ui_MainWindow):
 #                ax = fig3.add_subplot(gs[:,03], xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
 #                ax2 = fig3.add_subplot(gs[:,4:])
                 ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
-                ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.horizontalSlider.value(), self.horizontalSlider.value()))
+                ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
 #                ax = fig3.add_subplot(121)   
 #                ax2 = fig3.add_subplot(122)
                 ax.set_title('Muelle')
@@ -475,7 +479,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.rmmpl2()
         self.mplwindow_2.hide()
         self.game.hide()
-        self.fig=Figure()
+        self.fig=plt.figure()
         self.addmpl(self.fig)
         self.mplwindow.show()
         self.start.show()
@@ -485,37 +489,52 @@ class WD(QMainWindow,Ui_MainWindow):
         self.sim +=1
         self.slider_simulation.setValue(self.sim)
         
-        
         if (self.sim==self.spinBox.value()*int((10*np.pi*(2.))-1)):
-            self.sim=self.sim-1
-            self.timer.stop()
-        
+            self.timer1.stop()
+                
+                
+            
     def plot2(self):
         self.sim -=1
         self.slider_simulation.setValue(self.sim)
 
         
         if (self.sim==0):
-            self.timer.stop()
+            self.timer2.stop()
             
     def on(self):
-        self.timer=QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot)
-        self.timer.start(75)
+        if self.timer2==None:
+            self.timer1=QtCore.QTimer(self)
+            self.timer1.timeout.connect(self.plot)
+            self.timer1.start(75)
+        else:
+            self.timer1=QtCore.QTimer(self)
+            self.timer1.timeout.connect(self.plot)
+            self.timer2.stop()
+            self.timer1.start(75)
     
     def pause(self):
-        self.timer.stop()
+        self.timer1.stop()
+        self.timer2.stop()
         
     def back1(self):
-        self.timer=QtCore.QTimer(self)
-        self.timer.timeout.connect(self.plot2)
-        self.timer.start(75)
+        if self.timer1==None:
+            self.timer2=QtCore.QTimer(self)
+            self.timer2.timeout.connect(self.plot2)
+            self.timer2.start(75)
+        else:
+            self.timer2=QtCore.QTimer(self)
+            self.timer2.timeout.connect(self.plot2)
+            self.timer1.stop()
+            self.timer2.start(75)
         
     def changefig(self,item):
         text=item.text()
         self.rmmpl()
         self.addmpl(self.fig_dict[str(text)])
         self.fig=None
+        self.timer1.stop()
+        self.timer2.stop()
         
     def addfig(self,name,fig):
         self.fig_dict[name]=fig
@@ -536,7 +555,7 @@ class WD(QMainWindow,Ui_MainWindow):
     
     def rmmpl(self):
         self.mplvl.removeWidget(self.toolbar)
-        self.canvas.close()        
+        self.toolbar.close()        
         self.mplvl.removeWidget(self.canvas)
         self.canvas.close()
         
@@ -549,7 +568,7 @@ class WD(QMainWindow,Ui_MainWindow):
         
     def rmmpl2(self):
         self.mplvl_2.removeWidget(self.toolbar)
-        self.canvas.close()        
+        self.toolbar.close()        
         self.mplvl_2.removeWidget(self.canvas)
         self.canvas.close()
         
@@ -567,7 +586,12 @@ class WD(QMainWindow,Ui_MainWindow):
             self.file.close()
         else:
             event.ignore()
- 
+
+class NavigationToolbar(NavigationToolbar2QT):
+    # only display the buttons we need
+    toolitems = [t for t in NavigationToolbar2QT.toolitems if
+                 t[0] in ('Home','Pan', 'Zoom', 'Save','Back','Forward')]
+                   
 class Ui_porcessProgress(object):
     def setupUi(self, porcessProgress):
         porcessProgress.setObjectName("porcessProgress")
