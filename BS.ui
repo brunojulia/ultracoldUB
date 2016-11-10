@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>UltracoldUB: Bright solitons laboratory</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="back">
@@ -187,16 +187,16 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>-50</number>
+       <number>-25</number>
       </property>
       <property name="maximum">
-       <number>50</number>
+       <number>25</number>
       </property>
       <property name="singleStep">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="value">
-       <number>-30</number>
+       <number>-25</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -236,8 +236,20 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
       <property name="maximum">
-       <number>10</number>
+       <number>5</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="sliderPosition">
+       <number>2</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -246,7 +258,7 @@
        <enum>QSlider::TicksBelow</enum>
       </property>
       <property name="tickInterval">
-       <number>2</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QLabel" name="valor_x0_none">
@@ -1226,7 +1238,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>711</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -1242,11 +1254,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>850</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>281</y>
+     <y>421</y>
     </hint>
    </hints>
   </connection>
@@ -1258,7 +1270,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>971</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>960</x>
@@ -1274,11 +1286,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>711</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>281</y>
+     <y>421</y>
     </hint>
    </hints>
   </connection>
@@ -1290,7 +1302,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>711</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>960</x>
@@ -1306,7 +1318,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>850</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -1322,7 +1334,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>850</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>960</x>
@@ -1338,7 +1350,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>971</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -1354,43 +1366,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>971</x>
-     <y>147</y>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>281</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>valor_x0_none</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>940</x>
-     <y>202</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>755</x>
-     <y>173</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider_2</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>valor_v0_none</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>830</x>
-     <y>252</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>755</x>
-     <y>223</y>
+     <y>421</y>
     </hint>
    </hints>
   </connection>
@@ -1402,11 +1382,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>940</x>
-     <y>202</y>
+     <y>342</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>173</y>
+     <y>313</y>
     </hint>
    </hints>
   </connection>
@@ -1418,11 +1398,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>940</x>
-     <y>201</y>
+     <y>381</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>173</y>
+     <y>353</y>
     </hint>
    </hints>
   </connection>
@@ -1434,11 +1414,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>830</x>
-     <y>252</y>
+     <y>432</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>223</y>
+     <y>403</y>
     </hint>
    </hints>
   </connection>
@@ -1450,11 +1430,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>840</x>
-     <y>312</y>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
-     <y>283</y>
+     <y>463</y>
     </hint>
    </hints>
   </connection>
@@ -1466,7 +1446,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>445</x>
@@ -1482,7 +1462,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -1498,7 +1478,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>556</x>
@@ -1546,11 +1526,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>65</x>
-     <y>92</y>
+     <y>551</y>
     </hint>
     <hint type="destinationlabel">
      <x>129</x>
-     <y>65</y>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1562,7 +1542,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>510</x>
@@ -1578,7 +1558,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>915</x>
-     <y>496</y>
+     <y>517</y>
     </hint>
     <hint type="destinationlabel">
      <x>647</x>
@@ -1610,11 +1590,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>499</y>
+     <y>520</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
    </hints>
   </connection>
@@ -1625,12 +1605,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>548</x>
+     <x>544</x>
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
    </hints>
   </connection>
@@ -1642,11 +1622,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>849</x>
-     <y>491</y>
+     <y>512</y>
     </hint>
     <hint type="destinationlabel">
      <x>17</x>
-     <y>65</y>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1658,11 +1638,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>866</x>
-     <y>489</y>
+     <y>510</y>
     </hint>
     <hint type="destinationlabel">
      <x>116</x>
-     <y>56</y>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1678,7 +1658,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
-     <y>96</y>
+     <y>551</y>
     </hint>
    </hints>
   </connection>
@@ -1694,7 +1674,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>464</x>
-     <y>82</y>
+     <y>551</y>
     </hint>
    </hints>
   </connection>
@@ -1710,7 +1690,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>23</x>
-     <y>57</y>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1726,7 +1706,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>103</x>
-     <y>57</y>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1738,7 +1718,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>947</x>
-     <y>485</y>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
@@ -1770,7 +1750,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>834</x>
-     <y>413</y>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>757</x>
@@ -1786,11 +1766,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>886</x>
-     <y>493</y>
+     <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>329</x>
-     <y>42</y>
+     <x>460</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1802,11 +1782,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>896</x>
-     <y>489</y>
+     <y>510</y>
     </hint>
     <hint type="destinationlabel">
-     <x>277</x>
-     <y>42</y>
+     <x>350</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1818,11 +1798,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>892</x>
-     <y>495</y>
+     <y>516</y>
     </hint>
     <hint type="destinationlabel">
-     <x>188</x>
-     <y>47</y>
+     <x>240</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1837,8 +1817,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>341</x>
-     <y>41</y>
+     <x>460</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1853,8 +1833,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>246</x>
-     <y>50</y>
+     <x>350</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1869,8 +1849,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>156</x>
-     <y>42</y>
+     <x>240</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1882,11 +1862,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>925</x>
-     <y>499</y>
+     <y>520</y>
     </hint>
     <hint type="destinationlabel">
      <x>898</x>
-     <y>497</y>
+     <y>518</y>
     </hint>
    </hints>
   </connection>
@@ -1902,7 +1882,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>848</x>
-     <y>487</y>
+     <y>508</y>
     </hint>
    </hints>
   </connection>
@@ -1914,11 +1894,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>647</x>
-     <y>446</y>
+     <y>467</y>
     </hint>
     <hint type="destinationlabel">
-     <x>369</x>
-     <y>36</y>
+     <x>460</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -1930,7 +1910,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>846</x>
-     <y>458</y>
+     <y>479</y>
     </hint>
     <hint type="destinationlabel">
      <x>590</x>
@@ -1962,7 +1942,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>855</x>
-     <y>461</y>
+     <y>482</y>
     </hint>
     <hint type="destinationlabel">
      <x>797</x>
@@ -1994,11 +1974,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>888</x>
-     <y>457</y>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>812</x>
-     <y>399</y>
+     <y>421</y>
     </hint>
    </hints>
   </connection>
@@ -2014,7 +1994,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>769</x>
-     <y>407</y>
+     <y>428</y>
     </hint>
    </hints>
   </connection>

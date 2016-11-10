@@ -14,10 +14,16 @@ from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+#from matplotlib._png import read_png
+import matplotlib.image as mpimg
+#from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationBbox
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+#from matplotlib.cbook import get_sample_data
 
 import time
 Ui_MainWindow,QMainWindow=loadUiType('BS.ui')
@@ -73,8 +79,8 @@ class BS(QMainWindow,Ui_MainWindow):
             
         self.fig=Figure()        
         figini=self.fig.add_subplot(111)
-        figini.set_xlabel("Position ($x/a_{ho}$)")
-        figini.set_ylabel("Density $|\psi|^2$")
+        figini.set_xlabel("Position ($x/ \\xi$)")
+        figini.set_ylabel("Density $|\psi|^2 \\xi$")
         figini.set_title("An example of bright soliton")
         figini.plot(ax,aphi)
         self.addmpl(self.fig)
@@ -85,9 +91,21 @@ class BS(QMainWindow,Ui_MainWindow):
         self.tanca.clicked.connect(self.torna)
         self.intenta.clicked.connect(self.grafica)
         
+        self.horizontalSlider.valueChanged.connect(self.escriu2x)
+        self.horizontalSlider_2.valueChanged.connect(self.escriu2v)
+        
         self.btn_none.clicked.connect(self.initial)
         self.btn_harm.clicked.connect(self.initial)
         self.btn_wall.clicked.connect(self.initial)
+        
+#        if self.btn_none.isChecked()==True:
+#            self.setWindowTitle("Bright solitons laboratory: Free bright solitons")
+#        elif self.btn_harm.isChecked()==True:
+#            self.setWindowTitle("Bright solitons laboratory: Solitons under an harmonic trap")
+#        elif self.btn_wall.isChecked()==True:
+#            self.setWindowTitle("Bright solitons laboratory: Solitons through a barrier")
+        
+        self.horizontalSlider_2.setSingleStep(2)
 
         self.fig_dict={}
         
@@ -95,6 +113,12 @@ class BS(QMainWindow,Ui_MainWindow):
 
         self.start.clicked.connect(self.start2) #despres definirem start2 que ens dona les dades inicials
         self.back.clicked.connect(self.close)
+        
+    def escriu2x(self):
+        self.valor_x0_none.setNum(2*self.horizontalSlider.value())
+        
+    def escriu2v(self):
+        self.valor_v0_none.setNum(2*self.horizontalSlider_2.value())
         
     def initial(self):
         global language
@@ -121,14 +145,15 @@ class BS(QMainWindow,Ui_MainWindow):
             self.addmpl(self.fig)
         self.fig.clear()
         figini=self.fig.add_subplot(111)
-        figini.set_xlabel("Position ($x/a_{ho}$)")
-        figini.set_ylabel("Density $|\psi|^2$")
+        figini.set_xlabel("Position ($x/ \\xi $)")
+        figini.set_ylabel("Density $|\psi|^2 \\xi$")
         figini.set_title("An example of bright soliton")
         figini.plot(ax,aphi)
         self.canvas.draw()
         self.slider_simulation.hide()
         self.ButtonOn.hide()
         self.ButtonBack.hide()
+   #     self.ButtonPause.click()
         self.ButtonPause.hide()
         self.value_sim.hide()
         self.label_5.hide()
@@ -224,7 +249,7 @@ class BS(QMainWindow,Ui_MainWindow):
             file_data=open('input.txt','w')
 #            self.slider_simulation.setValue(self.sim)
             if pot==0:           
-                file_data.write('%d \t %d \t %f \t %f \t %d \t %f' %(0,self.gn.value(),self.horizontalSlider.value(),self.horizontalSlider_2.value(),self.yes_no.value(),tempss))
+                file_data.write('%d \t %d \t %f \t %f \t %d \t %f' %(0,self.gn.value(),self.horizontalSlider.value()*2.0,self.horizontalSlider_2.value()*2.0,self.yes_no.value(),tempss))
             elif pot==1:
                 file_data.write('%d \t %d \t %f \t %d \t %d' %(1,self.gn.value(),self.horizontalSlider_3.value(),self.spinBox.value(),0))
             elif pot==2:
@@ -306,7 +331,7 @@ class BS(QMainWindow,Ui_MainWindow):
                         QApplication.processEvents()
                 os.chdir(prev)
             
-            time.sleep(3)
+            time.sleep(2)
             
             self.ButtonOn.show() 
             self.ButtonBack.show()
@@ -373,8 +398,12 @@ class BS(QMainWindow,Ui_MainWindow):
        #     figmv.axes.set_xlim([0,20.0])
             figmv.axes.set_ylim([-128.0,128.0])
         figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($t/ \omega$)")
-        figmv.set_ylabel("Position ($x/a_{ho}$)")
+        if pot==0 or pot==2:
+            figmv.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)")
+            figmv.set_ylabel("Position ($x/ \\xi$)")
+        elif pot==1:
+            figmv.set_xlabel("Time ($t/ \omega_{ho}$)")
+            figmv.set_ylabel("Position ($x/a_{ho}$)")
             
         #energies
         ftime=[]
@@ -423,15 +452,19 @@ class BS(QMainWindow,Ui_MainWindow):
         allenergies.plot(atime,aepot,label='$E_{pot}$')
         allenergies.plot(atime,aeint,label='$E_{int}$')
         allenergies.set_title("Energies")
-        allenergies.set_xlabel("Time ($t/ \omega$)")
-        allenergies.set_ylabel("Energy per particle ($E/ \hbar \omega$)")
+        if pot==0 or pot==1:
+            allenergies.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
+            allenergies.set_ylabel("Energy per particle ($E $  $({m \\xi^2})/{\hbar^2}$)")
+        elif pot==1:
+            allenergies.set_xlabel("Time ($t/ \omega_{ho}$)")
+            allenergies.set_ylabel("Energy per particle ($E/ \hbar \omega_{ho}$)")
         allenergies.legend()
         if pot==2:
             integrals=fig3.add_subplot(111)
             integrals.plot(atime,alint,label='left side')
             integrals.plot(atime,aiint,label='inside')
             integrals.plot(atime,arint,label='right side')
-            integrals.set_xlabel("Time ($t/ \omega$)")
+            integrals.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)")
             integrals.set_title("Integrals of the wave function")
             integrals.legend()
         elif pot==1:    
@@ -442,17 +475,20 @@ class BS(QMainWindow,Ui_MainWindow):
         meanvelocity=fig4.add_subplot(111)
         meanvelocity.plot(atmv,avelm)
         meanvelocity.set_title("Mean velocity of the soliton")
-        meanvelocity.set_xlabel("Time ($t/ \omega$)")
-        meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
-        if pot==1:
+        if pot==0 or pot==1:
+            meanvelocity.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
+            meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v $  ${m \\xi}/{\hbar}$)")
+        elif pot==1:
+            meanvelocity.set_xlabel("Time ($t/ \omega$)")
+            meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
             meanvelocity.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
             
-        fig7=Figure()
+        fig7=Figure()       #only for harmonic potential
         velpos=fig7.add_subplot(111)
         velpos.plot(amv,avelm)
         velpos.set_title("$<|v|>$ with $<x>$")
         velpos.set_xlabel("Position ($x/ a_{ho}$)")
-        velpos.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
+        velpos.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega_{ho}$)")
           
         self.delfig()
         self.delfig()
@@ -535,7 +571,7 @@ class BS(QMainWindow,Ui_MainWindow):
         figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
         figmv.axes.set_ylim([-34.0,34.0])
         figmv.set_title("Position of the soliton")
-        figmv.set_xlabel("Time ($t/ \omega$)")
+        figmv.set_xlabel("Time ($t/ \omega_{ho}$)")
         figmv.set_ylabel("Position ($x/ a_{ho}$)")
             
     def simulation(self):
@@ -575,26 +611,89 @@ class BS(QMainWindow,Ui_MainWindow):
                 phi2=np.array(listphi)
                 pote=np.array(listpot)
                 confin=np.array(listconf)
-                        
-                if self.fig==None:
-                    self.rmmpl()
-                    self.fig=Figure()
-                    self.addmpl(self.fig)
-                self.fig.clear()
-                state=self.fig.add_subplot(111)
-                state.set_xlabel("Position ($x/ a_{ho}$)")
-                state.set_ylabel("Density $|\psi|^2$")
-                state.plot(posit,phi2)
-                state.fill_between(posit,phi2,0,facecolor='0.80')
-                state.plot(posit,pote,'g',label="Potential")
-                state.plot(posit,confin,'g')
-                state.set_ylim(0,0.3)
-                if (self.yes_no.value()==1):
-                    state.set_xlim(-100,100)
-                else:
+                
+                if (self.yes_no.value()==1): #soliton in a box
+                    if self.fig==None:
+                        self.rmmpl()
+                        self.fig=Figure()
+                        self.addmpl(self.fig)
+                    self.fig.clear()
+                    gs=GridSpec(8,1)  #7 rows and 1 column
+                    state=self.fig.add_subplot(gs[0:6,:])
+                    wave=self.fig.add_subplot(gs[6:8,:])
+             #       state=self.fig.add_subplot(111)
+             #       wave=plt.subplot2grid((3,3),(0,0),rowspan=1,colspan=3,autoscale_on=False,xlim=(-100,100),ylim=(-1,1))
+             #       state=plt.subplot2grid((3,3),(1,0),rowspan=2,colspan=3,autoscale_on=False,xlim=(-100,100),ylim=(0,0.3))                    
+                    wave.set_xlabel("Position ($x/ \\xi$)")
+                    state.set_ylabel("Density $|\psi|^2 \\xi$")
+                    state.plot(posit,phi2)
+                    state.fill_between(posit,phi2,0,facecolor='0.80')
+                    state.plot(posit,pote,'g',label="Potential")
+                    state.plot(posit,confin,'g')
+                    state.set_ylim(0,0.3)
+                    state.set_xlim(-120,120)
+                    wave.set_xlim(-120,120)
+                    state.axes.get_xaxis().set_visible(False)
+                    wave.axes.get_yaxis().set_visible(False)                    
+                    
+                    state.legend()
+                    
+                    #let's plot the wave on the string
+                    Nini=10.0*(2.0*self.horizontalSlider.value()+50.0)
+                    if self.none_20.isChecked()==True:
+                        Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0)
+                    elif self.none_40.isChecked()==True:
+                        Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0)
+                    data=open('./pulse_data/string-%08d.dat' %(round(Nnow)),'r')
+                    datalin=data.readlines()
+                    xstringl=[]
+                    ystringl=[]
+                    for l in range(1,386):
+                        xstringl.append(float(datalin[l].split('\t')[0])*100.0)
+                        ystringl.append(float(datalin[l].split('\t')[1]))
+                    xstring=np.array(xstringl)
+                    ystring=np.array(ystringl)
+                    wave.plot(xstring,ystring,color='brown',linewidth=2.0)
+                    wave.set_ylim(-1.05,1.05)
+                    
+                 #   xy = (0.5, 0.7)
+                 #   left = get_sample_data("./lside_hand.png", asfileobj=False)
+                 #   right = get_sample_data("./rside_hand.png", asfileobj=False)
+                 #   arr_l=read_png(left)
+                 #   arr_r=read_png(right)
+                 #   imageboxl = OffsetImage(arr_l, zoom=0.1)
+                 #   imageboxr = OffsetImage(arr_r, zoom=0.1)
+                 #   ab_l = AnnotationBbox(imageboxl, xy,xybox=(-107., 0))
+                 #   ab_r = AnnotationBbox(imageboxr, xy,xybox=(107., 0))
+                 #   wave.add_artist(ab_l)
+                 #   wave.add_artist(ab_r)
+                    
+                    left=mpimg.imread('lside_hand.png')
+                    right=mpimg.imread('rside_hand.png')
+                    wave.imshow(left,extent=(-120,-96,-0.5,0.5),aspect='auto')
+                    wave.imshow(right,extent=(96,120,-0.5,0.5),aspect='auto')
+                    
+                    
+                    self.canvas.draw()
+                
+                elif (self.yes_no.value()==0): #soliton in a ring                                           
+                    if self.fig==None:
+                        self.rmmpl()
+                        self.fig=Figure()
+                        self.addmpl(self.fig)
+                    self.fig.clear()
+                    state=self.fig.add_subplot(111)
+                    state.set_xlabel("Position ($x/ \\xi$)")
+                    state.set_ylabel("Density $|\psi|^2 \\xi$")
+                    state.plot(posit,phi2)
+                    state.fill_between(posit,phi2,0,facecolor='0.80')
+                    state.plot(posit,pote,'g',label="Potential")
+                    state.plot(posit,confin,'g')
+                    state.set_ylim(0,0.3)
                     state.set_xlim(-128,128)
-                state.legend()
-                self.canvas.draw()
+                    state.legend()
+                    self.canvas.draw()
+                    
             elif pot==2:
            #     i=self.slider_simulation.value()*200
            #     data=open("WfBs-%08d.dat" %(i),'r')
@@ -626,8 +725,8 @@ class BS(QMainWindow,Ui_MainWindow):
                     self.addmpl(self.fig)
                 self.fig.clear()
                 state=self.fig.add_subplot(111)
-                state.set_xlabel("Position ($x/ a_{ho}$)")
-                state.set_ylabel("Density $|\psi|^2$")
+                state.set_xlabel("Position ($x/ \\xi$)")
+                state.set_ylabel("Density $|\psi|^2 \\xi$")
                 state.plot(posit,phi2)
                 state.fill_between(posit,phi2,0,facecolor='0.80')
                 potential=state.twinx()
@@ -636,7 +735,7 @@ class BS(QMainWindow,Ui_MainWindow):
                 potential.legend()
                 potential.set_ylim(bottom=0)
                 state.plot(posit,confin,'g')
-                potential.set_ylabel("Potential ($V/ \hbar \omega$)", color='g')
+                potential.set_ylabel("Potential ($V $  ${m \\xi^2}/{\hbar^2}$)", color='g')
                 state.set_ylim(0,0.3)
                 if (self.yes_no.value()==1):
                     state.set_xlim(-100,100)
@@ -675,8 +774,8 @@ class BS(QMainWindow,Ui_MainWindow):
                 potential.plot(posit,tote,'r', label='$E_{total}$') #in red the total energy
                 potential.legend()
                 state.set_xlabel("Position ($x/ a_{ho}$)")
-                state.set_ylabel("Density $|\psi|^2$", color='b')
-                potential.set_ylabel("Potential ($V/ \hbar \omega$)", color='g')
+                state.set_ylabel("Density $|\psi|^2 \a_{ho}$", color='b')
+                potential.set_ylabel("Potential ($V/ \hbar \omega_{ho}$)", color='g')
                 potential.set_ylim(0,0.5*(np.abs(self.horizontalSlider_3.value())+7)**2)
                 if (self.horizontalSlider_3.value() <= 0):
                     state.set_xlim(self.horizontalSlider_3.value()-7,-self.horizontalSlider_3.value()+7)
@@ -697,16 +796,25 @@ class BS(QMainWindow,Ui_MainWindow):
     def on(self):
         self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plotsim)
-        self.timer.start(75)
+        self.timer.start(25)
+     #   self.ext_potential.hide()
+     #   self.Confinement.hide()
+     #   self.interaction.hide()
         
     def backsim(self):
         self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plotsim2)
-        self.timer.start(75)
+        self.timer.start(25)
+     #   self.ext_potential.hide()
+     #   self.Confinement.hide()
+     #   self.interaction.hide()
         
     def pause(self):
 #        self.timer=QtCore.QTimer(self)   #it gives some problems
         self.timer.stop()
+     #   self.ext_potential.show()
+     #   self.Confinement.show()
+     #   self.interaction.show()
         
     def plotsim(self):
         self.sim=self.sim+1
@@ -715,6 +823,7 @@ class BS(QMainWindow,Ui_MainWindow):
         if (self.btn_none.isChecked()==True):
             if (self.sim==100):
                 self.timer.stop()
+     #           self.ButtonPause.click()
         if (self.btn_harm.isChecked()==True):
        #     if (self.spinBox.value()==1) or (self.spinBox.value()==2):
        #         if (self.sim==(60*self.spinBox.value())):
@@ -724,16 +833,20 @@ class BS(QMainWindow,Ui_MainWindow):
        #             self.timer.stop()
             if (self.sim==(60*self.spinBox.value())):
                     self.timer.stop()
+     #               self.ButtonPause.click()
         if (self.btn_wall.isChecked()==True):
             if self.wall_1.isChecked()==True:
                 if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
                     self.timer.stop()
+     #               self.ButtonPause.click()
             elif self.wall_2.isChecked()==True:
                 if (self.sim==(10*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
                     self.timer.stop()
+     #               self.ButtonPause.click()
             else:
                 if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
                     self.timer.stop()
+     #               self.ButtonPause.click()
         
     def plotsim2(self):
         self.sim=self.sim-1
@@ -741,6 +854,7 @@ class BS(QMainWindow,Ui_MainWindow):
         
         if (self.sim==0):
             self.timer.stop()
+     #       self.ButtonPause.click()
             
     def play2(self):
         global language
