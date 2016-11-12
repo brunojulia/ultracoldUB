@@ -23,6 +23,9 @@ from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanva
 pause_spr = False
 on_spr = True
 back_spr = False  
+pause_nc = False
+on_nc = True
+back_nc = False 
 Ui_MainWindow,QMainWindow=loadUiType('DS.ui')
 
 class DS(QMainWindow,Ui_MainWindow):
@@ -82,7 +85,7 @@ class DS(QMainWindow,Ui_MainWindow):
         axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
         axf.fill_between(xv,xv1,0.10,facecolor='black')
         axf.set_ylim(0.,0.1)
-        axf.set_title('An example of dark soliton')
+        axf.set_title('Bose-Einstein condensate')
         self.addmpl(self.fig) 
 
     def initial(self):
@@ -268,13 +271,20 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.textBrowser.show()
                 self.rmmpl2()
                 self.mplwindow.hide()
-                self.widget_osci.show()
+                if (self.radioButton_2.isChecked()==True):
+                    self.widget_osci.show()
+                    self.widget_osci_2.hide()
+                    self.spin_amplitude.setValue(3.)
+                    self.spin_frequency.setValue(0.5)
+                if (self.radioButton_3.isChecked()==True):
+                    self.widget_osci_2.show()
+                    self.widget_osci.hide()
+                    self.spin_amplitude_2.setValue(3.)
+                    self.spin_frequency_2.setValue(0.5)
                 self.widget_densi.hide()
                 self.start.hide()
                 self.mplfigs.hide()
                 self.addmpl2(self.fig3)
-                self.spin_amplitude.setValue(3.)
-                self.spin_frequency.setValue(0.5)
                     
             if (self.radioButton_densi.isChecked()==True):
                 self.spin_mu.setValue(25.)
@@ -381,24 +391,24 @@ class DS(QMainWindow,Ui_MainWindow):
                 finally:
                     os.chdir(prevdir)
                 
-                if (self.radioButton_2.isChecked()==True) and not (self.spinBox_2.value()==1) or (self.radioButton_3.isChecked()==True):
-                    fig3=Figure()
-                    self.addmpl2(fig3)
-                    ax1f3=fig3.add_subplot(111)
-                    ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                    ax1f3.set_xlabel('$T*w_{ho}$',fontsize=17)
-                    ax1f3.set_xlim(0,(time1-1)/10.)
-                    
-                    x=np.arange(0,time1+1)/10.
-                    y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
-                    
-                    ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
-                    ax1f3.plot(x,y)    
-                    ax1f3.set_ylim=(0.,0.6)
-                    ax1f3.set_title('evolution condensate')
-                    self.canvas.draw()
+#                if (self.radioButton_2.isChecked()==True) and not (self.spinBox_2.value()==1) or (self.radioButton_3.isChecked()==True):
+#                    fig3=Figure()
+#                    self.addmpl2(fig3)
+#                    ax1f3=fig3.add_subplot(111)
+#                    ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
+#                    ax1f3.set_xlabel('$T*w_{ho}$',fontsize=17)
+#                    ax1f3.set_xlim(0,(time1-1)/10.)
+#                    
+#                    x=np.arange(0,time1+1)/10.
+#                    y=self.spin_amplitude.value()*np.cos(self.spin_frequency.value()*x)
+#                    
+#                    ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
+#                    ax1f3.plot(x,y)    
+#                    ax1f3.set_ylim=(0.,0.6)
+#                    ax1f3.set_title('evolution condensate')
+#                    self.canvas.draw()
                 
-                if (self.radioButton_2.isChecked()==True) and (self.spinBox_2.value()==1):
+                if (self.radioButton_2.isChecked()==True):
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
@@ -410,8 +420,11 @@ class DS(QMainWindow,Ui_MainWindow):
                         w = self.spin_frequency.value()
                         y = 0.0
                         t = 0.0
-                        while t <= t_max and t >= 0:
+                        while t <= t_max:
                             if on_spr and not back_spr and not pause_spr:
+                                y = L*np.sin(w*t+np.pi/2.)
+                                t = t + dt
+                            if t<0:
                                 y = L*np.sin(w*t+np.pi/2.)
                                 t = t + dt
                             if back_spr and not on_spr and not pause_spr:
@@ -467,7 +480,7 @@ class DS(QMainWindow,Ui_MainWindow):
                     ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
     #                ax = fig3.add_subplot(121)   
     #                ax2 = fig3.add_subplot(122)
-                    ax.set_title('Muelle')
+                    ax.set_title('Spring')
                     ax.set_xticks(np.arange(-1., 2., 1.))
                     ax.set_xlim(-1,1)
 #                    if self.spin_amplitude.value()>=0:
@@ -478,7 +491,7 @@ class DS(QMainWindow,Ui_MainWindow):
                     ax2.set_xlabel('$T*w_{ho}$',fontsize=17)        
                     ax2.set_ylabel('$x/a_{ho}$',fontsize=17)
                     ax2.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
-                    ax2.set_title('evolution condensate')
+                    ax2.set_title('Condensate: real time evolution')
                     self.addmpl2(fig3)
                     
                     line, = ax.plot([], [], 'o-', lw=2)
@@ -497,7 +510,193 @@ class DS(QMainWindow,Ui_MainWindow):
                     #ani.save('muelle.mp4', fps=15)
                     self.canvas.draw()
                 
-            
+                if (self.radioButton_3.isChecked()==True):
+                    self.ani_co += 1
+                    if self.ani_co>1:
+                        self.ani.event_source.stop()
+                    on = True
+                    back = False
+                    pause = False
+                      
+                    B=self.spin_amplitude_2.value()
+                    tf_sim =  time1/10.
+                    r0=self.spin_rad.value()
+                    def simData():
+                        tf_sim =  time1/10.
+                        dt = 0.01
+                        M=self.spin_M.value()
+                        N=self.spin_N.value()
+                        r0=self.spin_rad.value()
+                        A = 0.0
+                        C = 0.0
+                        D = 0.0
+                        B=self.spin_amplitude_2.value()
+                        w = self.spin_frequency_2.value()
+                        impac=0
+                        t_max = tf_sim
+                        m2 = 1.
+                        m1 = self.spin_ratio.value()
+                        y = 0.0
+                        y2=0.0
+                        t = 0.0
+                        t_1=0.0
+                        i=0
+                        r = ((1.+((N-1)/2.))*2.*r0)+(((M-1))*r0)
+                        y_=np.empty([int(t_max/dt)+2,2])
+                        t_=np.empty([int(t_max/dt)+2])
+                        y_[0,0]=B
+                        y_[0,1]=D
+                        t_[0]=t
+                        
+                        while t <= t_max:
+                            if on_nc and not back_nc and not pause_nc:
+                                t += dt
+                                t_1 += dt
+                                i += 1
+                            if t<0:
+                                t += dt
+                                t_1 += dt
+                                i += 1
+                            if back_nc and not on_nc and not pause_nc:
+                                t -= dt
+                                t_1 -= dt
+                                i -= 1
+                             
+                            y = A*np.sin(w*t_1)+B*np.cos(w*t_1)
+                            y2 = C*np.sin(w*t_1)+D*np.cos(w*t_1)
+#                            der_y = A*w*np.cos(w*t_1)-B*w*np.sin(w*t_1)
+#                            der_y2 = C*w*np.cos(w*t_1)-D*w*np.sin(w*t_1) 
+                            
+                            y_[i,0]=y
+                            y_[i,1]=y2
+                            t_[i]=t
+                            if np.abs(y-y2)<(r+(r/100.)):
+                              t1=t_1
+                              impac +=1
+                              A_=A
+                              B_=B
+                              C_=C
+                              D_=D
+                              
+                              C=((m1-m2)/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+((2*m2/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
+                              D=A_*np.sin(w*t1)+B_*np.cos(w*t1)
+                              A=(2*m1/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+(((m2-m1)/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
+                              B=C_*np.sin(w*t1)+D_*np.cos(w*t1)
+                              
+                              if (y-y2)>0:
+                                  D=D-((N-1)/2.)*2.*r0+((M-1)*r0)
+                                  B=B-((N-1)/2.)*2.*r0+((M-1)*r0)
+                              if (y-y2)<0:
+                                  D=D+((N-1)/2.)*2.*r0-((M-1)*r0)
+                                  B=B+((N-1)/2.)*2.*r0-((M-1)*r0)
+                                 
+                              m1_=m1
+                              m2_=m2
+                              m1=m2_
+                              m2=m1_
+#                              print impac,np.abs(y-y2),t
+                              t_1=0.
+                            yield y, t, y2,t_,y_
+        
+                    def onClick(event):
+                        global pause_nc, on_nc, back_nc
+                        back_nc ^= True
+                        on_nc ^= True
+                        
+                    def init():
+                    #    time_text.set_text('')
+                        line_nc_.set_data([], [])
+                        line_nc_2.set_data([], [])
+                        for i in range(0,14):
+                            globals()['line_nc%s' %(i)].set_data([], [])
+                    
+                            return line_nc_,line_nc_2,line_nc_3,line_nc_4, globals()['line_nc%s' %(i)]
+                        
+                    def simPoints(simData):
+                        dt = 0.01
+                        M=self.spin_M.value()
+                        N=self.spin_N.value()
+                        r0=self.spin_rad.value()
+                        B = self.spin_amplitude_2.value()
+                        B_0=B
+                        r=2*r0
+                        y, t, y2, t_, y_ = simData[0], simData[1], simData[2], simData[3], simData[4]
+                    #    time_text.set_text(time_template%(t))
+                        
+                        circle1.center=(y+(r*(M-1.)/2.),np.sqrt(B_0**2-(y+(r*(M-1.)/2.))**2.))
+                        line_nc1.set_data([0.,y+(r*(M-1.)/2.)],[0.,np.sqrt(B_0**2-(y+(r*(M-1.)/2.))**2.)])
+                        line_nc2.set_data(t,y+(r*(M-1.)/2.))
+                        circle2.center=(t,y+(r*(M-1.)/2.))
+                        line_nc_.set_data(t_[:int(t/dt)],y_[:int(t/dt),0])
+                        if M==2:
+                            line_nc11.set_data([0.,y-r/2.],[0.,np.sqrt(B_0**2-(y-r/2.)**2.)])
+                            circle11.center=(y-r/2.,np.sqrt(B_0**2-(y-r/2.)**2.))
+                            line_nc12.set_data(t,y-r/2.)
+                            circle12.center=(t,y-r/2.)
+                            
+                        circle3.center=(y2-(r*(N-1.)/2.),np.sqrt(B_0**2-(y2-(r*(N-1.)/2.))**2.))
+                        line_nc3.set_data([0.,y2-(r*(N-1.)/2.)],[0.,np.sqrt(B_0**2-(y2-(r*(N-1.)/2.))**2.)])
+                        line_nc4.set_data([t,y2-(r*(N-1.)/2.)])
+                        circle4.center=(t,y2-(r*(N-1.)/2.))
+                        line_nc_2.set_data(t_[:int(t/dt)],y_[:int(t/dt),1]-(r*(N-1.)/2.))
+                        if N==2:
+                            circle5.center=(y2+r/2.,np.sqrt(B_0**2-(y2+r/2.)**2.))
+                            line_nc5.set_data([0.,y2+r/2.],[0.,np.sqrt(B_0**2-(y2+r/2.)**2.)])
+                            line_nc6.set_data([t,y2+r/2.])
+                            circle6.center=(t,y2+r/2.)
+                            line_nc_3.set_data(t_[:int(t/dt)],y_[:int(t/dt),1]+r/2.)
+                        if N==3:
+                            circle9.center=(y2,np.sqrt(B_0**2-y2**2.))
+                            line_nc9.set_data([0.,y2],[0.,np.sqrt(B_0**2-y2**2.)])
+                            line_nc10.set_data([t,y2])
+                            line_nc_3.set_data(y_[:int(t/dt),1],t_[:int(t/dt)])
+                            circle10.center=(t,y2)
+                            circle7.center=(y2+r,np.sqrt(B_0**2-(y2+r)**2.))
+                            line_nc7.set_data([0.,y2+r],[0.,np.sqrt(B_0**2-(y2+r)**2.)])
+                            line_nc8.set_data([t,y2+r])
+                            line_nc_4.set_data(t_[:int(t/dt)],y_[:int(t/dt),1]+r)
+                            circle8.center=(t,y2+r)
+                            
+                    #    time_text.set_text(time_template % (t))
+                        return (line_nc0, line_nc_, line_nc1, line_nc_2, line_nc_3, line_nc_4, line_nc3, line_nc4, line_nc5, line_nc6, line_nc7, line_nc8, line_nc9, line_nc10, line_nc11, line_nc12,
+                               circle0, circle1, circle2, circle3, circle4, circle5, circle6, circle7, circle8, circle9, circle10, circle11, circle12)      
+                        
+                    fig = plt.figure()
+                    ax = plt.subplot2grid((100,100), (0,0), rowspan=30, colspan=30, autoscale_on=False, xlim=(-B-r0-0.05,B+r0+0.05), ylim=(+B+r0+0.05,-B-r0-0.05))
+                    ax2 = plt.subplot2grid((100,100), (0,40), rowspan=100, colspan=60, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
+                    ax.set_title('NC')
+                    #ax.set_xticks(np.arange(-1., 2., 1.))
+                    ax.grid()
+                    
+                    
+                    ax2.set_xlabel('$T*w_{ho}$',fontsize=17)        
+                    ax2.set_ylabel('$x/a_{ho}$',fontsize=17)
+                    ax2.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
+                    ax2.set_title('Condensate: real time evolution')
+                    
+                    for i in range(0,17,2):
+                        globals()['line_nc%s' %(i)], = ax2.plot([], [], 'o-', lw=2)
+                        globals() ['circle%s' %(i)] = plt.Circle((10., 10.), radius=r0)
+                        ax2.add_patch(globals() ['circle%s' %(i)])
+                    for i in range(1,17,2):
+                        globals()['line_nc%s' %(i)], = ax.plot([], [], 'b-', lw=1)
+                        globals() ['circle%s' %(i)] = plt.Circle((10., 10.), radius=r0)
+                        ax.add_patch(globals() ['circle%s' %(i)])
+                        
+                    line_nc_, = ax2.plot([], [], 'b-', lw=2)
+                    for i in range(2,5):
+                        globals()['line_nc_%s' %(i)], = ax2.plot([], [], 'r-', lw=2)
+                    #time_template = 'time = %.1fs'
+                    #time_text = ax2.text(0.05, 0.9, '', transform=ax.transAxes)
+                    self.addmpl2(fig)
+                    fig.canvas.mpl_connect('button_press_event', onClick)
+                    self.ani = animation.FuncAnimation(fig, simPoints, simData,
+                                                  interval=1, blit=True, init_func=init, repeat=False)
+                    #dt=0.01
+                    #ani.save('NC_3_1.mp4')
+                    self.canvas.draw()
+                    
+                    
             if (self.radioButton_densi.isChecked()==True):
                 self.rmmpl2()
                 

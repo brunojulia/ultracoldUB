@@ -387,10 +387,13 @@ class WD(QMainWindow,Ui_MainWindow):
                     w = self.spin_frequency.value()
                     y = 0.0
                     t = 0.0
-                    while t <= t_max and t >= 0:
+                    while t <= t_max:
                         if on_spr and not back_spr and not pause_spr:
                             y = L*np.sin(w*t+np.pi/2.)
                             t = t + dt
+                        if t<0:
+                                y = L*np.sin(w*t+np.pi/2.)
+                                t = t + dt
                         if back_spr and not on_spr and not pause_spr:
                             y = L*np.sin(w*t+np.pi/2.)
                             t = t - dt
@@ -444,7 +447,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
 #                ax = fig3.add_subplot(121)   
 #                ax2 = fig3.add_subplot(122)
-                ax.set_title('Muelle')
+                ax.set_title('Spring')
                 ax.set_xticks(np.arange(-1., 2., 1.))
                 ax.set_xlim(-1,1)
                 if self.spin_amplitude.value()>=0:

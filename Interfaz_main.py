@@ -25,14 +25,16 @@ class Main(QMainWindow,Ui_MainWindow):
         self.button3.clicked.connect(self.dispersionbutton)
         
         scene = QGraphicsScene()
-        scene.addPixmap(QPixmap('initial.png'))
+        scene.addPixmap(QPixmap('initial_DS.png'))
         self.DS.setScene(scene)
         
         scene2=QGraphicsScene()        
-        scene2.addPixmap(QPixmap('initialbs.png').scaled(141,91))
+        scene2.addPixmap(QPixmap('initial_BS.png'))
         self.BS.setScene(scene2)
     
-        self.DS.show()
+        scene3 = QGraphicsScene()
+        scene3.addPixmap(QPixmap('initial_WD.png'))
+        self.WD.setScene(scene3)
         
         self.eng.clicked.connect(self.english)
         self.spa.clicked.connect(self.spanish)
