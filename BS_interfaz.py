@@ -640,10 +640,7 @@ class BS(QMainWindow,Ui_MainWindow):
                     
                     #let's plot the wave on the string
                     Nini=10.0*(2.0*self.horizontalSlider.value()+50.0)
-                    if self.none_20.isChecked()==True:
-                        Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0)
-                    elif self.none_40.isChecked()==True:
-                        Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0)
+                    Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0) #for any time (t=20 or t=40)
                     data=open('./pulse_data/string-%08d.dat' %(round(Nnow)),'r')
                     datalin=data.readlines()
                     xstringl=[]
@@ -656,24 +653,11 @@ class BS(QMainWindow,Ui_MainWindow):
                     wave.plot(xstring,ystring,color='brown',linewidth=2.0)
                     wave.set_ylim(-1.05,1.05)
                     
-                 #   xy = (0.5, 0.7)
-                 #   left = get_sample_data("./lside_hand.png", asfileobj=False)
-                 #   right = get_sample_data("./rside_hand.png", asfileobj=False)
-                 #   arr_l=read_png(left)
-                 #   arr_r=read_png(right)
-                 #   imageboxl = OffsetImage(arr_l, zoom=0.1)
-                 #   imageboxr = OffsetImage(arr_r, zoom=0.1)
-                 #   ab_l = AnnotationBbox(imageboxl, xy,xybox=(-107., 0))
-                 #   ab_r = AnnotationBbox(imageboxr, xy,xybox=(107., 0))
-                 #   wave.add_artist(ab_l)
-                 #   wave.add_artist(ab_r)
-                    
                     left=mpimg.imread('lside_hand.png')
                     right=mpimg.imread('rside_hand.png')
                     wave.imshow(left,extent=(-120,-96,-0.5,0.5),aspect='auto')
                     wave.imshow(right,extent=(96,120,-0.5,0.5),aspect='auto')
-                    
-                    
+                                        
                     self.canvas.draw()
                 
                 elif (self.yes_no.value()==0): #soliton in a ring                                           
