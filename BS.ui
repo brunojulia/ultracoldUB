@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>UltracoldUB: Bright solitons laboratory</string>
+   <string>UltracoldUB: Bright solitons' laboratory</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="back">
@@ -784,7 +784,7 @@
    <widget class="QPushButton" name="ButtonOn">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>320</x>
       <y>490</y>
       <width>75</width>
       <height>23</height>
@@ -797,7 +797,7 @@
    <widget class="QPushButton" name="ButtonPause">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>500</x>
       <y>490</y>
       <width>75</width>
       <height>23</height>
@@ -836,7 +836,7 @@
    <widget class="QPushButton" name="ButtonBack">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>410</x>
       <y>490</y>
       <width>75</width>
       <height>23</height>
@@ -864,17 +864,7 @@
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
     </property>
-    <layout class="QVBoxLayout" name="mplvl">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-    </layout>
+    <layout class="QVBoxLayout" name="mplvl"/>
    </widget>
    <widget class="QListWidget" name="mplfigs">
     <property name="geometry">
@@ -1162,6 +1152,14 @@ p, li { white-space: pre-wrap; }
       </property>
      </layout>
     </widget>
+    <zorder>mpl_window_2</zorder>
+    <zorder>textBrowser</zorder>
+    <zorder>A</zorder>
+    <zorder>w</zorder>
+    <zorder>label_19</zorder>
+    <zorder>label_20</zorder>
+    <zorder>tanca</zorder>
+    <zorder>intenta</zorder>
    </widget>
    <widget class="QPushButton" name="playmoment">
     <property name="geometry">
@@ -1180,7 +1178,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>-20</y>
+      <y>0</y>
       <width>591</width>
       <height>581</height>
      </rect>
@@ -1195,7 +1193,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>40</y>
+       <y>20</y>
        <width>581</width>
        <height>541</height>
       </rect>
@@ -1215,6 +1213,37 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="lot">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>490</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <zorder>play_2</zorder>
+   <zorder>moment</zorder>
+   <zorder>back</zorder>
+   <zorder>interaction</zorder>
+   <zorder>ext_potential</zorder>
+   <zorder>ButtonOn</zorder>
+   <zorder>ButtonPause</zorder>
+   <zorder>label_5</zorder>
+   <zorder>slider_simulation</zorder>
+   <zorder>ButtonBack</zorder>
+   <zorder>mpl_window</zorder>
+   <zorder>mplfigs</zorder>
+   <zorder>Confinement</zorder>
+   <zorder>info1</zorder>
+   <zorder>value_sim</zorder>
+   <zorder>play</zorder>
+   <zorder>playmoment</zorder>
+   <zorder>lot</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
