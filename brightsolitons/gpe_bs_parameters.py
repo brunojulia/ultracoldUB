@@ -32,7 +32,7 @@ elif V_ext==2:  #wall
     x0=float(values[2])
     velocity=float(values[3])
     def_w=int(values[4])
-    barrier_w=int(values[5])
+    barrier_w=float(values[5])
     barrier_h=float(values[6])
     simtime=float(values[7])
 #    print V_ext,int_str,x0,velocity,def_w,barrier_w,barrier_h
