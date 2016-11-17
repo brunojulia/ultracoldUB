@@ -22,7 +22,7 @@ import matplotlib.image as mpimg
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT)
 #from matplotlib.cbook import get_sample_data
 
 import time
@@ -47,6 +47,8 @@ class BS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.hide()
         self.moment.hide()
         self.playmoment.hide()
+        self.none_20.click()
+        self.wall_1.click()
         
         self.playmoment.clicked.connect(self.play2)
         
@@ -90,6 +92,10 @@ class BS(QMainWindow,Ui_MainWindow):
         self.play.clicked.connect(self.juga)
         self.tanca.clicked.connect(self.torna)
         self.intenta.clicked.connect(self.grafica)
+        self.lot.hide()
+        self.lot.setText("Light: On")
+        
+        self.lot.clicked.connect(self.turn_light)
         
         self.horizontalSlider.valueChanged.connect(self.escriu2x)
         self.horizontalSlider_2.valueChanged.connect(self.escriu2v)
@@ -97,6 +103,10 @@ class BS(QMainWindow,Ui_MainWindow):
         self.btn_none.clicked.connect(self.initial)
         self.btn_harm.clicked.connect(self.initial)
         self.btn_wall.clicked.connect(self.initial)
+        
+        self.horizontalSlider_5.valueChanged.connect(self.initial)  #velocity (barrier case)
+        self.hb.valueChanged.connect(self.initial)                  #height barrier
+        self.wb.valueChanged.connect(self.initial)                  #width barrier
         
 #        if self.btn_none.isChecked()==True:
 #            self.setWindowTitle("Bright solitons laboratory: Free bright solitons")
@@ -114,14 +124,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.start.clicked.connect(self.start2) #despres definirem start2 que ens dona les dades inicials
         self.back.clicked.connect(self.close)
         
-    def escriu2x(self):
-        self.valor_x0_none.setNum(2*self.horizontalSlider.value())
-        
-    def escriu2v(self):
-        self.valor_v0_none.setNum(2*self.horizontalSlider_2.value())
-        
-    def initial(self):
-        global language
         #let's show the initial state
         prevdir=os.getcwd()
         try:
@@ -149,6 +151,86 @@ class BS(QMainWindow,Ui_MainWindow):
         figini.set_ylabel("Density $|\psi|^2 \\xi$")
         figini.set_title("An example of bright soliton")
         figini.plot(ax,aphi)
+        self.canvas.draw()
+        self.slider_simulation.hide()
+        self.ButtonOn.hide()
+        self.ButtonBack.hide()
+   #     self.ButtonPause.click()
+        self.ButtonPause.hide()
+        self.value_sim.hide()
+        self.label_5.hide()
+        
+    def turn_light(self):
+        if self.lot.text()=="Light: On":
+            self.lot.setText("Light: Off")
+        elif self.lot.text()=="Light: Off":
+            self.lot.setText("Light: On")
+        
+    def escriu2x(self):
+        self.valor_x0_none.setNum(2*self.horizontalSlider.value())
+        
+    def escriu2v(self):
+        self.valor_v0_none.setNum(2*self.horizontalSlider_2.value())
+        
+    def initial(self):
+        self.lot.hide()
+        global language
+        #let's show the initial state
+        prevdir=os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons'))
+            example=open('pinta.dat','r')
+            lines=example.readlines()
+            x=[]
+            phi2=[]
+            if int(self.gn.value()) == 1:
+                a_s = -0.005e-3
+            elif int(self.gn.value()) == 2:
+                a_s = -0.01e-3
+            elif int(self.gn.value()) == 3:
+                a_s = -0.02e-3
+            xiv=1.0/np.sqrt(2.0*(20.0e+3*a_s)**2) #from exact formula
+            if self.btn_wall.isChecked()==True:            
+                limp=0.5*0.5*(2**self.wb.value())*xiv   #positive limit
+                hb=[]
+                Etot=[]
+            for i in range(0,len(lines)):
+                x.append(float(lines[i].split('\t')[0]))
+                if self.btn_wall.isChecked()==True:
+                    phi2.append(float(lines[int(len(lines))-(i+int(len(lines)/4.0))].split('\t')[1]))
+                    if (np.abs(x[i])<=limp):
+                        hb.append((self.hb.value()/10.0)*0.5*self.horizontalSlider_5.value()**2)
+                    else:
+                        hb.append(0.0)
+                    Etot.append(0.5*self.horizontalSlider_5.value()**2)
+                else:
+                    phi2.append(float(lines[i].split('\t')[1]))
+            example.close()
+            ax=np.array(x)
+            aphi=np.array(phi2)
+            if self.btn_wall.isChecked()==True:
+                tote=np.array(Etot)
+                pote=np.array(hb)
+        finally:
+            os.chdir(prevdir)
+        
+        if self.fig==None:
+            self.rmmpl()            
+            self.fig=Figure()
+            self.addmpl(self.fig)
+        self.fig.clear()
+        figini=self.fig.add_subplot(111)
+        figini.set_xlabel("Position ($x/ \\xi $)")
+        figini.set_ylabel("Density $|\psi|^2 \\xi$")
+        figini.set_title("An example of bright soliton")
+        figini.plot(ax,aphi)
+        if self.btn_wall.isChecked()==True:
+            potential=figini.twinx()
+            potential.plot(ax,pote,'g')
+            potential.plot(ax,tote,'r', label='$E_{total}$') #in red the total energy
+            potential.legend()
+            potential.set_ylim(bottom=0)
+            potential.set_ylabel("Potential ($V $  ${m \\xi^2}/{\hbar^2}$)", color='g')
         self.canvas.draw()
         self.slider_simulation.hide()
         self.ButtonOn.hide()
@@ -203,6 +285,7 @@ class BS(QMainWindow,Ui_MainWindow):
     def start2(self):
         self.timer=QtCore.QTimer(self)
         self.sim=0
+        self.lot.hide()
         
         #let's show the progress bar
         dialog = QtGui.QDialog()    
@@ -253,7 +336,7 @@ class BS(QMainWindow,Ui_MainWindow):
             elif pot==1:
                 file_data.write('%d \t %d \t %f \t %d \t %d' %(1,self.gn.value(),self.horizontalSlider_3.value(),self.spinBox.value(),0))
             elif pot==2:
-                file_data.write('%d \t %d \t %f \t %f \t %d \t %d \t %f \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0, tempss))
+                file_data.write('%d \t %d \t %f \t %f \t %d \t %f \t %f \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0, tempss))
             file_data.close()
             
             subprocess.Popen('python gpe_bright_solitons.py',shell=True)
@@ -576,6 +659,7 @@ class BS(QMainWindow,Ui_MainWindow):
             
     def simulation(self):
         global language
+        self.lot.hide()
         self.sim=self.slider_simulation.value()
         prevdir = os.getcwd()
         try:
@@ -679,8 +763,7 @@ class BS(QMainWindow,Ui_MainWindow):
                     self.canvas.draw()
                     
             elif pot==2:
-           #     i=self.slider_simulation.value()*200
-           #     data=open("WfBs-%08d.dat" %(i),'r')
+                self.lot.show()               
                 names=open("namefiles.dat",'r')
                 listnames=names.readlines()
                 name=int(listnames[int(self.slider_simulation.value())])
@@ -691,24 +774,56 @@ class BS(QMainWindow,Ui_MainWindow):
                 listpot=[]
                 listconf=[]
                 listtote=[]
+                hb=[]
+                listx1=[]
+                listx2=[]
+                listx3=[]
+                if int(self.gn.value()) == 1:
+                    a_s = -0.005e-3
+                elif int(self.gn.value()) == 2:
+                    a_s = -0.01e-3
+                elif int(self.gn.value()) == 3:
+                    a_s = -0.02e-3
+                xiv=1.0/np.sqrt(2.0*(20.0e+3*a_s)**2) #from exact formula
+                limp=0.5*0.5*(2**self.wb.value())*xiv
                 for j in range(2,len(lines)):
                     listpos.append(float((lines[j].split('\t'))[0]))
                     listphi.append(float((lines[j].split('\t'))[1]))
-                    listpot.append(float((lines[j].split('\t'))[5]))
+                    listpot.append(float((lines[j].split('\t'))[5])-float((lines[j].split('\t'))[6])) #only barrier
                     listconf.append(float((lines[j].split('\t'))[6]))
                     listtote.append(epart)
+                    if (np.abs(listpos[j-2])<=limp):
+                        hb.append(1.0)
+                    else:
+                        hb.append(-1.0)
+                    if listpos[j-2]<=0.0:                        
+                        if self.yes_no.value()==1 and listpos[j-2]>=-73:
+                            listx1.append(float((lines[j].split('\t'))[0]))
+                        elif self.yes_no.value()==0 and listpos[j-2]>=-100:
+                            listx1.append(float((lines[j].split('\t'))[0])) 
+                        listx2.append(float((lines[j].split('\t'))[0]))
+                    elif listpos[j-2]>=0.0:
+                        listx3.append(float((lines[j].split('\t'))[0]))
                 posit=np.array(listpos)
                 phi2=np.array(listphi)
                 pote=np.array(listpot)
                 tote=np.array(listtote)
                 confin=np.array(listconf)
+                glass=np.array(hb)
+                x1=np.array(listx1)
+                x2=np.array(listx2)
+                x3=np.array(listx3)
                         
                 if self.fig==None:
                     self.rmmpl()
                     self.fig=Figure()
                     self.addmpl(self.fig)
                 self.fig.clear()
-                state=self.fig.add_subplot(111)
+                gs=GridSpec(8,1)  #7 rows and 1 column
+                state=self.fig.add_subplot(gs[2:,:])
+                light=self.fig.add_subplot(gs[0:2,:])
+                light.axes.get_yaxis().set_visible(False)
+                light.axes.get_xaxis().set_visible(False)
                 state.set_xlabel("Position ($x/ \\xi$)")
                 state.set_ylabel("Density $|\psi|^2 \\xi$")
                 state.plot(posit,phi2)
@@ -721,10 +836,38 @@ class BS(QMainWindow,Ui_MainWindow):
                 state.plot(posit,confin,'g')
                 potential.set_ylabel("Potential ($V $  ${m \\xi^2}/{\hbar^2}$)", color='g')
                 state.set_ylim(0,0.3)
+                light.set_ylim(-1,1)
+                
+                light.fill_between(posit,glass,-1,facecolor='blue',alpha=0.2)
+                flight=mpimg.imread('linterna2.png')
+                datacoef=open('llum.dat','r')
+                coef=datacoef.readlines()
+                valorT=float((coef[0]).split('\t')[1])
+                valorR=float((coef[0]).split('\t')[0])
+                valorTot=valorT + valorR
+                coefT=valorT/valorTot
+                coefR=valorR/valorTot
+                
                 if (self.yes_no.value()==1):
                     state.set_xlim(-100,100)
+                    light.set_xlim(-100,100)
+                    light.imshow(flight,extent=(-100,-70,0,1),aspect='auto')
+                    y1=-0.45*x1/73.0
+                    y3=-x3/100.0
+                    y2=x2/100.0
                 else:
                     state.set_xlim(-128,128)
+                    light.set_xlim(-128,128)
+                    light.imshow(flight,extent=(-128,-98,0,1),aspect='auto')
+                    y1=-0.42*x1/100.0
+                    y3=-x3/128.0
+                    y2=x2/128.0
+                
+                if self.lot.text()=="Light: On":
+                    light.plot(x1,y1,color='yellow',linewidth=5.0,alpha=1.0)   #we plot the beams
+                    light.plot(x2,y2,color='yellow',linewidth=5.0,alpha=coefR)
+                    light.plot(x3,y3,color='yellow',linewidth=5.0,alpha=coefT)
+                
                 self.canvas.draw()
             else:
                 names=open("namefiles.dat",'r')
@@ -930,3 +1073,8 @@ class Ui_porcessProgress(object):
         porcessProgress.setWindowTitle(QtGui.QApplication.translate("porcessProgress", "Please wait...", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("porcessProgress", " in progress...", None, QtGui.QApplication.UnicodeUTF8))
         QtCore.QMetaObject.connectSlotsByName(porcessProgress)
+
+class NavigationToolbar(NavigationToolbar2QT):  
+    #for not showing undesired buttons
+    toolitems = [t for t in NavigationToolbar2QT.toolitems if
+                 t[0] in ('Home','Pan', 'Zoom', 'Save','Back','Forward')]

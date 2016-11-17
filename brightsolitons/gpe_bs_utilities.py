@@ -71,7 +71,7 @@ def Vpot(n, z):
         Vpot_R = 0.5*(whoz**2)*(z**2)
     elif(n==2):
         Vpot_R = 0.0*z
-        Vpot_0 = 0.0*z
+        Vpot_0 = Vpot_Rc
         for i in range(0,Npoint):
             if m*(z[i]-xbr) > tol_arg:
                 barrier_exp1 = tol_exp

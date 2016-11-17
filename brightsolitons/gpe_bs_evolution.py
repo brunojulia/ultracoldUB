@@ -12,7 +12,7 @@ import sys
 # Evolution
 # ------------------------------------------------------------------------------
 
-def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
+def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,time_final):
     """Calculates the evolution of the wavefunction c.
        t0         initial time
        Dt         time step (either imaginary or real)
@@ -51,7 +51,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
        the program checks if the directory where the files will be stored exists
            and if so deletes its contents (otherwise creates a new directory).
     """
-    global Ntime_out, Ntime_fin, gint, Npoint, NormWF, Zmax, Nparticle, a_s, x0, v, whoz, xb, wb, hb, wall_h, wall
+    global Ntime_out, Ntime_fin, gint, Npoint, NormWF, Zmax, Nparticle, a_s, x0, v, whoz, xb, wb, hb, wall_h, wall,simtime
     # where the files of evolution will be saved
     if (write_ev==0):
         dir = "bs_evolution" # name of the directory
@@ -83,6 +83,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
     Ninter = Ntime_fin//Ntime_out # number of outputs (intermediate states)
     c = c0
     j=0; t=t0; l=0
+    counter=0
 
     # define vectors for the energies, time and % of the wf (matrix)
     tevol=np.empty([Ninter+1])
@@ -205,6 +206,19 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                         integral=0
                         integral2=0
                         integral3=0
+                        psileft=0.0
+                        psiright=0.0
+                        if (tevol[j]>=(round(time_final,2)/simtime - 0.5)) and (tevol[j]<=(round(time_final,2)/simtime+0.5)) and counter==0:
+                            print ('Got one! %f' %(tevol[j]))
+                            for k in range(0,Npoint-1):
+                                if (z[k]>=0.5*wb):
+                                    psiright=psiright+(np.abs(psi[k]))**2
+                                elif (z[k]<=-0.5*wb):
+                                    psileft=psileft+(np.abs(psi[k]))**2
+                            counter=1
+                            escriu=open('./bs_evolution/llum.dat','w')
+                            escriu.write('%f \t %f' %(psileft,psiright))  #left and right |psi|^2
+                            escriu.close()
                         for k in range(0,Npoint-1):
                             integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
                             integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
@@ -213,7 +227,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil):
                         tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
                         sigma[l]=np.sqrt((integral2)-(integral**2))
                         vmean[l]=integral3
-                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
+                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))                       
 
                 # writes a file for each timestep
                 if(not(i%Ntime_out)):
