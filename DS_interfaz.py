@@ -271,12 +271,12 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.textBrowser.show()
                 self.rmmpl2()
                 self.mplwindow.hide()
-                if (self.radioButton_2.isChecked()==True):
+                if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()==1:
                     self.widget_osci.show()
                     self.widget_osci_2.hide()
                     self.spin_amplitude.setValue(3.)
                     self.spin_frequency.setValue(0.5)
-                if (self.radioButton_3.isChecked()==True):
+                if (self.radioButton_3.isChecked()==True)  or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
                     self.widget_osci_2.show()
                     self.widget_osci.hide()
                     self.spin_amplitude_2.setValue(3.)
@@ -289,10 +289,10 @@ class DS(QMainWindow,Ui_MainWindow):
             if (self.radioButton_densi.isChecked()==True):
                 self.spin_mu.setValue(25.)
                 self.spin_gn.setValue(200.)
-                if (self.radioButton_2.isChecked()==True):
+                if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
                     time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
     
-                if (self.radioButton_3.isChecked()==True):
+                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
                     time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
                     
                 self.widget_osci.hide()
@@ -408,7 +408,7 @@ class DS(QMainWindow,Ui_MainWindow):
 #                    ax1f3.set_title('evolution condensate')
 #                    self.canvas.draw()
                 
-                if (self.radioButton_2.isChecked()==True):
+                if (self.radioButton_2.isChecked()==True) and (self.spinBox_2.value()==1):
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
@@ -510,13 +510,10 @@ class DS(QMainWindow,Ui_MainWindow):
                     #ani.save('muelle.mp4', fps=15)
                     self.canvas.draw()
                 
-                if (self.radioButton_3.isChecked()==True):
+                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
-                    on = True
-                    back = False
-                    pause = False
                       
                     B=self.spin_amplitude_2.value()
                     tf_sim =  time1/10.
@@ -529,8 +526,10 @@ class DS(QMainWindow,Ui_MainWindow):
                         r0=self.spin_rad.value()
                         A = 0.0
                         C = 0.0
-                        D = 0.0
                         B=self.spin_amplitude_2.value()
+                        D = 0.0
+                        if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
+                            D = -B
                         w = self.spin_frequency_2.value()
                         impac=0
                         t_max = tf_sim
@@ -538,66 +537,133 @@ class DS(QMainWindow,Ui_MainWindow):
                         m1 = self.spin_ratio.value()
                         y = 0.0
                         y2=0.0
+                        y3=0.0
+                        E=0.01
+                        F=0.0
                         t = 0.0
                         t_1=0.0
+                        t_2=0.0
+                        t_3=0.0
                         i=0
                         r = ((1.+((N-1)/2.))*2.*r0)+(((M-1))*r0)
-                        y_=np.empty([int(t_max/dt)+2,2])
+                        y_=np.empty([int(t_max/dt)+2,3])
                         t_=np.empty([int(t_max/dt)+2])
                         y_[0,0]=B
                         y_[0,1]=D
+                        y_[0,2]=F
                         t_[0]=t
                         
                         while t <= t_max:
                             if on_nc and not back_nc and not pause_nc:
                                 t += dt
                                 t_1 += dt
+                                t_2 += dt
+                                t_3 += dt
                                 i += 1
                             if t<0:
                                 t += dt
                                 t_1 += dt
+                                t_2 += dt
+                                t_3 += dt
                                 i += 1
                             if back_nc and not on_nc and not pause_nc:
                                 t -= dt
                                 t_1 -= dt
+                                t_2 -= dt
+                                t_3 -= dt
                                 i -= 1
                              
-                            y = A*np.sin(w*t_1)+B*np.cos(w*t_1)
-                            y2 = C*np.sin(w*t_1)+D*np.cos(w*t_1)
-#                            der_y = A*w*np.cos(w*t_1)-B*w*np.sin(w*t_1)
-#                            der_y2 = C*w*np.cos(w*t_1)-D*w*np.sin(w*t_1) 
-                            
+                            if self.spinBox_2.value()==3 and (self.radioButton_2.isChecked()==True):
+                                y = A*np.sin(w*t_2)+B*np.cos(w*t_2)
+                                y2 = C*np.sin(w*t_3)+D*np.cos(w*t_3)
+                                y3 = E*np.sin(w*t_1)+F*np.cos(w*t_1)
+                                der_y = A*w*np.cos(w*t_2)-B*w*np.sin(w*t_2)
+                                der_y2 = C*w*np.cos(w*t_3)-D*w*np.sin(w*t_3) 
+                                der_y3 = E*w*np.cos(w*t_1)-F*w*np.sin(w*t_1)
+                            else:
+                                y = A*np.sin(w*t_1)+B*np.cos(w*t_1)
+                                y2 = C*np.sin(w*t_1)+D*np.cos(w*t_1)
+#                            energy=0.5*(w*y)**2+0.5*(w*y2)**2+0.5*(w*y3)**2+0.5*der_y**2+0.5*der_y2**2+0.5*der_y3**2
                             y_[i,0]=y
                             y_[i,1]=y2
+                            y_[i,2]=y3
                             t_[i]=t
-                            if np.abs(y-y2)<(r+(r/100.)):
-                              t1=t_1
-                              impac +=1
-                              A_=A
-                              B_=B
-                              C_=C
-                              D_=D
-                              
-                              C=((m1-m2)/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+((2*m2/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
-                              D=A_*np.sin(w*t1)+B_*np.cos(w*t1)
-                              A=(2*m1/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+(((m2-m1)/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
-                              B=C_*np.sin(w*t1)+D_*np.cos(w*t1)
-                              
-                              if (y-y2)>0:
-                                  D=D-((N-1)/2.)*2.*r0+((M-1)*r0)
-                                  B=B-((N-1)/2.)*2.*r0+((M-1)*r0)
-                              if (y-y2)<0:
-                                  D=D+((N-1)/2.)*2.*r0-((M-1)*r0)
-                                  B=B+((N-1)/2.)*2.*r0-((M-1)*r0)
-                                 
-                              m1_=m1
-                              m2_=m2
-                              m1=m2_
-                              m2=m1_
-#                              print impac,np.abs(y-y2),t
-                              t_1=0.
-                            yield y, t, y2,t_,y_
-        
+                            if self.spinBox_2.value()==3 and (self.radioButton_2.isChecked()==True):
+                                if np.abs(y-y3)<(2.*r0+(2.*r0/100.)):
+                                  t2=t_2
+                                  t1=t_1
+                                  impac +=1
+                                  A_=A
+                                  B_=B
+                                  E_=E
+                                  F_=F
+                                  
+                                  A=((m1-m2)/(m1+m2))*(A_*np.cos(w*t2)-B_*np.sin(w*t2))+((2*m2/(m1+m2))*(E_*np.cos(w*t1)-F_*np.sin(w*t1)))
+                                  B=A_*np.sin(w*t2)+B_*np.cos(w*t2)
+                                  E=(2*m1/(m1+m2))*(A_*np.cos(w*t2)-B_*np.sin(w*t2))+(((m2-m1)/(m1+m2))*(E_*np.cos(w*t1)-F_*np.sin(w*t1)))
+                                  F=E_*np.sin(w*t1)+F_*np.cos(w*t1)
+                                  m1_=m1
+                                  m2_=m2
+                                  m1=m2_
+                                  m2=m1_
+                                  t_2=0.
+                                  t_1=0.
+                                if np.abs(y2-y3)<(2.*r0+(2.*r0/100.)):
+                                  t3=t_3
+                                  t1=t_1
+                                  impac +=1
+                                  C_=C
+                                  D_=D
+                                  E_=E
+                                  F_=F
+                                  
+                                  C=((m1-m2)/(m1+m2))*(C_*np.cos(w*t3)-D_*np.sin(w*t3))+((2*m2/(m1+m2))*(E_*np.cos(w*t1)-F_*np.sin(w*t1)))
+                                  D=C_*np.sin(w*t3)+D_*np.cos(w*t3)
+                                  E=(2*m1/(m1+m2))*(C_*np.cos(w*t3)-D_*np.sin(w*t3))+(((m2-m1)/(m1+m2))*(E_*np.cos(w*t1)-F_*np.sin(w*t1)))
+                                  F=E_*np.sin(w*t1)+F_*np.cos(w*t1)
+                                  m1_=m1
+                                  m2_=m2
+                                  m1=m2_
+                                  m2=m1_
+                                  t_3=0.
+                                  t_1=0.
+                            if self.spinBox_2.value()!=3 or (self.radioButton_3.isChecked()==True):
+                                if np.abs(y-y2)<(r+(r/100.)):
+                                  t1=t_1
+                                  impac +=1
+                                  A_=A
+                                  B_=B
+                                  C_=C
+                                  D_=D
+                                  
+                                  C=((m1-m2)/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+((2*m2/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
+                                  D=A_*np.sin(w*t1)+B_*np.cos(w*t1)
+                                  A=(2*m1/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+(((m2-m1)/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
+                                  B=C_*np.sin(w*t1)+D_*np.cos(w*t1)
+                                  
+                                  if self.spinBox_2.value()==2 and (self.radioButton_2.isChecked()==True):
+                                      A_=A
+                                      B_=B
+                                      C_=C
+                                      D_=D
+                                      A=C_
+                                      B=D_
+                                      C=A_
+                                      D=B_
+                                  if (y-y2)>0:
+                                      D=D-((N-1)/2.)*2.*r0+((M-1)*r0)
+                                      B=B-((N-1)/2.)*2.*r0+((M-1)*r0)
+                                  if (y-y2)<0:
+                                      D=D+((N-1)/2.)*2.*r0-((M-1)*r0)
+                                      B=B+((N-1)/2.)*2.*r0-((M-1)*r0)
+                                     
+                                  m1_=m1
+                                  m2_=m2
+                                  m1=m2_
+                                  m2=m1_
+    #                              print impac,np.abs(y-y2),t
+                                  t_1=0.
+                            yield y, t, y2,t_,y_,y3
                     def onClick(event):
                         global pause_nc, on_nc, back_nc
                         back_nc ^= True
@@ -620,19 +686,32 @@ class DS(QMainWindow,Ui_MainWindow):
                         B = self.spin_amplitude_2.value()
                         B_0=B
                         r=2*r0
-                        y, t, y2, t_, y_ = simData[0], simData[1], simData[2], simData[3], simData[4]
+                        y, t, y2, t_, y_,y3 = simData[0], simData[1], simData[2], simData[3], simData[4], simData[5]
                     #    time_text.set_text(time_template%(t))
+                        x=B_0**2-(y+(r*(M-1.)/2.))**2. 
+                        x_=B_0**2-(y-r/2.)**2.
+                        if x<0:
+                            x=np.sqrt(-x)
+                            x=-x
+                        else:
+                            x=np.sqrt(x)
+                        if x_<0:
+                            x_=np.sqrt(-x_)
+                            x_=-x_
+                        else:
+                            x_=np.sqrt(x_)
                         
-                        circle1.center=(y+(r*(M-1.)/2.),np.sqrt(B_0**2-(y+(r*(M-1.)/2.))**2.))
-                        line_nc1.set_data([0.,y+(r*(M-1.)/2.)],[0.,np.sqrt(B_0**2-(y+(r*(M-1.)/2.))**2.)])
+                        circle1.center=(y+(r*(M-1.)/2.),x)
+                        line_nc1.set_data([0.,y+(r*(M-1.)/2.)],[0.,x])
                         line_nc2.set_data(t,y+(r*(M-1.)/2.))
                         circle2.center=(t,y+(r*(M-1.)/2.))
-                        line_nc_.set_data(t_[:int(t/dt)],y_[:int(t/dt),0])
+                        line_nc_.set_data(t_[:int(t/dt)],y_[:int(t/dt),0]+(r*(M-1.)/2.))
                         if M==2:
-                            line_nc11.set_data([0.,y-r/2.],[0.,np.sqrt(B_0**2-(y-r/2.)**2.)])
-                            circle11.center=(y-r/2.,np.sqrt(B_0**2-(y-r/2.)**2.))
+                            line_nc11.set_data([0.,y-r/2.],[0.,x_])
+                            circle11.center=(y-r/2.,x_)
                             line_nc12.set_data(t,y-r/2.)
                             circle12.center=(t,y-r/2.)
+                            line_nc_1.set_data(t_[:int(t/dt)],y_[:int(t/dt),0]-r/2.)
                             
                         circle3.center=(y2-(r*(N-1.)/2.),np.sqrt(B_0**2-(y2-(r*(N-1.)/2.))**2.))
                         line_nc3.set_data([0.,y2-(r*(N-1.)/2.)],[0.,np.sqrt(B_0**2-(y2-(r*(N-1.)/2.))**2.)])
@@ -649,21 +728,31 @@ class DS(QMainWindow,Ui_MainWindow):
                             circle9.center=(y2,np.sqrt(B_0**2-y2**2.))
                             line_nc9.set_data([0.,y2],[0.,np.sqrt(B_0**2-y2**2.)])
                             line_nc10.set_data([t,y2])
-                            line_nc_3.set_data(y_[:int(t/dt),1],t_[:int(t/dt)])
+                            line_nc_3.set_data(t_[:int(t/dt)],y_[:int(t/dt),1])
                             circle10.center=(t,y2)
                             circle7.center=(y2+r,np.sqrt(B_0**2-(y2+r)**2.))
                             line_nc7.set_data([0.,y2+r],[0.,np.sqrt(B_0**2-(y2+r)**2.)])
                             line_nc8.set_data([t,y2+r])
                             line_nc_4.set_data(t_[:int(t/dt)],y_[:int(t/dt),1]+r)
                             circle8.center=(t,y2+r)
+                        
+                        if self.spinBox_2.value()!=3 or (self.radioButton_3.isChecked()==True):
+                            circle_3.center=(999999,999999)
+                            circle_4.center=(999999,999999)
+                            line_nc_31.set_data(0,0)
+                        if self.spinBox_2.value()==3 and (self.radioButton_3.isChecked()==False):
+                            circle_3.center=(y3,np.sqrt(B_0**2-y3**2.))
+                            circle_4.center=(t,y3)
+                            line_nc_31.set_data([0.,y3],[0.,np.sqrt(B_0**2-y3**2.)])
+                            line_nc_32.set_data(t_[:int(t/dt)],y_[:int(t/dt),2])
                             
                     #    time_text.set_text(time_template % (t))
-                        return (line_nc0, line_nc_, line_nc1, line_nc_2, line_nc_3, line_nc_4, line_nc3, line_nc4, line_nc5, line_nc6, line_nc7, line_nc8, line_nc9, line_nc10, line_nc11, line_nc12,
-                               circle0, circle1, circle2, circle3, circle4, circle5, circle6, circle7, circle8, circle9, circle10, circle11, circle12)      
+                        return (line_nc0, line_nc_, line_nc1, line_nc_1, line_nc_2, line_nc_3, line_nc_4, line_nc3, line_nc4, line_nc5, line_nc6, line_nc7, line_nc8, line_nc9, line_nc10, line_nc11, line_nc12,
+                               circle0, circle1, circle2, circle3, circle4, circle5, circle6, circle7, circle8, circle9, circle10, circle11, circle12, circle_3, circle_4, line_nc_31, line_nc_32)      
                         
                     fig = plt.figure()
-                    ax = plt.subplot2grid((100,100), (0,0), rowspan=30, colspan=30, autoscale_on=False, xlim=(-B-r0-0.05,B+r0+0.05), ylim=(+B+r0+0.05,-B-r0-0.05))
-                    ax2 = plt.subplot2grid((100,100), (0,40), rowspan=100, colspan=60, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
+                    ax = plt.subplot2grid((100,200), (0,0), rowspan=50, colspan=50, autoscale_on=False, xlim=(-B-r0-0.05,B+r0+0.05), ylim=(+B+r0+0.05,-B-r0-0.05))
+                    ax2 = plt.subplot2grid((100,200), (0,80), rowspan=100, colspan=120, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
                     ax.set_title('NC')
                     #ax.set_xticks(np.arange(-1., 2., 1.))
                     ax.grid()
@@ -684,8 +773,17 @@ class DS(QMainWindow,Ui_MainWindow):
                         ax.add_patch(globals() ['circle%s' %(i)])
                         
                     line_nc_, = ax2.plot([], [], 'b-', lw=2)
+                    line_nc_1, = ax2.plot([], [], 'b-', lw=2)
                     for i in range(2,5):
                         globals()['line_nc_%s' %(i)], = ax2.plot([], [], 'r-', lw=2)
+                        
+#                    if self.spinBox_2.value()==3:
+                    circle_3 = plt.Circle((10., 10.), radius=r0)
+                    ax.add_patch(circle_3)
+                    circle_4 = plt.Circle((10., 10.), radius=r0)
+                    ax2.add_patch(circle_4)
+                    line_nc_31, = ax.plot([], [], 'b-', lw=1)
+                    line_nc_32, = ax2.plot([], [], 'y-', lw=2)
                     #time_template = 'time = %.1fs'
                     #time_text = ax2.text(0.05, 0.9, '', transform=ax.transAxes)
                     self.addmpl2(fig)
@@ -695,7 +793,6 @@ class DS(QMainWindow,Ui_MainWindow):
                     #dt=0.01
                     #ani.save('NC_3_1.mp4')
                     self.canvas.draw()
-                    
                     
             if (self.radioButton_densi.isChecked()==True):
                 self.rmmpl2()

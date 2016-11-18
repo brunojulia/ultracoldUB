@@ -904,7 +904,7 @@ p, li { white-space: pre-wrap; }
        <double>1.000000000000000</double>
       </property>
       <property name="value">
-       <double>2.000000000000000</double>
+       <double>1.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="label_A_4">
@@ -1074,11 +1074,6 @@ p, li { white-space: pre-wrap; }
        <string>gN:</string>
       </property>
      </widget>
-     <zorder>spin_mu</zorder>
-     <zorder>spin_gn</zorder>
-     <zorder>label_A_2</zorder>
-     <zorder>label_w_2</zorder>
-     <zorder>textBrowser_2</zorder>
     </widget>
    </widget>
    <widget class="QWidget" name="interact_game" native="true">
@@ -1130,23 +1125,6 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <zorder>mplwindow</zorder>
-   <zorder>mplfigs</zorder>
-   <zorder>back</zorder>
-   <zorder>slider_simulation</zorder>
-   <zorder>label_5</zorder>
-   <zorder>label_4</zorder>
-   <zorder>ButtonOn</zorder>
-   <zorder>ButtonBack</zorder>
-   <zorder>ButtonPause</zorder>
-   <zorder>start</zorder>
-   <zorder>groupBox</zorder>
-   <zorder>groupBox_2</zorder>
-   <zorder>state</zorder>
-   <zorder>mplwindow_2</zorder>
-   <zorder>game</zorder>
-   <zorder>interact_game</zorder>
-   <zorder>widget_osci_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
