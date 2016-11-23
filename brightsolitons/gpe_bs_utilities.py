@@ -115,9 +115,8 @@ def Energy(c, Vpot_R, Ekin_K):
     chem_pot = em+ei;
     return em, chem_pot, ek, ep, ei
     
-def velmean(c,Vpot_R,Ekin_K):
-    global Dk
-    vmean=sum(np.sqrt(2*Ekin_K)*abs(c)**2) 
+def velmean(c,kp):
+    vmean=sum(kp*abs(c)**2)  #mean velocity
     return vmean
 
 def T_K(Dt, Ekin_K):

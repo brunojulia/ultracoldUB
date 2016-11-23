@@ -13,6 +13,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
 import math
+import zipfile
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -50,6 +51,14 @@ class BS(QMainWindow,Ui_MainWindow):
         self.none_20.click()
         self.wall_1.click()
         
+        #unzip all material in pulse_data (takes a few seconds the first time...)
+        if (not os.path.exists('./brightsolitons/bs_evolution/pulse_data')):
+            zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/pulse_data.zip', 'r')
+            zip_ref.extractall('./brightsolitons/bs_evolution/')
+            zip_ref.close()
+        else:
+            pass
+        
         self.playmoment.clicked.connect(self.play2)
         
         self.slider_simulation.valueChanged.connect(self.simulation)
@@ -62,6 +71,8 @@ class BS(QMainWindow,Ui_MainWindow):
         self.horizontalSlider_4.setMaximum(-20)
         self.horizontalSlider_4.setSingleStep(1)
         self.horizontalSlider_4.TicksBelow
+        
+        self.horizontalSlider_5.setMinimum(1)
         
         prevdir=os.getcwd()
         try:
@@ -211,6 +222,9 @@ class BS(QMainWindow,Ui_MainWindow):
             if self.btn_wall.isChecked()==True:
                 tote=np.array(Etot)
                 pote=np.array(hb)
+            #let's draw the brick wall
+ #           brick=mpimg.imread('./bs_evolution/brick.jpg')
+ #           #http://bgfons.com/download/3452
         finally:
             os.chdir(prevdir)
         
@@ -225,12 +239,30 @@ class BS(QMainWindow,Ui_MainWindow):
         figini.set_title("An example of bright soliton")
         figini.plot(ax,aphi)
         if self.btn_wall.isChecked()==True:
+            energymax=np.amax(tote)
+            potmax=np.amax(pote)
             potential=figini.twinx()
             potential.plot(ax,pote,'g')
+            potential.fill_between(ax,pote,0,hatch='-',facecolor='brown',alpha=0.6)
             potential.plot(ax,tote,'r', label='$E_{total}$') #in red the total energy
             potential.legend()
-            potential.set_ylim(bottom=0)
+            if energymax >= potmax:
+                potential.set_ylim(0, 1.1*energymax)
+            elif energymax <= potmax:
+                potential.set_ylim(0, 1.1*potmax)
             potential.set_ylabel("Potential ($V $  ${m \\xi^2}/{\hbar^2}$)", color='g')
+            
+  #          #let's draw the brick wall
+  #          heightbar=(self.hb.value()/10.0)*0.5*self.horizontalSlider_5.value()**2
+  #          potential.imshow(brick,extent=(-limp,limp,0,heightbar),aspect='auto')
+        
+ #       if (self.yes_no.value()==1):
+ #           figini.set_xlim(-100,100)
+ #           potential.set_xlim(-100,100)
+ #       else:
+ #           figini.set_xlim(-128,128)
+ #           potential.set_xlim(-128,128)
+        
         self.canvas.draw()
         self.slider_simulation.hide()
         self.ButtonOn.hide()
@@ -339,6 +371,32 @@ class BS(QMainWindow,Ui_MainWindow):
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %f \t %f \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0, tempss))
             file_data.close()
             
+            """#let's compute T and R coefficients in case of the barrier potential
+            if self.gn.value() == 1:
+                a_s = -0.005e-3
+            elif self.gn.value() == 2:
+                a_s = -0.01e-3
+            elif self.gn.value() == 3:
+                a_s = -0.02e-3
+            xiv=1.0/np.sqrt(2.0*(20.0e+3*a_s)**2) #from exact formula
+            limp=0.5*0.5*(2**self.wb.value())*xiv
+            tandr=open('TandR.dat','w')
+            valuehb=self.hb.value()/10.0
+            valuev0=self.horizontalSlider_5.value()
+            if valuehb>1.0:
+                T=(1.0+((np.sinh(2.0*limp*(np.sqrt(2.0*(valuehb-1.0)))*valuev0))**2)/(4.0*(1.0/valuehb)*(1.0-(1.0/valuehb))))**-1
+                R=1.0-T
+                tandr.write('E<V0! T, R: %f \t %f' %(T,R))
+            elif valuehb<1.0:
+                T=(1.0+((np.sin(2.0*limp*(np.sqrt(2.0*(1.0-valuehb)))*valuev0))**2)/(4.0*(1.0/valuehb)*((1.0/valuehb)-1.0)))**-1
+                R=1.0-T
+                tandr.write('E>V0! T, R: %f \t %f' %(T,R))
+            else:
+                T=1.0/(1 + 0.5*0.5*valuehb*(2.0*limp*valuev0)**2)  #wikipedia: https://en.wikipedia.org/wiki/Rectangular_potential_barrier
+                R=1.0-T
+                tandr.write('E=V0! T, R: %f \t %f' %(T,R))
+            tandr.close()"""
+            
             subprocess.Popen('python gpe_bright_solitons.py',shell=True)
 
             if (self.btn_none.isChecked()==True):
@@ -445,16 +503,12 @@ class BS(QMainWindow,Ui_MainWindow):
         tmv=[]  #time
         mv=[]   #mean value
         smv=[]  #sigma
-        vmean=[]#mean velocity
-        vrem=[] #mean velocity[t=i]- mean velocity[t=0]
         velm=[]
         for i in range(1,len(meanval)):
             tmv.append(float((meanval[i].split('\t'))[0]))
             mv.append(float((meanval[i].split('\t'))[1]))
             smv.append(float((meanval[i].split('\t'))[2]))
-            vmean.append(float((meanval[i].split('\t'))[3]))
-            vrem.append(float((meanval[i].split('\t'))[4]))
-            velm.append(float((meanval[i].split('\t'))[5]))
+            velm.append(float((meanval[i].split('\t'))[3]))
         fig1=Figure()
         figmv=fig1.add_subplot(111) #only one plot in the window
         atmv=np.array(tmv)
@@ -535,7 +589,7 @@ class BS(QMainWindow,Ui_MainWindow):
         allenergies.plot(atime,aepot,label='$E_{pot}$')
         allenergies.plot(atime,aeint,label='$E_{int}$')
         allenergies.set_title("Energies")
-        if pot==0 or pot==1:
+        if pot==0 or pot==2:
             allenergies.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
             allenergies.set_ylabel("Energy per particle ($E $  $({m \\xi^2})/{\hbar^2}$)")
         elif pot==1:
@@ -558,20 +612,20 @@ class BS(QMainWindow,Ui_MainWindow):
         meanvelocity=fig4.add_subplot(111)
         meanvelocity.plot(atmv,avelm)
         meanvelocity.set_title("Mean velocity of the soliton")
-        if pot==0 or pot==1:
+        if pot==0 or pot==2:
             meanvelocity.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
-            meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v $  ${m \\xi}/{\hbar}$)")
+            meanvelocity.set_ylabel("$<v>$ ($v $  ${m \\xi}/{\hbar}$)")
         elif pot==1:
-            meanvelocity.set_xlabel("Time ($t/ \omega$)")
-            meanvelocity.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega$)")
+            meanvelocity.set_xlabel("Time ($t/ \omega_{ho}$)")
+            meanvelocity.set_ylabel("$<v>$ ($v/ a_{ho} \omega_{ho}$)")
             meanvelocity.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
             
         fig7=Figure()       #only for harmonic potential
         velpos=fig7.add_subplot(111)
         velpos.plot(amv,avelm)
-        velpos.set_title("$<|v|>$ with $<x>$")
+        velpos.set_title("$<v>$ with $<x>$")
         velpos.set_xlabel("Position ($x/ a_{ho}$)")
-        velpos.set_ylabel("$\sqrt{<v^2>}$ ($v/ a_{ho} \omega_{ho}$)")
+        velpos.set_ylabel("$<v>$ ($v/ a_{ho} \omega_{ho}$)")
           
         self.delfig()
         self.delfig()
@@ -609,6 +663,9 @@ class BS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setValue(0)
             
     def juga(self): #enables a window for play-plot
+        self.interaction.setEnabled(False)
+        self.Confinement.setEnabled(False)
+        self.ext_potential.setEnabled(False)
         global language
         self.rmmpl()
         self.mpl_window.hide()
@@ -617,6 +674,9 @@ class BS(QMainWindow,Ui_MainWindow):
         self.play_2.show()
        
     def torna(self): #hides the play-plot window and returns to normal plots
+        self.interaction.setEnabled(True)
+        self.Confinement.setEnabled(True)
+        self.ext_potential.setEnabled(True)
         global language
         self.rmmpl2()
         self.play_2.hide()        
@@ -661,22 +721,37 @@ class BS(QMainWindow,Ui_MainWindow):
         global language
         self.lot.hide()
         self.sim=self.slider_simulation.value()
+        initialdata=open('./brightsolitons/input.txt','r')
+        data0=initialdata.readline().split('\t')
+        pot=int(data0[0])  #input: external potential
+        if pot==0:
+            valuex0=float(data0[2]) #initial position
+            valuev0=float(data0[3]) #initial velocity
+            valueconf=int(data0[4]) #confinement
+            valuetime=float(data0[5]) #total time of simulation
+            valuegn=int(data0[1]) #gn
+        elif pot==1:
+            valuex0=float(data0[2]) #initial position
+            valueoscil=int(data0[3]) #number oscillations
+            valuegn=int(data0[1]) #gn
+        elif pot==2:
+            valuex0=float(data0[2]) #initial position
+            valuev0=float(data0[3]) #initial velocity
+            valueconf=int(data0[4]) #confinement
+            valuewb=float(data0[5]) #width barrier
+            valuehb=float(data0[6]) #height barrier
+            valuetime=float(data0[7]) #total time of simulation
+            valuegn=int(data0[1]) #gn
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
             datener=open('energies.dat','r')
             linener=datener.readlines()
             epart=float((linener[1].split('\t'))[1]) #as total energy is cte, we take the first one
-            if (self.btn_none.isChecked()==True):
-                pot=0
-            if (self.btn_harm.isChecked()==True):
-                pot=1
-            if (self.btn_wall.isChecked()==True):
-                pot=2
             if pot==0:
-                if self.none_20.isChecked()==True:
+                if int(valuetime)==20:
                     i=self.slider_simulation.value()*200
-                elif self.none_40.isChecked()==True:
+                elif int(valuetime)==40:
                     i=self.slider_simulation.value()*400
                 else:
                     i=self.slider_simulation.value()*200
@@ -696,7 +771,7 @@ class BS(QMainWindow,Ui_MainWindow):
                 pote=np.array(listpot)
                 confin=np.array(listconf)
                 
-                if (self.yes_no.value()==1): #soliton in a box
+                if (valueconf==1): #soliton in a box
                     if self.fig==None:
                         self.rmmpl()
                         self.fig=Figure()
@@ -714,6 +789,7 @@ class BS(QMainWindow,Ui_MainWindow):
                     state.fill_between(posit,phi2,0,facecolor='0.80')
                     state.plot(posit,pote,'g',label="Potential")
                     state.plot(posit,confin,'g')
+                    state.fill_between(posit,confin,0,hatch='-',facecolor='brown',alpha=0.6)
                     state.set_ylim(0,0.3)
                     state.set_xlim(-120,120)
                     wave.set_xlim(-120,120)
@@ -723,8 +799,8 @@ class BS(QMainWindow,Ui_MainWindow):
                     state.legend()
                     
                     #let's plot the wave on the string
-                    Nini=10.0*(2.0*self.horizontalSlider.value()+50.0)
-                    Nnow=int(Nini + (i/100.0)*self.horizontalSlider_2.value()*2.0) #for any time (t=20 or t=40)
+                    Nini=10.0*(valuex0+50.0)
+                    Nnow=int(Nini + (i/100.0)*valuev0) #for any time (t=20 or t=40)
                     data=open('./pulse_data/string-%08d.dat' %(round(Nnow)),'r')
                     datalin=data.readlines()
                     xstringl=[]
@@ -744,7 +820,7 @@ class BS(QMainWindow,Ui_MainWindow):
                                         
                     self.canvas.draw()
                 
-                elif (self.yes_no.value()==0): #soliton in a ring                                           
+                elif (valueconf==0): #soliton in a ring                                           
                     if self.fig==None:
                         self.rmmpl()
                         self.fig=Figure()
@@ -757,6 +833,7 @@ class BS(QMainWindow,Ui_MainWindow):
                     state.fill_between(posit,phi2,0,facecolor='0.80')
                     state.plot(posit,pote,'g',label="Potential")
                     state.plot(posit,confin,'g')
+                    state.fill_between(posit,confin,0,hatch='-',facecolor='brown',alpha=0.6)
                     state.set_ylim(0,0.3)
                     state.set_xlim(-128,128)
                     state.legend()
@@ -778,14 +855,15 @@ class BS(QMainWindow,Ui_MainWindow):
                 listx1=[]
                 listx2=[]
                 listx3=[]
-                if int(self.gn.value()) == 1:
+                if valuegn == 1:
                     a_s = -0.005e-3
-                elif int(self.gn.value()) == 2:
+                elif valuegn == 2:
                     a_s = -0.01e-3
-                elif int(self.gn.value()) == 3:
+                elif valuegn == 3:
                     a_s = -0.02e-3
                 xiv=1.0/np.sqrt(2.0*(20.0e+3*a_s)**2) #from exact formula
-                limp=0.5*0.5*(2**self.wb.value())*xiv
+                limp=0.5*valuewb*xiv
+                
                 for j in range(2,len(lines)):
                     listpos.append(float((lines[j].split('\t'))[0]))
                     listphi.append(float((lines[j].split('\t'))[1]))
@@ -797,9 +875,9 @@ class BS(QMainWindow,Ui_MainWindow):
                     else:
                         hb.append(-1.0)
                     if listpos[j-2]<=0.0:                        
-                        if self.yes_no.value()==1 and listpos[j-2]>=-73:
+                        if valueconf==1 and listpos[j-2]>=-73:
                             listx1.append(float((lines[j].split('\t'))[0]))
-                        elif self.yes_no.value()==0 and listpos[j-2]>=-100:
+                        elif valueconf==0 and listpos[j-2]>=-100:
                             listx1.append(float((lines[j].split('\t'))[0])) 
                         listx2.append(float((lines[j].split('\t'))[0]))
                     elif listpos[j-2]>=0.0:
@@ -809,6 +887,8 @@ class BS(QMainWindow,Ui_MainWindow):
                 pote=np.array(listpot)
                 tote=np.array(listtote)
                 confin=np.array(listconf)
+                energymax=np.amax(tote)
+                potmax=np.amax(pote)
                 glass=np.array(hb)
                 x1=np.array(listx1)
                 x2=np.array(listx2)
@@ -830,10 +910,15 @@ class BS(QMainWindow,Ui_MainWindow):
                 state.fill_between(posit,phi2,0,facecolor='0.80')
                 potential=state.twinx()
                 potential.plot(posit,pote,'g')
+                potential.fill_between(posit,pote,0,hatch='-',facecolor='brown',alpha=0.6)
                 potential.plot(posit,tote,'r', label='$E_{total}$') #in red the total energy
                 potential.legend()
-                potential.set_ylim(bottom=0)
+                if energymax >= potmax:
+                    potential.set_ylim(0, 1.1*energymax)
+                elif energymax <= potmax:
+                    potential.set_ylim(0, 1.1*potmax)
                 state.plot(posit,confin,'g')
+                state.fill_between(posit,confin,0,hatch='-',facecolor='brown',alpha=0.6)
                 potential.set_ylabel("Potential ($V $  ${m \\xi^2}/{\hbar^2}$)", color='g')
                 state.set_ylim(0,0.3)
                 light.set_ylim(-1,1)
@@ -848,20 +933,20 @@ class BS(QMainWindow,Ui_MainWindow):
                 coefT=valorT/valorTot
                 coefR=valorR/valorTot
                 
-                if (self.yes_no.value()==1):
+                if (valueconf==1):
                     state.set_xlim(-100,100)
                     light.set_xlim(-100,100)
                     light.imshow(flight,extent=(-100,-70,0,1),aspect='auto')
                     y1=-0.45*x1/73.0
-                    y3=-x3/100.0
-                    y2=x2/100.0
+                    y3=-0.45*x3/73.0
+                    y2=0.45*x2/73.0
                 else:
                     state.set_xlim(-128,128)
                     light.set_xlim(-128,128)
                     light.imshow(flight,extent=(-128,-98,0,1),aspect='auto')
                     y1=-0.42*x1/100.0
-                    y3=-x3/128.0
-                    y2=x2/128.0
+                    y3=-0.42*x3/100.0
+                    y2=0.42*x2/100.0
                 
                 if self.lot.text()=="Light: On":
                     light.plot(x1,y1,color='yellow',linewidth=5.0,alpha=1.0)   #we plot the beams
@@ -903,16 +988,16 @@ class BS(QMainWindow,Ui_MainWindow):
                 state.set_xlabel("Position ($x/ a_{ho}$)")
                 state.set_ylabel("Density $|\psi|^2 \a_{ho}$", color='b')
                 potential.set_ylabel("Potential ($V/ \hbar \omega_{ho}$)", color='g')
-                potential.set_ylim(0,0.5*(np.abs(self.horizontalSlider_3.value())+7)**2)
-                if (self.horizontalSlider_3.value() <= 0):
-                    state.set_xlim(self.horizontalSlider_3.value()-7,-self.horizontalSlider_3.value()+7)
-                elif (self.horizontalSlider_3.value() > 0):
-                    state.set_xlim(-self.horizontalSlider_3.value()-7,self.horizontalSlider_3.value()+7)
-                if self.gn.value()==1:
+                potential.set_ylim(0,0.5*(np.abs(valuex0)+7)**2)
+                if (valuex0 <= 0):
+                    state.set_xlim(valuex0-7,-valuex0+7)
+                elif (valuex0 > 0):
+                    state.set_xlim(-valuex0-7,valuex0+7)
+                if valuegn==1:
                     state.set_ylim(0,7.2)    
-                elif self.gn.value()==2:
+                elif valuegn==2:
                     state.set_ylim(0,4)
-                elif self.gn.value()==3:
+                elif valuegn==3:
                     state.set_ylim(0,2.2)
                 self.canvas.draw()
         finally:
@@ -924,6 +1009,9 @@ class BS(QMainWindow,Ui_MainWindow):
         self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plotsim)
         self.timer.start(25)
+        self.interaction.setEnabled(False)
+        self.Confinement.setEnabled(False)
+        self.ext_potential.setEnabled(False)
      #   self.ext_potential.hide()
      #   self.Confinement.hide()
      #   self.interaction.hide()
@@ -932,6 +1020,9 @@ class BS(QMainWindow,Ui_MainWindow):
         self.timer=QtCore.QTimer(self)
         self.timer.timeout.connect(self.plotsim2)
         self.timer.start(25)
+        self.interaction.setEnabled(False)
+        self.Confinement.setEnabled(False)
+        self.ext_potential.setEnabled(False)
      #   self.ext_potential.hide()
      #   self.Confinement.hide()
      #   self.interaction.hide()
@@ -939,6 +1030,9 @@ class BS(QMainWindow,Ui_MainWindow):
     def pause(self):
 #        self.timer=QtCore.QTimer(self)   #it gives some problems
         self.timer.stop()
+        self.interaction.setEnabled(True)
+        self.Confinement.setEnabled(True)
+        self.ext_potential.setEnabled(True)
      #   self.ext_potential.show()
      #   self.Confinement.show()
      #   self.interaction.show()
@@ -947,33 +1041,35 @@ class BS(QMainWindow,Ui_MainWindow):
         self.sim=self.sim+1
         self.slider_simulation.setValue(self.sim)
         
-        if (self.btn_none.isChecked()==True):
+        initialdata=open('./brightsolitons/input.txt','r')
+        data0=initialdata.readline().split('\t')
+        pot=int(data0[0])  #input: external potential
+        if pot==1:
+            valuex0=float(data0[2]) #initial position
+            valueoscil=int(data0[3]) #number oscillations
+            valuegn=int(data0[1]) #gn
+        elif pot==2:
+            valuex0=float(data0[2]) #initial position
+            valuev0=float(data0[3]) #initial velocity
+        
+        if (pot==0):
             if (self.sim==100):
                 self.timer.stop()
-     #           self.ButtonPause.click()
-        if (self.btn_harm.isChecked()==True):
-       #     if (self.spinBox.value()==1) or (self.spinBox.value()==2):
-       #         if (self.sim==(60*self.spinBox.value())):
-       #             self.timer.stop()
-       #     elif (self.spinBox.value()==3):
-       #         if (self.sim==200):
-       #             self.timer.stop()
-            if (self.sim==(60*self.spinBox.value())):
+                self.interaction.setEnabled(True)
+                self.Confinement.setEnabled(True)
+                self.ext_potential.setEnabled(True)
+        if (pot==1):
+            if (self.sim==(60*valueoscil)):
                     self.timer.stop()
-     #               self.ButtonPause.click()
-        if (self.btn_wall.isChecked()==True):
-            if self.wall_1.isChecked()==True:
-                if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
-                    self.timer.stop()
-     #               self.ButtonPause.click()
-            elif self.wall_2.isChecked()==True:
-                if (self.sim==(10*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
-                    self.timer.stop()
-     #               self.ButtonPause.click()
-            else:
-                if (self.sim==(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))):
-                    self.timer.stop()
-     #               self.ButtonPause.click()
+                    self.interaction.setEnabled(True)
+                    self.Confinement.setEnabled(True)
+                    self.ext_potential.setEnabled(True)
+        if (pot==2):
+            if (self.sim==(5*math.ceil(-2.0*valuex0/float(valuev0)))):
+                self.timer.stop()
+                self.interaction.setEnabled(True)
+                self.Confinement.setEnabled(True)
+                self.ext_potential.setEnabled(True)
         
     def plotsim2(self):
         self.sim=self.sim-1
@@ -981,7 +1077,9 @@ class BS(QMainWindow,Ui_MainWindow):
         
         if (self.sim==0):
             self.timer.stop()
-     #       self.ButtonPause.click()
+            self.interaction.setEnabled(True)
+            self.Confinement.setEnabled(True)
+            self.ext_potential.setEnabled(True)
             
     def play2(self):
         global language

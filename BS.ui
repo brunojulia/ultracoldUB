@@ -508,7 +508,7 @@
        <enum>QSlider::TicksBelow</enum>
       </property>
       <property name="tickInterval">
-       <number>2</number>
+       <number>3</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_9">

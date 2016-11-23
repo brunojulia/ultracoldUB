@@ -12,7 +12,7 @@ import sys
 # Evolution
 # ------------------------------------------------------------------------------
 
-def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,time_final):
+def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,time_final,kp):
     """Calculates the evolution of the wavefunction c.
        t0         initial time
        Dt         time step (either imaginary or real)
@@ -26,6 +26,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
        plots      plots data if 0
        oscil      gives the number of oscillation under harmonic potential
                   otherwise (no external potential or barrier) is 0.
+       time_final total time of simulation
+       kp         K-space grid points (FFT order)
     Global variables:
        Ntime_out  number of time steps for intermediate outputs
        Ntime_fin  total number of time steps
@@ -105,8 +107,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
     fe.write("# %s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" %("time","total energy","chemical potential","kinetic energy","potential energy","interaction energy", "left integral", "inside integral", "right integral"))
     format_psi = "%.2f" + ("\t %.12g")*6 + "\n"
     rmean=open('./bs_evolution/meanvalues.dat', 'w') #more files! this one for real mean value vs t
-    rmean.write('#time   mean value sigma   mean velocity   meanv[i]-meanv[0] (reescalat)    velm(tornada a calcular diferent, en Energy funcio)' + '\n') 
-    format_mean = "%.2f" + "\t %.12g" + "\t %.12g" + "\t %.12g" + "\t %.12g" + "\t %.12g" + "\n"
+    rmean.write('#time   <x>    sigma    <v>' + '\n') 
+    format_mean = "%.2f" + "\t %.12g" + "\t %.12g" + "\t %.12g" + "\n"
     if V_ext == 2: # potential barrier
         format_e = "%.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \t %.10f \n"
         header_variables = "x", "|psi|^2", "phase", "Re(psi)", "Im(psi)", "V(x)", Nparticle, a_s, 2*Zmax, Npoint, Ntime_fin, Dt, x0, v, xb, wb, hb, energy_cicle[j,1], energy_cicle[j,0]
@@ -119,7 +121,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
     # energy and time at t0
     tevol[0]=t0
     energy_cicle[0,:] = Energy(c, Vpot_R, Ekin_K)
-    velm=velmean(c, Vpot_R, Ekin_K) 
+    velm=velmean(c, kp) 
     print("Energies:          Emed    mu    Ekin    Epot    Eint")
     print("         initial = %g %g %g %g %g"%(Energy(c0, Vpot_R, Ekin_K)))
 
@@ -151,7 +153,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
         meanval[l]=integral
         sigma[l]=np.sqrt((integral2)-(integral**2))
         vmean[l]=integral3
-        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
+        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],velm))
 
     # time evolution cicle
     for i in range(1, Ntime_fin+1):
@@ -168,7 +170,7 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
             cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
             psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
             energy_cicle[j,:] = Energy(c, Vpot_R, Ekin_K)
-            velm=velmean(c, Vpot_R, Ekin_K)              
+            velm=velmean(c, kp)              
             if V_ext == 2:
                 wave_function[j,:] = list_integrals(np.abs(psi)**2,z)
                 fe.write(format_e %(tevol[j], energy_cicle[j,0], energy_cicle[j,1], energy_cicle[j,2], energy_cicle[j,3], energy_cicle[j,4], wave_function[j,0], wave_function[j,1], wave_function[j,2]))
@@ -185,17 +187,14 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                     l+=1
                     integral=0
                     integral2=0
-                    integral3=0
                     for k in range(0,Npoint-1):
                         fpsi.write(format_psi %(z[k], np.abs(psi[k]**2), np.angle(psi[k]), psi[k].real, psi[k].imag, V[k], Vpot_Rc[k]))
                         integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
                         integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
-                        integral3=integral3+(np.sqrt(2*Ekin_K[k])*(np.abs((psi[k])**2))*Dz)
                     meanval[l]=integral
                     tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
                     sigma[l]=np.sqrt((integral2)-(integral**2))
-                    vmean[l]=integral3
-                    rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))                  
+                    rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],velm))                  
                     fpsi.close()
             elif V_ext==2:        
                 if(not(i%Ntime_out)):
@@ -205,7 +204,6 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                         l+=1
                         integral=0
                         integral2=0
-                        integral3=0
                         psileft=0.0
                         psiright=0.0
                         if (tevol[j]>=(round(time_final,2)/simtime - 0.5)) and (tevol[j]<=(round(time_final,2)/simtime+0.5)) and counter==0:
@@ -222,12 +220,10 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                         for k in range(0,Npoint-1):
                             integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
                             integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
-                            integral3=integral3+(np.sqrt(2*Ekin_K[k])*(np.abs((psi[k])**2))*Dz)
                         meanval[l]=integral
                         tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
                         sigma[l]=np.sqrt((integral2)-(integral**2))
-                        vmean[l]=integral3
-                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))                       
+                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],velm))                       
 
                 # writes a file for each timestep
                 if(not(i%Ntime_out)):
@@ -246,24 +242,15 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                         l+=1
                         integral=0
                         integral2=0
-                        integral3=0
                         for k in range(0,Npoint-1):
                             integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
                             integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
-                            integral3=integral3+(np.sqrt(2*Ekin_K[k])*(np.abs((psi[k])**2))*Dz)
                         meanval[l]=integral
                         tmeanval[l]=tevol[j] #the final value written in each position corresponds to the one painted in the original plots
                         sigma[l]=np.sqrt((integral2)-(integral**2))
-                        vmean[l]=integral3
-                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],vmean[l],(vmean[l]-vmean[0]),velm))
+                        rmean.write(format_mean %(tmeanval[l],meanval[l],sigma[l],velm))
 
                 # writes a file for each timestep
-     #           if oscil==1:
-     #               valor=500
-     #           elif oscil==2:
-     #               valor=250
-     #           elif oscil==3:
-     #               valor=150  #tricky
                 if(not(i%(Ntime_out))):
                     if(write_ev==0):
                         number_name_file.append(round(tevol[j],2)*1000)
