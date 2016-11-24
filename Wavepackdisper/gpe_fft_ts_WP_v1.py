@@ -139,7 +139,7 @@ file.write(" Number of grid points = %g\n"%(Npoint))
 file.write(" Scattering length = %g\n"%(0))
 file.write(" Total time of evolution in real time = %g\n"%(Ntime_fin*Dtr))
 file.write(" Real time step = %g\n"%(Dtr))
-file.write(" Intermediate solutions = %g\n"%(Ntime_fin//Ntime_out-1))
+file.write(" Intermediate solutions = %g\n\n"%(Ntime_fin//Ntime_out-1))
 file.close()
 
 file=open('output_sp.txt','w')
@@ -151,7 +151,7 @@ file.write(" Numero de puntos en la red = %g\n"%(Npoint))
 file.write(" Longitud de dispersion inicial = %g\n"%(0))
 file.write(" Tiempo total de la evolucion en tiempo real = %g\n"%(Ntime_fin*Dtr))
 file.write(" Paso real de tiempo = %g\n"%(Dti))
-file.write(" Soluciones intermedias = %g\n"%(Ntime_fin//Ntime_out-1))
+file.write(" Soluciones intermedias = %g\n\n"%(Ntime_fin//Ntime_out-1))
 file.close()
 
 # Grid definitions: physical and momentum space
@@ -264,12 +264,12 @@ for k in range (0,int(2*Zmax/Dz)):
 file4.close()
 
 file=open('output_eng.txt','a')
-file.write(" Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint\n")
+file.write(" Energies in evolution real time:\n          Emed    mu    Ekin    Epot    Eint\n")
 file.write("         initial = %g %g %g %g %g\n"%(Energy(c0)))
 file.close()
 
 file=open('output_sp.txt','a')
-file.write(" Energias en la evolucion de tiempo real:          Emed    mu    Ecin    Epot    Eint\n")
+file.write(" Energias en la evolucion de tiempo real:\n          Emed    mu    Ecin    Epot    Eint\n")
 file.write("         inicial = %g %g %g %g %g\n"%(Energy(c0)))
 file.close()
 # evolution in time: parameters
@@ -371,4 +371,7 @@ file.close()
 
 file=open('output_sp.txt','a')
 file.write("         final = %g %g %g %g %g"%(Energy(c)))
+file.close()
+
+file=open('WfWd-end','w')
 file.close()

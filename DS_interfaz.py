@@ -82,7 +82,7 @@ class DS(QMainWindow,Ui_MainWindow):
         self.fig=Figure()
         axf=self.fig.add_subplot(111)
         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+        axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
         axf.fill_between(xv,xv1,0.10,facecolor='black')
         axf.set_ylim(0.,0.1)
         axf.set_title('Bose-Einstein condensate')
@@ -113,7 +113,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.fig.clear()
                 ax1f2=self.fig.add_subplot(111)
                 ax1f2.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f2.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                ax1f2.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 ax1f2.fill_between(xv1,globals()['xv%s' %i],0.10,facecolor='black')
                 ax1f2.set_ylim(0.,0.1)
                 ax1f2.set_title('initial state')
@@ -170,10 +170,10 @@ class DS(QMainWindow,Ui_MainWindow):
         if (self.radioButton.isChecked()==True):
             if (self.sim==74):
                 self.timer1.stop()
-            if (self.sim==self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
+            if (self.sim==self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.)))):
                 self.timer1.stop()
         if (self.radioButton_3.isChecked()==True):
-            if (self.sim==self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))-1):
+            if (self.sim==self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))):
                 self.timer1.stop()
                 
                 
@@ -256,7 +256,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 fig4=Figure()
                 axf=fig4.add_subplot(111)
                 axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 axf.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 axf.set_title('state at %s' %np.real(self.sim/10.))
                 axf.set_ylim(0.,0.6)
@@ -264,19 +264,24 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.addmpl2(fig4)
                 
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
-            
             if (self.radioButton_oscil.isChecked()==True):
+                if (self.radioButton_3.isChecked()==True):
+                    self.spin_M.setMaximum(2.)
+                    self.spin_N.setMaximum(3.)
+                if (self.radioButton_2.isChecked()==True):
+                    self.spin_M.setMaximum(1.)
+                    self.spin_N.setMaximum(1.)
                 self.rmmpl()
                 self.textBrowser_2.hide()
                 self.textBrowser.show()
                 self.rmmpl2()
                 self.mplwindow.hide()
-                if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()==1:
+                if (self.radioButton_2.isChecked()==True) and self.spinBox_2_value==1:
                     self.widget_osci.show()
                     self.widget_osci_2.hide()
                     self.spin_amplitude.setValue(3.)
                     self.spin_frequency.setValue(0.5)
-                if (self.radioButton_3.isChecked()==True)  or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
+                if (self.radioButton_3.isChecked()==True)  or (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
                     self.widget_osci_2.show()
                     self.widget_osci.hide()
                     self.spin_amplitude_2.setValue(3.)
@@ -289,11 +294,11 @@ class DS(QMainWindow,Ui_MainWindow):
             if (self.radioButton_densi.isChecked()==True):
                 self.spin_mu.setValue(25.)
                 self.spin_gn.setValue(200.)
-                if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
-                    time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                if (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
+                    time1=self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.)))
     
-                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
-                    time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
+                    time1=self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))
                     
                 self.widget_osci.hide()
                 self.widget_densi.show()
@@ -329,7 +334,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 fig3=Figure()
                 ax1f3=fig3.add_subplot(111)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
                 ax1f3.set_ylim(0.,0.1)
@@ -354,7 +359,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.addmpl2(fig5)
                 ax1f3=fig5.add_subplot(111)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 ax1f3.set_ylim(0.,0.6)                
                 ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3,'y-',lw=2)
@@ -365,10 +370,10 @@ class DS(QMainWindow,Ui_MainWindow):
             if (self.radioButton_oscil.isChecked()==True):
                 
                 if (self.radioButton_2.isChecked()==True):
-                    time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                    time1=self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.)))
     
                 if (self.radioButton_3.isChecked()==True):
-                    time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                    time1=self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))
                 
                 self.rmmpl2()
                 psi_time=np.empty([512,time1])
@@ -408,7 +413,7 @@ class DS(QMainWindow,Ui_MainWindow):
 #                    ax1f3.set_title('evolution condensate')
 #                    self.canvas.draw()
                 
-                if (self.radioButton_2.isChecked()==True) and (self.spinBox_2.value()==1):
+                if (self.radioButton_2.isChecked()==True) and (self.spinBox_2_value==1):
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
@@ -510,7 +515,7 @@ class DS(QMainWindow,Ui_MainWindow):
                     #ani.save('muelle.mp4', fps=15)
                     self.canvas.draw()
                 
-                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
+                if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
@@ -528,13 +533,13 @@ class DS(QMainWindow,Ui_MainWindow):
                         C = 0.0
                         B=self.spin_amplitude_2.value()
                         D = 0.0
-                        if (self.radioButton_2.isChecked()==True) and self.spinBox_2.value()>1:
+                        if (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
                             D = -B
                         w = self.spin_frequency_2.value()
                         impac=0
                         t_max = tf_sim
                         m2 = 1.
-                        m1 = self.spin_ratio.value()
+                        m1 = 1.
                         y = 0.0
                         y2=0.0
                         y3=0.0
@@ -573,7 +578,7 @@ class DS(QMainWindow,Ui_MainWindow):
                                 t_3 -= dt
                                 i -= 1
                              
-                            if self.spinBox_2.value()==3 and (self.radioButton_2.isChecked()==True):
+                            if self.spinBox_2_value==3 and (self.radioButton_2.isChecked()==True):
                                 y = A*np.sin(w*t_2)+B*np.cos(w*t_2)
                                 y2 = C*np.sin(w*t_3)+D*np.cos(w*t_3)
                                 y3 = E*np.sin(w*t_1)+F*np.cos(w*t_1)
@@ -588,7 +593,7 @@ class DS(QMainWindow,Ui_MainWindow):
                             y_[i,1]=y2
                             y_[i,2]=y3
                             t_[i]=t
-                            if self.spinBox_2.value()==3 and (self.radioButton_2.isChecked()==True):
+                            if self.spinBox_2_value==3 and (self.radioButton_2.isChecked()==True):
                                 if np.abs(y-y3)<(2.*r0+(2.*r0/100.)):
                                   t2=t_2
                                   t1=t_1
@@ -627,7 +632,7 @@ class DS(QMainWindow,Ui_MainWindow):
                                   m2=m1_
                                   t_3=0.
                                   t_1=0.
-                            if self.spinBox_2.value()!=3 or (self.radioButton_3.isChecked()==True):
+                            if self.spinBox_2_value!=3 or (self.radioButton_3.isChecked()==True):
                                 if np.abs(y-y2)<(r+(r/100.)):
                                   t1=t_1
                                   impac +=1
@@ -641,7 +646,7 @@ class DS(QMainWindow,Ui_MainWindow):
                                   A=(2*m1/(m1+m2))*(A_*np.cos(w*t1)-B_*np.sin(w*t1))+(((m2-m1)/(m1+m2))*(C_*np.cos(w*t1)-D_*np.sin(w*t1)))
                                   B=C_*np.sin(w*t1)+D_*np.cos(w*t1)
                                   
-                                  if self.spinBox_2.value()==2 and (self.radioButton_2.isChecked()==True):
+                                  if self.spinBox_2_value==2 and (self.radioButton_2.isChecked()==True):
                                       A_=A
                                       B_=B
                                       C_=C
@@ -736,11 +741,11 @@ class DS(QMainWindow,Ui_MainWindow):
                             line_nc_4.set_data(t_[:int(t/dt)],y_[:int(t/dt),1]+r)
                             circle8.center=(t,y2+r)
                         
-                        if self.spinBox_2.value()!=3 or (self.radioButton_3.isChecked()==True):
+                        if self.spinBox_2_value!=3 or (self.radioButton_3.isChecked()==True):
                             circle_3.center=(999999,999999)
                             circle_4.center=(999999,999999)
                             line_nc_31.set_data(0,0)
-                        if self.spinBox_2.value()==3 and (self.radioButton_3.isChecked()==False):
+                        if self.spinBox_2_value==3 and (self.radioButton_3.isChecked()==False):
                             circle_3.center=(y3,np.sqrt(B_0**2-y3**2.))
                             circle_4.center=(t,y3)
                             line_nc_31.set_data([0.,y3],[0.,np.sqrt(B_0**2-y3**2.)])
@@ -807,9 +812,9 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.addmpl2(fig3)
                 ax1f3=fig3.add_subplot(111)
                 ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_xlabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                ax1f3.set_xlabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
-                ax1f3.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                ax1f3.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_ylim(0.,0.1)                  
                 ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3,'y-',lw=2)
@@ -827,6 +832,8 @@ class DS(QMainWindow,Ui_MainWindow):
         self.mplwindow.show()
         self.start.show()
         self.mplfigs.show()
+        self.slider_simulation.setValue(self.sim+1)
+        self.slider_simulation.setValue(self.sim-1)
 
     def start1(self):
         self.timer1.stop()
@@ -907,7 +914,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.fig=Figure()
             axf=self.fig.add_subplot(111)
             axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+            axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
             axf.fill_between(xv2,yv2,0.6,facecolor='black')
             axf.set_title('state at %s' %np.real(0/10.))
             self.addmpl(self.fig)
@@ -988,13 +995,16 @@ class DS(QMainWindow,Ui_MainWindow):
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
             self.sim=0
             self.radioButton_dens.setChecked(True)
+            self.spinBox_value=self.spinBox.value()
+            self.spinBox_4_value=self.spinBox_4.value()
+            self.spinBox_2_value=self.spinBox_2.value()
             if (self.radioButton_2.isChecked()==True):
-                time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time1=self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.)))
                 self.file.write('...Módulo seleccionado: Dark solitons study...\n\n' )
-                self.file.write('Posición inicial del solitón=%s\nNúmero de oscilaciones=%s\nNúmero de solitones simétricos=%s\n\n' %(self.horizontalSlider.value()/10.0,self.spinBox.value(),self.spinBox_2.value()))
+                self.file.write('Posición inicial del solitón=%s\nNúmero de oscilaciones=%s\nNúmero de solitones simétricos=%s\n\n' %(self.horizontalSlider.value()/10.0,self.spinBox_value,self.spinBox_2.value()))
 
             if (self.radioButton_3.isChecked()==True):
-                time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time1=self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))
                 self.file.write('...Módulo seleccionado: Newton,s cradle...\n\n' )
                 self.file.write('Número de solitones en movimiento=%s\nPosición de los solitones en movimiento=%s\nNúmero de oscilaciones=%s\nNúmero de solitones en cadena estacionaria=%s\n\n' %(self.spinBox_6.value(),self.horizontalSlider_2.value()/10.0,self.spinBox_4.value(),self.spinBox_5.value()))
 
@@ -1019,9 +1029,9 @@ class DS(QMainWindow,Ui_MainWindow):
                 
                 start_sub=time.time()
                 subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
-                progressBar.porcessProgressBar.setMaximum(time1)
+                progressBar.porcessProgressBar.setMaximum(time1+1)
                 diff=0
-                while diff<time1+1:
+                while diff<time1+2:
                     diff=0
                     for root, dirs, files in os.walk(os.getcwd()):
                         for file in files:
@@ -1032,7 +1042,7 @@ class DS(QMainWindow,Ui_MainWindow):
                             progressBar.label.setText('Imaginary time method in progress...')
                         if (diff<time1-10) and (diff>10):
                             progressBar.label.setText('Evolution in real time in progress...')
-                        if (diff<time1) and (diff>time1-10):
+                        if (diff<time1+1) and (diff>time1-10):
                             progressBar.label.setText('Writing results ...')
                                                 
                         progressBar.porcessProgressBar.setValue(diff)                     
@@ -1049,9 +1059,9 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.slider_simulation.show()
                 self.slider_simulation.setMinimum(0)
                 if (self.radioButton_2.isChecked()==True):
-                    self.slider_simulation.setMaximum(self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))-1)
+                    self.slider_simulation.setMaximum(self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.))))
                 if (self.radioButton_3.isChecked()==True):
-                    self.slider_simulation.setMaximum(self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))-1)
+                    self.slider_simulation.setMaximum(self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))-1)
                 self.slider_simulation.setSingleStep(1)
             
                 time.sleep(2)
@@ -1104,7 +1114,7 @@ class DS(QMainWindow,Ui_MainWindow):
             self.fig=Figure()
             axf4=self.fig.add_subplot(111)
             axf4.set_xlabel('$x/a_{ho}$',fontsize=17)
-            axf4.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+            axf4.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
             axf4.fill_between(xv2,yv2,0.1,facecolor='black')
             axf4.set_ylim(0.,0.10)
             axf4.set_title('state at %s' %np.real(0/10.))
@@ -1241,7 +1251,7 @@ class DS(QMainWindow,Ui_MainWindow):
                         self.fig.clear()
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                        axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                         axf.set_ylim([0,0.6])
                         axf.fill_between(xv1,xv2,0.6,facecolor='black')
                         axf.set_title('state at %s' %np.real(i/10.))
@@ -1251,9 +1261,9 @@ class DS(QMainWindow,Ui_MainWindow):
                 
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
             if (self.radioButton_2.isChecked()==True):
-                time1=self.spinBox.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time1=self.spinBox_value*int((10*np.pi*2.*np.sqrt(2.)))
             if (self.radioButton_3.isChecked()==True):
-                time1=self.spinBox_4.value()*int((10*np.pi*2.*np.sqrt(2.)))
+                time1=self.spinBox_4_value*int((10*np.pi*2.*np.sqrt(2.)))
             value=self.slider_simulation.value()
             self.sim=value
             prevdir = os.getcwd()
@@ -1286,7 +1296,7 @@ class DS(QMainWindow,Ui_MainWindow):
                         self.fig.clear()
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                        axf.set_ylabel('density $|\psi|^2/a_{ho}$',fontsize=14)
+                        axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
                         if (self.radioButton_ph.isChecked()==True):
                             axf.set_xlim([-8.5,8.5])
                             axf.set_ylim(-4.,4.)
@@ -1300,6 +1310,8 @@ class DS(QMainWindow,Ui_MainWindow):
                 os.chdir(prevdir)
             
     def close(self):
+        self.timer1.stop()
+        self.timer2.stop()
         self.hide()
         self.file.close()
         self.parent().show()

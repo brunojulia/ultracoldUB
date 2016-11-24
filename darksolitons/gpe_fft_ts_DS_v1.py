@@ -142,8 +142,7 @@ file.write(" Total time of evolution = %g\n"%(Ntime_fin*Dtr))
 file.write(" Real time step = %g\n"%(Dtr))
 file.write(" Imaginary time step = %g\n"%(Dti))
 file.write(" Intermediate solutions = %g\n"%(Ntime_fin//Ntime_out-1))
-file.write(" Initial characteristic interaction energy = %g"%(gint))
-file.close()
+file.write(" Initial characteristic interaction energy = %g\n"%(gint))
 
 file2=open('output_sp.txt','w')
 file2.write("Datos iniciales:\n")
@@ -156,8 +155,7 @@ file2.write(" Tiempo total de la evolucion = %g\n"%(Ntime_fin*Dtr))
 file2.write(" Paso real de tiempo = %g\n"%(Dtr))
 file2.write(" Paso imaginario de tiempo = %g\n"%(Dti))
 file2.write(" Soluciones intermedias = %g\n"%(Ntime_fin//Ntime_out-1))
-file2.write(" Energia caracteristica de interaccion initial = %g"%(gint))
-file2.close()
+file2.write(" Energia caracteristica de interaccion initial = %g\n\n"%(gint))
 
 # Grid definitions: physical and momentum space
 # __________________________________________________________________________________________
@@ -257,8 +255,11 @@ t0=0.0
 tevol=np.empty([Ninter+1])          # time vector
 energy_cicle=np.empty([Ninter+1,5]) # put the energies in a matrix
 energy_cicle[0,:] = Energy(c0)      # Energies at t=0
-print("Energies in evolution imaginary time:          Emed    mu    Ekin    Epot    Eint")
-print("         initial = %g %g %g %g %g"%(Energy(c0)))
+file.write("Energies in evolution imaginary time:\n          Emed    mu    Ekin    Epot    Eint\n")
+file.write("         initial = %g %g %g %g %g\n"%(Energy(c0)))
+
+file2.write("Energias en la evolucion de tiempo imaginario:\n          Emed    mu    Ecin    Epot    Eint\n")
+file2.write("         inicial = %g %g %g %g %g\n"%(Energy(c0)))
 
 #initiation of time evolution:
 c=c0
@@ -278,7 +279,9 @@ for i in range(1, Ntime_fin+1):
         energy_cicle[j,:] = Energy(c)
         if (np.abs(energy_cicle[j,1]-energy_cicle[j-1,1])<(1e-4)):
             break
-print("         final = %g %g %g %g %g"%(Energy(c)))
+file.write("         final = %g %g %g %g %g\n"%(Energy(c)))
+
+file2.write("         final = %g %g %g %g %g\n"%(Energy(c)))
 
 
 # Plots of the final state:
@@ -343,8 +346,11 @@ Ninter = Ntime_fin//Ntime_out # Number of outputs with the intermediate states
 psi_sol=changeFFTposition(psi_sol,Npoint,1)
 c0=normaliza(fft(psi_sol)/Npoint) # initial wave function
 
-print("Energies in evolution real time:          Emed    mu    Ekin    Epot    Eint")
-print("         initial = %g %g %g %g %g"%(Energy(c0)))
+file.write("Energies in evolution real time:\n          Emed    mu    Ekin    Epot    Eint\n")
+file.write("         initial = %g %g %g %g %g\n"%(Energy(c0)))
+
+file2.write("Energias en la evolucion de tiempo real:\n          Emed    mu    Ecin    Epot    Eint\n")
+file2.write("         inicial = %g %g %g %g %g\n"%(Energy(c0)))
 
 # evolution in time: parameters
 t0=0.0
@@ -359,7 +365,7 @@ energi=np.empty([5])           # put the energies in a vector
 
 
 # Open files
-file=open('energies.txt','w')
+file5=open('energies.txt','w')
 #file.write('#Tabla donde se muestran diversos valores de la energia a lo largo del movimiento del soliton.\n')
 #file.write('#Tiempo\tEnergia media\tPotencial quimico\tEnergia cinetica\tEnergia potencial\tEnergia interna\n' )
 
@@ -385,8 +391,8 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         j+=1
         tevol[j] = t
 # Write energies from function Energy        
-        file.write('%s\t' %t)
-        file.write('%g\t%g\t%g\t%g\t%g\n' %(Energy(c)))
+        file5.write('%s\t' %t)
+        file5.write('%g\t%g\t%g\t%g\t%g\n' %(Energy(c)))
 # Representation of intermediate solutions
         cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
         psi = changeFFTposition(cc,Npoint,0) # psi is the final wave function
@@ -425,22 +431,26 @@ for i in range(1, Ntime_fin+1): # time evolution cicle
         file4.write('%s\t%s\n' %(t,dif_phase))
         
         # Writes wave function        
-        file2=open('WfDs-%08d.txt'%(j),'w')
+        file6=open('WfDs-%08d.txt'%(j),'w')
 #        file2.write('Tiempo=%s\n' %(t))
 #        file2.write('#Datos de interes: N.particulas=%g\tPar.Interaccion=%g\tLong.caja=%g\tN.puntos=%g\tFreq.Oscilador=%g\tPot. quim.=%s\n ' %(Nparticle,gint,2*Zmax,Npoint,whoz,energi[1]))
 #        file2.write('#x\tDensidad\tFase\tRe\tIm\tV(x)\n')
         for i in range (0,int(2*Zmax/Dz)):
-            file2.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(math.atan2(np.imag(psi[i]),np.real(psi[i]))),psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
+            file6.write("%s\t%s\t%s\t%s\t%s\t%s \n" %(z[i],(abs(psi)**2)[i],(math.atan2(np.imag(psi[i]),np.real(psi[i]))),psi.real[i],psi.imag[i],changeFFTposition(Vpot_R,Npoint,0)[i]))
 #        file2.write('\n\n')
         
         
-file.close()    
-file2.close()                
+file5.close()    
+file6.close()                
 #file3.close()
 file4.close()   
 
 # Prints final energy (soliton)        
-print("         final = %g %g %g %g %g"%(Energy(c)))           
+file.write("         final = %g %g %g %g %g"%(Energy(c)))
+file2.write("         final = %g %g %g %g %g"%(Energy(c)))
+
+file.close()
+file2.close()           
 #
 ## Plots minus position and value           
 ##f5=plt.figure()
@@ -455,6 +465,8 @@ print("         final = %g %g %g %g %g"%(Energy(c)))
 ##         
 end=time.time()
 print (end-start)
+file=open('WfDs-end','w')
+file.close()
 
 
 

@@ -54,6 +54,9 @@
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -140,6 +143,9 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser_3">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>600</x>
@@ -157,6 +163,9 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser_2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>310</x>
