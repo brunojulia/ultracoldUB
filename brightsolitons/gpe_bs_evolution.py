@@ -7,6 +7,7 @@ from gpe_bs_parameters import *
 from gpe_bs_plots import *
 from gpe_bs_utilities import *
 import sys
+import subprocess
 
 
 # Evolution
@@ -217,6 +218,16 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                             escriu=open('./bs_evolution/llum.dat','w')
                             escriu.write('%f \t %f' %(psileft,psiright))  #left and right |psi|^2
                             escriu.close()
+                            
+                            #creates gifs for light simulations                            
+                            prevdir=os.getcwd()
+                            try:
+                                os.chdir(os.path.expanduser('./bs_evolution/'))
+                                subprocess.call('python sim_1_light.py',shell=True)
+                                subprocess.call('python sim_2_light.py',shell=True)
+                            finally:
+                                os.chdir(prevdir)
+                                
                         for k in range(0,Npoint-1):
                             integral=integral+(z[k]*(np.abs((psi[k])**2))*Dz)
                             integral2=integral2+(((z[k])**2)*(np.abs((psi[k])**2))*Dz)
