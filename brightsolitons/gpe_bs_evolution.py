@@ -223,8 +223,8 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                             prevdir=os.getcwd()
                             try:
                                 os.chdir(os.path.expanduser('./bs_evolution/'))
-                     #           subprocess.call('python sim_1_light.py',shell=True)
-                     #           subprocess.call('python sim_2_light.py',shell=True)
+                                subprocess.call('python sim_1_light.py',shell=True)
+                                subprocess.call('python sim_2_light.py',shell=True)
                             finally:
                                 os.chdir(prevdir)
                                 
