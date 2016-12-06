@@ -51,7 +51,7 @@
     <property name="geometry">
      <rect>
       <x>633</x>
-      <y>367</y>
+      <y>407</y>
       <width>200</width>
       <height>101</height>
      </rect>
@@ -73,7 +73,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>550</y>
+      <y>590</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -163,9 +163,9 @@
    <widget class="QPushButton" name="start">
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>340</y>
-      <width>75</width>
+      <x>690</x>
+      <y>350</y>
+      <width>81</width>
       <height>23</height>
      </rect>
     </property>
@@ -1045,7 +1045,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>630</x>
-      <y>480</y>
+      <y>520</y>
       <width>211</width>
       <height>51</height>
      </rect>
@@ -1090,7 +1090,34 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="ButtonDemo_1">
+    <property name="geometry">
+     <rect>
+      <x>634</x>
+      <y>380</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Demo 1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ButtonDemo_2">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>380</y>
+      <width>71</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Demo 2</string>
+    </property>
+   </widget>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -1101,7 +1128,11 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAuthors">
+   <property name="text">
+    <string>Authors</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -1117,7 +1148,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
-     <y>412</y>
+     <y>433</y>
     </hint>
    </hints>
   </connection>
@@ -1341,7 +1372,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>759</x>
-     <y>417</y>
+     <y>438</y>
     </hint>
    </hints>
   </connection>
