@@ -57,6 +57,9 @@ class WD(QMainWindow,Ui_MainWindow):
         self.fig=plt.figure()
         self.addmpl(self.fig)
         
+        self.ButtonDemo_1.clicked.connect(self.demo1)
+        self.ButtonDemo_2.clicked.connect(self.demo2)
+        self.horizontalSlider.valueChanged.connect(self.initial)
         self.pushButton_game.clicked.connect(self.game_call)
         self.pushButton_try.clicked.connect(self.graph_try)
         self.pushButton_return.clicked.connect(self.game_return)
@@ -64,17 +67,82 @@ class WD(QMainWindow,Ui_MainWindow):
         self.ButtonBackDiffu.clicked.connect(self.backdiffu)
         self.mplwindow_2.hide()
         self.mplwindow_3.hide()
-        self.mplwindow_4.hide()
         self.textDiffu.hide()
         self.ButtonBackDiffu.hide()
         self.ButtonDiffu.hide()
+        
+        showAction=QtGui.QAction('&Authors', self)
+        showAction.triggered.connect(self.showAuthors)
+        mainMenu=self.menuBar()
+        fileMenu=mainMenu.addMenu('&About')
+        fileMenu.addAction(showAction)  
         
         self.timer1=QtCore.QTimer(self)
         self.timer2=QtCore.QTimer(self)
         
         self.ani_co=0
         
-
+        file=open('position_02.txt','r')
+        lines=file.readlines()
+        file.close()
+        x=[]
+        x1=[]
+        x2=[]
+        for line in lines:
+            p=line.split()
+            x.append(float(p[0]))
+            x1.append(float(p[1]))
+            x2.append(float(p[5]))
+        xv=np.array(x)
+        xv1=np.array(x1)
+        xv2=np.array(x2)
+        
+        self.rmmpl()
+        self.fig=plt.figure()
+        axf=self.fig.add_subplot(111)
+        axf.set_xlabel('$x/a_{ho}$',fontsize=17)
+        axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
+        axf.fill_between(xv,0,xv1,label='$R-Space$',facecolor='blue',alpha=0.5)
+        axf.fill_between(xv,0,xv2,label='$K-Space$',facecolor='yellow',alpha=0.5)
+        axf.set_xlim([-20,20])
+        axf.set_title('Wave Packet')
+        axf.legend()
+        self.addmpl(self.fig) 
+        
+    def initial(self):
+        file=open('initial2.txt','r')
+        lines=file.readlines()
+        file.close()
+        for i in range(0,16):
+            globals()['x%s' %i]=[]
+        for line in lines:
+            p=line.split()
+            for i in range(0,16):
+                globals()['x%s' %i].append(float(p[i-1]))
+        for i in range(0,16):
+                globals()['xv%s' %i]=np.array(globals()['x%s' %i])       
+        value=self.horizontalSlider.value()
+        
+        for i in range(3,16):
+            if value==i-9:
+                if self.fig==None:
+                    self.rmmpl()
+                    self.fig=Figure()
+                    self.addmpl(self.fig)
+                    
+                
+                self.fig.clear()
+                ax1f2=self.fig.add_subplot(111)
+                ax1f2.set_xlabel('$x/a_{ho}$',fontsize=17)
+                ax1f2.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
+                ax1f2.fill_between(xv1,0,globals()['xv%s' %i],label='$R-Space$',facecolor='blue',alpha=0.5)
+                ax1f2.fill_between(xv1,0,xv2,label='$K-Space$',facecolor='yellow',alpha=0.5)
+                ax1f2.set_ylim(0.,0.6)
+                ax1f2.set_xlim(-20.,20.)
+                ax1f2.set_title('initial state')
+                ax1f2.legend()
+                self.canvas.draw()
+                
     def start1(self):
         self.timer1.stop()
         self.timer2.stop()
@@ -98,7 +166,7 @@ class WD(QMainWindow,Ui_MainWindow):
             file.write ('%s\t%s\t%s\t%s' %(self.horizontalSlider.value(),self.true1,self.spinBox.value(),self.spinBox_2.value()))
             file.close()
             
-            time1=self.spinBox_value*int((10*np.pi*2.0))
+            time1=int(self.spinBox_value*(10*np.pi*2.0))
             start_sub=time.time()
             subprocess.Popen('python gpe_fft_ts_WP_v1.py',shell=True)
             for root, dirs, files in os.walk(os.getcwd()):
@@ -118,7 +186,7 @@ class WD(QMainWindow,Ui_MainWindow):
                     if (diff<10):
                         progressBar.label.setText('Initiation of the progress...')
                     if (diff<time1-10) and (diff>10):
-                        progressBar.label.setText('Solving Schrodinger equation...')
+                        progressBar.label.setText(u'Solving Schrödinger equation...')
                     if (diff<time1+1) and (diff>time1-10):
                         progressBar.label.setText('Writing results ...')
                                             
@@ -148,7 +216,7 @@ class WD(QMainWindow,Ui_MainWindow):
             if (self.radioButton_2.isChecked()==True):
                 self.interact_game.hide()
                 self.ButtonDiffu.show()
-            time.sleep(2)
+#            time.sleep(2)
             
             file=open('output_sp.txt','r')
             self.file.write('%s\n\n' %file.read())
@@ -186,7 +254,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.fig=plt.figure()
         axf=self.fig.add_subplot(111)
         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-        axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
+        axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
         axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
         axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
         axf.set_xlim([-20,20])
@@ -261,7 +329,7 @@ class WD(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setValue(0)
         
     def simulation(self):
-        time1=self.spinBox_value*int((10*np.pi*2.0))
+        time1=int(self.spinBox_value*(10*np.pi*2.0))
         value=self.slider_simulation.value()
         self.sim=value
         prevdir = os.getcwd()
@@ -294,7 +362,7 @@ class WD(QMainWindow,Ui_MainWindow):
                     self.fig.clear()
                     axf=self.fig.add_subplot(111)
                     axf.set_xlabel('$x/a_{ho}$',fontsize=17)
-                    axf.set_ylabel('density $|\psi|^2*a_{ho}$',fontsize=14)
+                    axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                     axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
                     axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
                     axf.set_xlim([-20,20])
@@ -318,9 +386,11 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.mplwindow.hide()
                 self.textDiffu.hide()
                 self.mplwindow_3.hide()
-                self.mplwindow_4.hide()
                 self.widget_osci.show()
                 self.start.hide()
+                self.ButtonDemo_1.hide()
+                self.ButtonDemo_2.hide()
+                self.interact.setEnabled(False)
                 self.mplfigs.hide()
                 self.spin_amplitude.setValue(3.)
                 self.spin_frequency.setValue(0.5)
@@ -358,7 +428,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.ani_co += 1
                 if self.ani_co>1:
                     self.ani.event_source.stop()
-                time1=self.spinBox_value*int((10*np.pi*2.0))
+                time1=int(self.spinBox_value*(10*np.pi*2.0))
                 self.rmmpl2()
                 prevdir = os.getcwd()
                 try:
@@ -496,12 +566,14 @@ class WD(QMainWindow,Ui_MainWindow):
         self.mplwindow_2.hide()
         self.textDiffu.hide()
         self.mplwindow_3.hide()
-        self.mplwindow_4.hide()
         self.game.hide()
         self.fig=plt.figure()
         self.addmpl(self.fig)
         self.mplwindow.show()
         self.start.show()
+        self.ButtonDemo_1.show()
+        self.ButtonDemo_2.show()
+        self.interact.setEnabled(True)
         self.mplfigs.show()
         self.slider_simulation.setValue(self.sim+1)
         self.slider_simulation.setValue(self.sim-1)
@@ -524,6 +596,8 @@ class WD(QMainWindow,Ui_MainWindow):
             self.timer2.stop()
             
     def on(self):
+        self.timer1.stop()
+        self.timer2.stop()
         if self.timer2==None:
             self.timer1=QtCore.QTimer(self)
             self.timer1.timeout.connect(self.plot)
@@ -539,6 +613,8 @@ class WD(QMainWindow,Ui_MainWindow):
         self.timer2.stop()
         
     def back1(self):
+        self.timer1.stop()
+        self.timer2.stop()
         if self.timer1==None:
             self.timer2=QtCore.QTimer(self)
             self.timer2.timeout.connect(self.plot2)
@@ -555,17 +631,19 @@ class WD(QMainWindow,Ui_MainWindow):
         self.mplwindow.hide()
         self.mplwindow_2.hide()
         self.mplwindow_3.show()
-        self.mplwindow_4.show()
         self.game.hide()
         self.ButtonDiffu.hide()
         self.textDiffu.show()
         self.start.hide()
+        self.ButtonDemo_1.hide()
+        self.ButtonDemo_2.hide()
+        self.interact.setEnabled(False)
         self.mplfigs.hide()
         self.ButtonBackDiffu.show()
         
         
         
-        self.movie = QMovie("heat_map.gif", QByteArray(), self)
+        self.movie = QMovie("dispersion.gif", QByteArray(), self)
         self.movie_scr = QLabel()
         self.mplvl_3.addWidget(self.movie_scr)
         self.movie.setCacheMode(QMovie.CacheAll)
@@ -573,29 +651,35 @@ class WD(QMainWindow,Ui_MainWindow):
         self.movie_scr.setMovie(self.movie)
         self.movie.start()
         
-        self.movie2 = QMovie("cross_section.gif", QByteArray(), self)
-        self.movie_scr2 = QLabel()
-        self.mplvl_5.addWidget(self.movie_scr2)
-        self.movie.setCacheMode(QMovie.CacheAll)
-        self.movie.setSpeed(100)
-        self.movie_scr2.setMovie(self.movie2)
-        self.movie2.start()
-        
     def backdiffu(self):
         self.movie.stop()
-        self.movie2.stop()
         self.mplvl_3.removeWidget(self.movie_scr)
-        self.mplvl_5.removeWidget(self.movie_scr2)
         self.mplwindow_3.hide()
-        self.mplwindow_4.hide()
         self.ButtonBackDiffu.hide()
         self.textDiffu.hide()
         self.ButtonDiffu.show()
         self.mplwindow.show()
         self.start.show()
+        self.ButtonDemo_1.show()
+        self.ButtonDemo_2.show()
+        self.interact.setEnabled(True)
         self.mplfigs.show()
         self.slider_simulation.setValue(self.sim+1)
         self.slider_simulation.setValue(self.sim-1)
+        
+    def demo1(self):
+        self.radioButton_2.setChecked(True)
+        self.horizontalSlider.setValue(0)
+        self.spinBox_2.setValue(0)
+        self.spinBox.setValue(2)
+        self.start.click()
+        
+    def demo2(self):
+        self.radioButton.setChecked(True)
+        self.horizontalSlider.setValue(3)
+        self.spinBox_2.setValue(0)
+        self.spinBox.setValue(3)
+        self.start.click()
         
     def changefig(self,item):
         text=item.text()
@@ -648,6 +732,10 @@ class WD(QMainWindow,Ui_MainWindow):
         self.file.close()
         self.parent().show()
         
+    def showAuthors(self):
+        QtGui.QMessageBox.question(self, 'Authors',
+            "ULTRACOLDUB\n\nUniversitat de Barcelona")
+        
     def closeEvent(self, event):
         reply = QtGui.QMessageBox.question(self, 'EXIT',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
@@ -685,3 +773,4 @@ class Ui_porcessProgress(object):
         porcessProgress.setWindowTitle(QtGui.QApplication.translate("porcessProgress", "Please wait...", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("porcessProgress", " in progress...", None, QtGui.QApplication.UnicodeUTF8))
         QtCore.QMetaObject.connectSlotsByName(porcessProgress)
+        
