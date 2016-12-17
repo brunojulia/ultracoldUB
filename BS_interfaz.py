@@ -34,12 +34,24 @@ class BS(QMainWindow,Ui_MainWindow):
         lang2=lang.readlines()
         language=int(lang2[0])
         lang.close()
+        self.file=open('output.txt','a')
+        self.file.write('#################')
+        self.file.write('Interfaz seleccionada: Bright Solitons')
+        self.file.write('#################\n\n')
         self.setupUi(self)
         self.timer1=QtCore.QTimer(self)
         self.timer2=QtCore.QTimer(self)
         self.sim=0
+        self.format=' '   #to know whether demo or start has been clicked
         
-        #let's hide unnecessary buttons for the moment and preselct buttons
+        #information about project
+        showAction=QtGui.QAction('&Authors', self)
+        showAction.triggered.connect(self.showAuthors)
+        mainMenu=self.menuBar()
+        fileMenu=mainMenu.addMenu('&About')
+        fileMenu.addAction(showAction)      
+        
+        #let's hide unnecessary buttons for the moment and preselect buttons
         self.ButtonOn.hide() 
         self.ButtonBack.hide()
         self.ButtonPause.hide()
@@ -54,11 +66,22 @@ class BS(QMainWindow,Ui_MainWindow):
         self.none_20.click()
         self.wall_1.click()
         self.window_sims.hide()
+        self.btn_none.click()  #we select a potential (just in case no potential is chosen)
+        
+        self.demo1.clicked.connect(self.demo_1)  #for the harmonic movement demo
+        self.demo2.clicked.connect(self.demo_2)  #for the slip in 2 equal parts of the soliton
         
         #unzip all material in pulse_data (takes a few seconds the first time...)
         if (not os.path.exists('./brightsolitons/bs_evolution/pulse_data')):
             zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/pulse_data.zip', 'r')
             zip_ref.extractall('./brightsolitons/bs_evolution/')
+            zip_ref.close()
+        else:
+            pass
+        #unzip all material in Demo_2 (takes a few seconds the first time...)
+        if (not os.path.exists('./brightsolitons/Demo_2')):
+            zip_ref = zipfile.ZipFile('./brightsolitons/Demo_2.zip', 'r')
+            zip_ref.extractall('./brightsolitons/')
             zip_ref.close()
         else:
             pass
@@ -73,7 +96,7 @@ class BS(QMainWindow,Ui_MainWindow):
             zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/moviepy-0.2.2.11.zip', 'r')
             zip_ref.extractall('./brightsolitons/bs_evolution/')
             zip_ref.close()
-            #now we have to install moviepy for later simulations
+            #now we have to install moviepy (from folder) for later simulations
             prevdir=os.getcwd()
             try:
                 os.chdir(os.path.expanduser('./brightsolitons/bs_evolution/moviepy-0.2.2.11'))
@@ -84,7 +107,8 @@ class BS(QMainWindow,Ui_MainWindow):
             pass
 
         #creating signals and connecting them with the function        
-        self.playmoment.clicked.connect(self.play2)        
+        self.playmoment.clicked.connect(self.play2)    
+        self.return2.clicked.connect(self.retorna2)
         self.slider_simulation.valueChanged.connect(self.simulation)
         self.ButtonOn.clicked.connect(self.on)
         self.ButtonBack.clicked.connect(self.backsim)
@@ -138,6 +162,7 @@ class BS(QMainWindow,Ui_MainWindow):
         self.btn_sim.clicked.connect(self.change_sim)    
         self.horizontalSlider.valueChanged.connect(self.escriu2x)
         self.horizontalSlider_2.valueChanged.connect(self.escriu2v)
+        self.hb.valueChanged.connect(self.escriu2hb)
         
         self.btn_none.clicked.connect(self.initial)
         self.btn_harm.clicked.connect(self.initial)
@@ -264,30 +289,65 @@ class BS(QMainWindow,Ui_MainWindow):
             
             
             #### Plot the state previously shown before changing simulation
-          #  self.sim=self.slider_simulation.value()
-            initialdata=open('./brightsolitons/input.txt','r')
-            data0=initialdata.readline().split('\t')
-            valuex0=float(data0[2]) #initial position
-            valuev0=float(data0[3]) #initial velocity
-            valueconf=int(data0[4]) #confinement
-            valuewb=float(data0[5]) #width barrier
-            valuehb=float(data0[6]) #height barrier
-            valuetime=float(data0[7]) #total time of simulation
-            valuegn=int(data0[1]) #gn
+            if self.format=='Start':            
+                initialdata=open('./brightsolitons/input.txt','r')
+                data0=initialdata.readline().split('\t')
+                valuex0=float(data0[2]) #initial position
+                valuev0=float(data0[3]) #initial velocity
+                valueconf=int(data0[4]) #confinement
+                valuewb=float(data0[5]) #width barrier
+                valuehb=float(data0[6]) #height barrier
+                valuetime=float(data0[7]) #total time of simulation
+                valuegn=int(data0[1]) #gn
+            elif self.format=='Demo':
+                valuex0=-20.0 #initial position
+                valuev0=1.0 #initial velocity
+                valueconf=1 #confinement
+                valuewb=1.0 #width barrier
+                valuehb=1.1 #height barrier
+                valuetime=1.0 #total time of simulation
+                valuegn=3 #gn code == -0.8
             prevdir = os.getcwd()
             try:
                 os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-                datener=open('energies.dat','r')
+                if self.format=='Start':
+                    datener=open('energies.dat','r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir('..')
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        datener=open('energies.dat','r')
+                    finally:
+                        os.chdir(prevdir2)
                 linener=datener.readlines()
                 epart=float((linener[1].split('\t'))[1]) #as total energy is cte, we take the first one
                 self.lot.show() 
                 self.btn_sim.show()
                 self.mpl_window.show()
                 self.window_sims.hide()
-                names=open("namefiles.dat",'r')
+                if self.format=='Start':
+                    names=open("namefiles.dat",'r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir('..')
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        names=open('namefiles.dat','r')
+                    finally:
+                        os.chdir(prevdir2)
                 listnames=names.readlines()
                 name=int(listnames[int(self.slider_simulation.value())])
-                data=open("WfBs-%08d.dat" %(name),'r')
+                if self.format=='Start':
+                    data=open("WfBs-%08d.dat" %(name),'r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir('..')
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        data=open("WfBs-%08d.dat" %(name),'r')
+                    finally:
+                        os.chdir(prevdir2)
                 lines=data.readlines()
                 listpos=[]
                 listphi=[]
@@ -369,7 +429,16 @@ class BS(QMainWindow,Ui_MainWindow):
                 #we add the light analogy
                 light.fill_between(posit,glass,-1,facecolor='blue',alpha=0.2)
                 flight=mpimg.imread('linterna2.png')
-                datacoef=open('llum.dat','r')
+                if self.format=='Start':
+                    datacoef=open('llum.dat','r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir('..')
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        datacoef=open('llum.dat','r')
+                    finally:
+                        os.chdir(prevdir2)
                 coef=datacoef.readlines()
                 valorT=float((coef[0]).split('\t')[1])
                 valorR=float((coef[0]).split('\t')[0])
@@ -399,23 +468,23 @@ class BS(QMainWindow,Ui_MainWindow):
                 
                 self.canvas.draw()
             finally:
-                os.chdir(prevdir)
-            ####
-    #        self.slider_simulation.setValue(self.sim+1)
-    #        self.slider_simulation.setValue(self.sim-1)
-    #    self.slider_simulation.setValue(self.sim+1)
-    #    self.slider_simulation.setValue(self.sim-1)    
+                os.chdir(prevdir) 
         
         
     def escriu2x(self):
         #to show in the interface the correct initial position (there's a change between the real and the slider value)
         self.valor_x0_none.setNum(2*self.horizontalSlider.value())
+    
+    def escriu2hb(self):
+        #to show in the interface the correct initial position (there's a change between the real and the slider value)
+        self.hb_valor.setNum(self.hb.value()/10.0)
         
     def escriu2v(self):
         #to show in the interface the correct initial velocity (there's a change between the real and the slider value)
         self.valor_v0_none.setNum(2*self.horizontalSlider_2.value())
         
     def initial(self):  #everytime we change the module (i.e. external potential)
+        self.moment.hide()
         #hiding or showing things        
         self.lot.hide()
         self.btn_sim.hide()
@@ -546,8 +615,227 @@ class BS(QMainWindow,Ui_MainWindow):
         if not listItems: return
         for item in listItems:
             self.mplfigs.takeItem(self.mplfigs.row(item))
+            
+    def demo_1(self): #harmonic
+        self.rmmpl()
+        self.btn_none.click()   #for not having weird errors
+        self.btn_harm.click()
+        self.horizontalSlider_3.setValue(-25)
+        self.spinBox.setValue(2)
+        self.gn.setValue(3)
+        self.yes_no.setValue(0)
+        self.start.click()
+        
+    def demo_2(self): #barrier   #it does the same as start but with all fields on a folder (faster, everything already computed)
+        self.format='Demo'      
+        print self.format
+        self.btn_none.click()   #for not having weird errors
+        self.btn_wall.click()
+        self.horizontalSlider_4.setValue(-20)
+        self.horizontalSlider_5.setValue(1)
+        self.wb.setValue(1)
+        self.hb.setValue(11)
+        self.gn.setValue(3)
+        self.yes_no.setValue(1)
+        self.wall_1.click()
+        
+        time_b=time.time()  #time counter (the computation starts)
+        
+        self.timer1.stop()
+        self.timer2.stop()
+        self.sim=0
+        self.lot.hide()
+        self.btn_sim.hide()
+        self.btn_sim.setText("Sim: 1")
+        self.window_sims.hide()
+        
+        #let's show the progress bar
+        dialog = QtGui.QDialog()    
+        progressBar = Ui_porcessProgress()
+        progressBar.setupUi(dialog)
+        dialog.show()       
+        
+        prevdir=os.getcwd()
+        try:
+            os.chdir(os.path.expanduser('./brightsolitons'))
+            self.file.write('...Módulo seleccionado: Barrier potential...\n\n' )
+            self.file.write('¿Se encuentra el solitón en una caja? '+'Sí'+'\n')
+            self.file.write('Interacción=%.1f\nPosición inicial del solitón=%s\nVelocidad inicial del solitón=%s\nAnchura barrera=%.1f\nAltura barrera=%.1f\n\n' %(-0.8,self.horizontalSlider_4.value()*2.0,self.horizontalSlider_5.value()*2.0,0.5*(2**self.wb.value()),self.hb.value()/10.0))
+            time1=2.5  #it lasts 5 seconds                
+            progressBar.porcessProgressBar.setMaximum(time1)
+            diff=0            
+            prevdir2=os.getcwd()
+            try:
+                os.chdir(os.path.expanduser('./Demo_2'))
+                while diff<time1:
+                    diff=time.time()-time_b
+                    progressBar.label.setText('Preparing everything for Demo 2...')
+                    progressBar.porcessProgressBar.setValue(diff)                     
+                    QApplication.processEvents()
+                time.sleep(1)          
+                time_e=time.time() #time counter (end of computation)
+                print("Total time of computation: %.2f s" %(time_e-time_b)) #shows how long it takes to run the program (computation, files, etc)
+                file=open('output_data.txt','r')
+                self.file.write('%s\n\n' %file.read())
+                self.file.write('Durada de la computación=%.2f s\n\n' %(time_e-time_b))
+                #let's read the ouput files to plot the data            
+                energyfile=open('./energies.dat','r')
+                energy=energyfile.readlines()
+                energyfile.close()
+                meanvalfile=open('./meanvalues.dat','r')
+                meanval=meanvalfile.readlines()
+                meanvalfile.close()
+            finally:
+                os.chdir(prevdir2)
+        finally:
+            os.chdir(prevdir)
+        
+        #meanvalues (1st line of the data file is information)
+        tmv=[]  #time
+        mv=[]   #mean value
+        smv=[]  #sigma
+        velm=[]
+        for i in range(1,len(meanval)):
+            tmv.append(float((meanval[i].split('\t'))[0]))
+            mv.append(float((meanval[i].split('\t'))[1]))
+            smv.append(float((meanval[i].split('\t'))[2]))
+            velm.append(float((meanval[i].split('\t'))[3]))
+        fig1=Figure()
+        figmv=fig1.add_subplot(111) #only one plot in the window
+        atmv=np.array(tmv)
+        amv=np.array(mv)
+        asig=np.array(smv)
+        sigsalt=[]
+        for i in range(0,len(asig)):
+            if(not(i%10)):
+                sigsalt.append(asig[i])
+            else:
+                sigsalt.append(0.0)
+        sigsalt=np.array(sigsalt)
+          
+        figmv.axes.errorbar(atmv,amv,yerr=sigsalt)
+        figmv.axes.set_ylim([-25.0,25.0])
+        figmv.set_title("Position of the soliton")
+        figmv.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)") #all parameters are dimensionless
+        figmv.set_ylabel("Position ($x/ \\xi$)")  
+        
+        #energies
+        ftime=[]
+        etot=[]
+        chem=[]
+        ekin=[]
+        epot=[]
+        eint=[]
+        lint=[]
+        iint=[]
+        rint=[]
+        for i in range(1,len(energy)):
+            ftime.append(float((energy[i].split('\t'))[0]))
+            etot.append(float((energy[i].split('\t'))[1]))
+            chem.append(float((energy[i].split('\t'))[2]))
+            ekin.append(float((energy[i].split('\t'))[3]))
+            epot.append(float((energy[i].split('\t'))[4]))
+            eint.append(float((energy[i].split('\t'))[5]))
+            lint.append(float((energy[i].split('\t'))[6]))
+            iint.append(float((energy[i].split('\t'))[7]))
+            rint.append(float((energy[i].split('\t'))[8]))
+        
+        fig2=Figure()
+        fig3=Figure()
+          
+        atime=np.array(ftime)
+        aetot=np.array(etot)
+        achem=np.array(chem)
+        aekin=np.array(ekin)
+        aepot=np.array(epot)
+        aeint=np.array(eint)
+        alint=np.array(lint)
+        aiint=np.array(iint)
+        arint=np.array(rint)
+        
+        allenergies=fig2.add_subplot(111)
+        allenergies.plot(atime,aetot,label='$E_{tot}$')
+        allenergies.plot(atime,achem,label='$\mu$')
+        allenergies.plot(atime,aekin,label='$E_{kin}$')
+        allenergies.plot(atime,aepot,label='$E_{pot}$')
+        allenergies.plot(atime,aeint,label='$E_{int}$')
+        allenergies.set_title("Energies")
+        
+        allenergies.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
+        allenergies.set_ylabel("Energy per particle ($E $  $({m \\xi^2})/{\hbar^2}$)")
+        allenergies.legend()
+        integrals=fig3.add_subplot(111)
+        integrals.plot(atime,alint,label='left side')
+        integrals.plot(atime,aiint,label='inside')
+        integrals.plot(atime,arint,label='right side')
+        integrals.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)")
+        integrals.set_title("Integrals of the wave function")
+        integrals.legend()
+        
+        fig4=Figure()
+        avelm=np.array(velm)
+        meanvelocity=fig4.add_subplot(111)
+        meanvelocity.plot(atmv,avelm)
+        meanvelocity.set_title("Mean velocity of the soliton")
+        meanvelocity.set_xlabel("Time ($t $  ${\hbar}/({m \\xi^2})$)")
+        meanvelocity.set_ylabel("$<v>$ ($v $  ${m \\xi}/{\hbar}$)")
+        
+        self.delfig()
+        self.delfig()
+        self.delfig()
+        self.delfig()
+        self.addfig("Integral",fig3)
+        self.addfig("Position's mean value", fig1)
+        self.addfig("Energies",fig2)
+        self.addfig("Velocity",fig4)
+        self.slider_simulation.setMinimum(0)
+        self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))            
+        self.slider_simulation.setSingleStep(1)
+        
+        #we remove and add animation
+        try:
+            self.mplvl4.removeWidget(self.movie_scr)
+            self.mplvl5.removeWidget(self.movie_scr2)
+        except:
+            pass
+        
+        prevdir=os.getcwd()
+        try:                
+            os.chdir(os.path.expanduser("./brightsolitons/Demo_2"))
+            self.movie = QMovie("simulation_1.gif", QByteArray(), self)
+            self.movie_scr = QLabel()
+            self.mplvl4.addWidget(self.movie_scr)
+            self.movie.setCacheMode(QMovie.CacheAll)
+            self.movie.setSpeed(100)
+            self.movie_scr.setMovie(self.movie)
+            self.movie.start()
+            
+            self.movie2 = QMovie("simulation_2.gif", QByteArray(), self)
+            self.movie_scr2 = QLabel()
+            self.mplvl5.addWidget(self.movie_scr2)
+            self.movie2.setCacheMode(QMovie.CacheAll)
+            self.movie2.setSpeed(100)
+            self.movie_scr2.setMovie(self.movie2)
+            self.movie2.start()
+        finally:
+            os.chdir(prevdir)
+                
+        self.ButtonOn.show() 
+        self.ButtonBack.show()
+        self.ButtonPause.show()
+        self.slider_simulation.show()
+        self.label_5.show()
+        self.value_sim.show()
+        self.play.hide()
+        self.playmoment.hide()
+        
+        self.sim=0
+        self.slider_simulation.setValue(self.sim+1)
+        self.slider_simulation.setValue(self.sim-1)
         
     def start2(self):
+        self.format='Start'
+        print self.format
         time_b=time.time()  #time counter (the computation starts)
         self.timer1.stop()
         self.timer2.stop()
@@ -588,9 +876,9 @@ class BS(QMainWindow,Ui_MainWindow):
                     tempss=40.0
                 elif self.none_40.isChecked()==False or self.none_20.isChecked()==False:
                     tempss=20.0
-            if (self.btn_harm.isChecked()==True):
+            elif (self.btn_harm.isChecked()==True):
                 pot=1
-            if (self.btn_wall.isChecked()==True):
+            else:
                 pot=2
                 if self.wall_1.isChecked()==True:
                     tempss=1.0
@@ -602,11 +890,25 @@ class BS(QMainWindow,Ui_MainWindow):
                     tempss=1.0
             file_data=open('input.txt','w')
 #            self.slider_simulation.setValue(self.sim)
-            if pot==0:           
+            if self.yes_no.value()==0:
+                con="No"
+            elif self.yes_no.value()==1:
+                con="Sí"
+            gn_val=-0.1*2**(self.gn.value())
+            if (self.btn_none.isChecked()==True):
+                self.file.write('...Módulo seleccionado: No external potential...\n\n')
+                self.file.write('¿Se encuentra el solitón en una caja? '+con+'\n')
+                self.file.write('Interacción=%.1f\nPosición inicial del solitón=%s\nVelocidad inicial del solitón=%s\n\n' %(gn_val,self.horizontalSlider.value()*2.0,self.horizontalSlider_2.value()*2.0))
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %f' %(0,self.gn.value(),self.horizontalSlider.value()*2.0,self.horizontalSlider_2.value()*2.0,self.yes_no.value(),tempss))
-            elif pot==1:
+            elif (self.btn_harm.isChecked()==True):
+                self.file.write('...Módulo seleccionado: Harmonic trap...\n\n' )
+                self.file.write('¿Se encuentra el solitón en una caja? '+con+'\n')
+                self.file.write('Interacción=%.1f\nPosición inicial del solitón=%s\nNúmero de oscilaciones=%s\n\n' %(gn_val,self.horizontalSlider_3.value(),int(self.spinBox.value())))
                 file_data.write('%d \t %d \t %f \t %d \t %d' %(1,self.gn.value(),self.horizontalSlider_3.value(),self.spinBox.value(),0))
-            elif pot==2:
+            elif (self.btn_wall.isChecked()==True):
+                self.file.write('...Módulo seleccionado: Barrier potential...\n\n' )
+                self.file.write('¿Se encuentra el solitón en una caja? '+con+'\n')
+                self.file.write('Interacción=%.1f\nPosición inicial del solitón=%s\nVelocidad inicial del solitón=%s\nAnchura barrera=%.1f\nAltura barrera=%.1f\n\n' %(gn_val,self.horizontalSlider_4.value()*2.0,self.horizontalSlider_5.value()*2.0,0.5*(2**self.wb.value()),self.hb.value()/10.0))
                 file_data.write('%d \t %d \t %f \t %f \t %d \t %f \t %f \t %f' %(2,self.gn.value(),self.horizontalSlider_4.value(),self.horizontalSlider_5.value(),self.yes_no.value(),0.5*(2**self.wb.value()),self.hb.value()/10.0, tempss))
             file_data.close()
                        
@@ -626,7 +928,7 @@ class BS(QMainWindow,Ui_MainWindow):
                                 diff +=1
                                 
                         if (diff<10):
-                            progressBar.label.setText(u'Starting with Schrödinger equation...')
+                            progressBar.label.setText(u'Starting with Gross-Pitaevskii equation...')
                         if (diff<time1-10) and (diff>10):
                             progressBar.label.setText('Evolution in real time in progress...')
                         if (diff<time1) and (diff>time1-10):
@@ -649,7 +951,7 @@ class BS(QMainWindow,Ui_MainWindow):
                                 diff +=1
                             
                         if (diff<10):
-                            progressBar.label.setText(u'Starting with Schrödinger equation...')
+                            progressBar.label.setText(u'Starting with Gross-Pitaevskii equation...')
                         if (diff<time1-10) and (diff>10):
                             progressBar.label.setText('Evolution in real time in progress...')
                         if (diff<time1) and (diff>time1-10):
@@ -672,13 +974,13 @@ class BS(QMainWindow,Ui_MainWindow):
                                 diff +=1
                                 
                         if (diff<10):
-                            progressBar.label.setText(u'Starting with Schrödinger equation...')
+                            progressBar.label.setText(u'Starting with Gross-Pitaevskii equation...')
                         if (diff<time1-10) and (diff>10):
                             progressBar.label.setText('Evolution in real time in progress...')
                         if (diff<time1-5) and (diff>time1-10):
                             progressBar.label.setText('Writing results ...')
                         if (diff<time1) and (diff>time1-5):
-                            progressBar.label.setText('Taking stars from the sky to create the simulations...')
+                            progressBar.label.setText('Taking stars from the sky to build the simulation...')
                         progressBar.porcessProgressBar.setValue(diff)                     
                         QApplication.processEvents()
                 os.chdir(prev)
@@ -688,6 +990,16 @@ class BS(QMainWindow,Ui_MainWindow):
             time_e=time.time() #time counter (end of computation)
             print("Total time of computation: %.2f s" %(time_e-time_b)) #shows how long it takes to run the program (computation, files, etc)
             
+            prevdir_2=os.getcwd()
+            try:
+                os.chdir("..")
+                file=open('output_data.txt','r')
+                self.file.write('%s\n\n' %file.read())
+                self.file.write('Durada de la computación=%.2f s\n\n' %(time_e-time_b))
+                file.close()    
+            finally:
+                os.chdir(prevdir_2)
+                
             self.ButtonOn.show() 
             self.ButtonBack.show()
             self.ButtonPause.show()
@@ -739,13 +1051,13 @@ class BS(QMainWindow,Ui_MainWindow):
         if pot==1:
             figmv.plot(atmv,amv)
             figmv.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
-            figmv.axes.set_ylim([-34.0,34.0])
+            figmv.axes.set_ylim([-abs(self.horizontalSlider_3.value())-2.0,abs(self.horizontalSlider_3.value())+2.0])
         elif pot==2:
             figmv.axes.errorbar(atmv,amv,yerr=sigsalt)
-            figmv.axes.set_ylim([-128.0,128.0])
+            figmv.axes.set_ylim([min(amv)-10.0,max(amv)+10.0])
         elif pot==0:
             figmv.plot(atmv,amv)
-            figmv.axes.set_ylim([-128.0,128.0])
+            figmv.axes.set_ylim([min(amv)-10.0,max(amv)+10.0])
         figmv.set_title("Position of the soliton")
         if pot==0 or pot==2:
             figmv.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)") #all parameters are dimensionless
@@ -895,7 +1207,8 @@ class BS(QMainWindow,Ui_MainWindow):
                 self.movie2.start()
             finally:
                 os.chdir(prevdir)
-            
+        
+        self.sim=0
         self.slider_simulation.setValue(self.sim+1)
         self.slider_simulation.setValue(self.sim-1)
             
@@ -967,17 +1280,17 @@ class BS(QMainWindow,Ui_MainWindow):
         initialdata=open('./brightsolitons/input.txt','r')
         data0=initialdata.readline().split('\t')
         pot=int(data0[0])  #input: external potential
-        if pot==0:
+        if self.format=='Start' and pot==0:
             valuex0=float(data0[2]) #initial position
             valuev0=float(data0[3]) #initial velocity
             valueconf=int(data0[4]) #confinement
             valuetime=float(data0[5]) #total time of simulation
             valuegn=int(data0[1]) #gn
-        elif pot==1:
+        elif self.format=='Start' and pot==1:
             valuex0=float(data0[2]) #initial position
             valueoscil=int(data0[3]) #number oscillations
             valuegn=int(data0[1]) #gn
-        elif pot==2:
+        elif self.format=='Start' and pot==2:
             valuex0=float(data0[2]) #initial position
             valuev0=float(data0[3]) #initial velocity
             valueconf=int(data0[4]) #confinement
@@ -985,13 +1298,30 @@ class BS(QMainWindow,Ui_MainWindow):
             valuehb=float(data0[6]) #height barrier
             valuetime=float(data0[7]) #total time of simulation
             valuegn=int(data0[1]) #gn
+        elif self.format=='Demo':
+            valuex0=-20.0 #initial position
+            valuev0=1.0 #initial velocity
+            valueconf=1 #confinement
+            valuewb=1.0 #width barrier
+            valuehb=1.1 #height barrier
+            valuetime=1.0 #total time of simulation
+            valuegn=3 #gn code == -0.8
         prevdir = os.getcwd()
         try:
             os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-            datener=open('energies.dat','r')
+            if self.format=='Start':    
+                datener=open('energies.dat','r')
+            elif self.format=='Demo':
+                prevdir2=os.getcwd()
+                try:
+                    os.chdir('..')
+                    os.chdir(os.path.expanduser("./Demo_2"))
+                    datener=open('energies.dat','r')
+                finally:
+                    os.chdir(prevdir2)
             linener=datener.readlines()
             epart=float((linener[1].split('\t'))[1]) #as total energy is cte, we take the first one
-            if pot==0:
+            if self.format=='Start' and pot==0:
                 self.mpl_window.show()
                 self.window_sims.hide()
                 if int(valuetime)==20:
@@ -1081,15 +1411,33 @@ class BS(QMainWindow,Ui_MainWindow):
                     state.legend()
                     self.canvas.draw()
                     
-            elif pot==2 and self.btn_sim.text()=="Sim: 1":
+            elif (pot==2 or self.format=='Demo') and self.btn_sim.text()=="Sim: 1":
                 self.lot.show() 
                 self.btn_sim.show()
                 self.mpl_window.show()
                 self.window_sims.hide()
-                names=open("namefiles.dat",'r')
+                if self.format=='Start':
+                    names=open("namefiles.dat",'r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir("..")
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        names=open("namefiles.dat",'r')
+                    finally:
+                        os.chdir(prevdir2)
                 listnames=names.readlines()
                 name=int(listnames[int(self.slider_simulation.value())])
-                data=open("WfBs-%08d.dat" %(name),'r')
+                if self.format=='Start':
+                    data=open("WfBs-%08d.dat" %(name),'r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir("..")
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        data=open("WfBs-%08d.dat" %(name),'r')
+                    finally:
+                        os.chdir(prevdir2)
                 lines=data.readlines()
                 listpos=[]
                 listphi=[]
@@ -1170,7 +1518,16 @@ class BS(QMainWindow,Ui_MainWindow):
                 
                 light.fill_between(posit,glass,-1,facecolor='blue',alpha=0.2)
                 flight=mpimg.imread('linterna2.png')
-                datacoef=open('llum.dat','r')
+                if self.format=='Start':
+                    datacoef=open('llum.dat','r')
+                elif self.format=='Demo':
+                    prevdir2=os.getcwd()
+                    try:
+                        os.chdir("..")
+                        os.chdir(os.path.expanduser("./Demo_2"))
+                        datacoef=open("llum.dat",'r')
+                    finally:
+                        os.chdir(prevdir2)
                 coef=datacoef.readlines()
                 valorT=float((coef[0]).split('\t')[1])
                 valorR=float((coef[0]).split('\t')[0])
@@ -1200,7 +1557,7 @@ class BS(QMainWindow,Ui_MainWindow):
                 
                 self.canvas.draw()
                 
-            elif pot==2 and (self.btn_sim.text()=="Sim: 2" or self.btn_sim.text()=="Sim: 3"):
+            elif (pot==2 or self.format=='Demo') and (self.btn_sim.text()=="Sim: 2" or self.btn_sim.text()=="Sim: 3"):
                 self.btn_sim.show()                
                 pass
                 
@@ -1360,7 +1717,18 @@ class BS(QMainWindow,Ui_MainWindow):
             self.ButtonBack.setEnabled(True)
             self.ButtonPause.setEnabled(True)
             
+    def retorna2(self):
+        self.timer1.stop()
+        self.timer2.stop()
+        self.interaction.setEnabled(True)
+        self.Confinement.setEnabled(True)
+        self.ext_potential.setEnabled(True)
+            
     def play2(self):
+        self.ButtonPause.click()
+        self.interaction.setEnabled(False)
+        self.Confinement.setEnabled(False)
+        self.ext_potential.setEnabled(False)
         global language
         if language==1:
             self.expltext.setPlainText('Linear momentum \n \nLinear momentum is a derived quantity' + 
@@ -1419,6 +1787,7 @@ class BS(QMainWindow,Ui_MainWindow):
         self.timer1.stop()
         self.timer2.stop()
         self.hide()
+        self.file.close()
         self.parent().show()
         
     def closeEvent(self, event):
@@ -1427,8 +1796,13 @@ class BS(QMainWindow,Ui_MainWindow):
 
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
+            self.file.close() 
         else:
             event.ignore()
+    
+    def showAuthors(self):
+        QtGui.QMessageBox.question(self, 'Authors',
+            "ULTRACOLDUB\n\nUniversitat de Barcelona")
             
 class Ui_porcessProgress(object):
     def setupUi(self, porcessProgress):
