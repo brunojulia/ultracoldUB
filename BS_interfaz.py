@@ -485,6 +485,7 @@ class BS(QMainWindow,Ui_MainWindow):
         
     def initial(self):  #everytime we change the module (i.e. external potential)
         self.moment.hide()
+        self.fig.clear()
         #hiding or showing things        
         self.lot.hide()
         self.btn_sim.hide()
@@ -1277,9 +1278,12 @@ class BS(QMainWindow,Ui_MainWindow):
         self.lot.hide()
         self.btn_sim.hide()
         self.sim=self.slider_simulation.value()
-        initialdata=open('./brightsolitons/input.txt','r')
-        data0=initialdata.readline().split('\t')
-        pot=int(data0[0])  #input: external potential
+        if self.format=='Start':
+            initialdata=open('./brightsolitons/input.txt','r')
+            data0=initialdata.readline().split('\t')
+            pot=int(data0[0])  #input: external potential
+        elif self.format=='Demo':
+            pot=2 #barrier potential
         if self.format=='Start' and pot==0:
             valuex0=float(data0[2]) #initial position
             valuev0=float(data0[3]) #initial velocity
@@ -1665,16 +1669,22 @@ class BS(QMainWindow,Ui_MainWindow):
         self.sim=self.sim+1
         self.slider_simulation.setValue(self.sim)
         
-        initialdata=open('./brightsolitons/input.txt','r')
-        data0=initialdata.readline().split('\t')
-        pot=int(data0[0])  #input: external potential
-        if pot==1:
+        if self.format=='Start':
+            initialdata=open('./brightsolitons/input.txt','r')
+            data0=initialdata.readline().split('\t')
+            pot=int(data0[0])  #input: external potential
+        elif self.format=='Demo':
+            pot=2
+        if self.format=='Start' and pot==1:
             valuex0=float(data0[2]) #initial position
             valueoscil=int(data0[3]) #number oscillations
             valuegn=int(data0[1]) #gn
-        elif pot==2:
+        elif self.format=='Start' and pot==2:
             valuex0=float(data0[2]) #initial position
             valuev0=float(data0[3]) #initial velocity
+        elif self.format=='Demo':
+            valuex0=-20.0 #initial position
+            valuev0=1.0 #initial velocity
         
         if (pot==0):
             if (self.sim==100):
