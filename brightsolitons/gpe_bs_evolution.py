@@ -125,6 +125,16 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
     velm=velmean(c, kp) 
     print("Energies:          Emed    mu    Ekin    Epot    Eint")
     print("         initial = %g %g %g %g %g"%(Energy(c0, Vpot_R, Ekin_K)))
+    
+    prevdir=os.getcwd()
+    try:
+        os.chdir("..")
+        file=open('output_data.txt','a')
+        file.write("Energias en la evolución de tiempo real:\n          Emed    mu    Ecin    Epot    Eint\n")
+        file.write("         inicial = %g %g %g %g %g\n"%(Energy(c0, Vpot_R, Ekin_K)))
+        file.close()
+    finally:
+        os.chdir(prevdir)
 
     # wavefunction
     cc = ifft(c)*Npoint*NormWF**0.5 # FFT from K3 to R3 and include the wf norm
@@ -216,8 +226,11 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
                                     psileft=psileft+(np.abs(psi[k]))**2
                             counter=1
                             escriu=open('./bs_evolution/llum.dat','w')
+                            escriu2=open('./bs_evolution/llum2.dat','w')
                             escriu.write('%f \t %f' %(psileft,psiright))  #left and right |psi|^2
+                            escriu2.write('%f \t %f' %(psileft/(psileft+psiright),psiright/(psileft+psiright)))                             
                             escriu.close()
+                            escriu2.close()
                             
                             #creates gifs for light simulations                            
                             prevdir=os.getcwd()
@@ -276,6 +289,15 @@ def evolution(t0, Dt, z, c0, Vpot_R, Vpot_Rc, V, Ekin_K, write_ev, plots,oscil,t
     print("Energy change at last step  = %g"%(energy_cicle[Ninter,0]-energy_cicle[Ninter-1,0]))
     print("  E(final) - E(initial) = %g"%(np.abs(energy_cicle[Ninter,0]-energy_cicle[0,0])))
     
+    prevdir=os.getcwd()
+    try:
+        os.chdir("..")
+        file=open('output_data.txt','a')
+        file.write("         final   = %g %g %g %g %g"%(Energy(c, Vpot_R, Ekin_K)))
+        file.close()
+    finally:
+        os.chdir(prevdir)
+        
     format_name = "%d" + "\n"
     if V_ext==1 or V_ext==2:
         anoms=np.array(number_name_file)
