@@ -69,8 +69,31 @@ if wall != 0:
 if hb != 0.0:
     print(" Position of the potential barrier = %g" %(xb))
     print(" Height of the potential barrier = %g" %(hb))
-    print(" Width of the potential barrier = %g" %(wb*2.0))
+    print(" Width of the potential barrier = %g" %(wb))
 print(" Initial velocity of the soliton = %g \n" %(v))
+
+#-----------------------------------
+#writes data in output file
+prevdir=os.getcwd()
+try:
+    os.chdir("..")
+    file=open('output_data.txt','w')
+    file.write("Datos iniciales:\n")
+    file.write(" Número de partículas = %g\n"%(Nparticle))
+    file.write(" Frecuencia angular del oscilador armónico = %g\n"%(whoz))
+    file.write(" Mitad de la longitud del dominio = %g\n"%(Zmax))
+    file.write(" Número de puntos en la red = %g\n"%(Npoint))
+    file.write(" Longitud de dispersión = %g\n"%(a_s))
+    file.write(" Tiempo total de la evolución = %g\n"%(Ntime_fin*Dtr))
+    file.write(" Paso real de tiempo = %g\n"%(Dtr))
+    file.write(" Paso imaginario de tiempo = %g\n"%(Dti))
+    file.write(" Soluciones intermedias = %g\n"%(Ntime_fin//Ntime_out-1))
+    file.write(" Energia caracteristica de interaccion initial = %g\n"%(gint/NormWF))
+    file.write(" Healing length = %g\n\n" %(xi))
+    file.close()    
+finally:
+    os.chdir(prevdir)
+
 
 
 # Grid definitions: physical and momentum space; kinetic energy in K space

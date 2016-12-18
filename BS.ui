@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>UltracoldUB: Bright solitons' laboratory</string>
+   <string>ULTRACOLD UB: Bright Solitons' Laboratory</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="back">
@@ -766,6 +766,19 @@
        </property>
       </widget>
      </widget>
+     <widget class="QLabel" name="hb_valor">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>160</y>
+        <width>46</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
     <widget class="QPushButton" name="start">
      <property name="geometry">
@@ -778,6 +791,32 @@
      </property>
      <property name="text">
       <string>START</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="demo1">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>320</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Demo 1</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="demo2">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>320</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Demo 2</string>
      </property>
     </widget>
    </widget>
@@ -1352,7 +1391,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>421</y>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
@@ -1384,7 +1423,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>421</y>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
@@ -1464,7 +1503,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>950</x>
-     <y>421</y>
+     <y>271</y>
     </hint>
    </hints>
   </connection>
@@ -1476,11 +1515,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>940</x>
-     <y>342</y>
+     <y>192</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>313</y>
+     <y>163</y>
     </hint>
    </hints>
   </connection>
@@ -1492,11 +1531,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>940</x>
-     <y>381</y>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>353</y>
+     <y>163</y>
     </hint>
    </hints>
   </connection>
@@ -1508,11 +1547,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>830</x>
-     <y>432</y>
+     <y>242</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
-     <y>403</y>
+     <y>213</y>
     </hint>
    </hints>
   </connection>
@@ -1524,11 +1563,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>840</x>
-     <y>492</y>
+     <y>302</y>
     </hint>
     <hint type="destinationlabel">
      <x>885</x>
-     <y>463</y>
+     <y>273</y>
     </hint>
    </hints>
   </connection>
@@ -1863,8 +1902,8 @@ p, li { white-space: pre-wrap; }
      <y>514</y>
     </hint>
     <hint type="destinationlabel">
-     <x>460</x>
-     <y>511</y>
+     <x>510</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1879,8 +1918,8 @@ p, li { white-space: pre-wrap; }
      <y>510</y>
     </hint>
     <hint type="destinationlabel">
-     <x>350</x>
-     <y>511</y>
+     <x>430</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1895,8 +1934,8 @@ p, li { white-space: pre-wrap; }
      <y>516</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>511</y>
+     <x>350</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1911,8 +1950,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>460</x>
-     <y>511</y>
+     <x>510</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1927,8 +1966,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>350</x>
-     <y>511</y>
+     <x>430</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1943,8 +1982,8 @@ p, li { white-space: pre-wrap; }
      <y>580</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>511</y>
+     <x>350</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -1991,8 +2030,8 @@ p, li { white-space: pre-wrap; }
      <y>467</y>
     </hint>
     <hint type="destinationlabel">
-     <x>460</x>
-     <y>511</y>
+     <x>510</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -2052,7 +2091,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>515</x>
-     <y>555</y>
+     <y>576</y>
     </hint>
     <hint type="destinationlabel">
      <x>692</x>
@@ -2084,11 +2123,107 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>541</x>
-     <y>547</y>
+     <y>568</y>
     </hint>
     <hint type="destinationlabel">
      <x>769</x>
      <y>428</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>demo1</sender>
+   <signal>clicked()</signal>
+   <receiver>mplfigs</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>720</x>
+     <y>441</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>722</x>
+     <y>473</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>demo2</sender>
+   <signal>clicked()</signal>
+   <receiver>mplfigs</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>904</x>
+     <y>434</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>772</x>
+     <y>488</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>return2</sender>
+   <signal>clicked()</signal>
+   <receiver>demo1</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>517</x>
+     <y>572</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>697</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>return2</sender>
+   <signal>clicked()</signal>
+   <receiver>demo2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>517</x>
+     <y>572</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>897</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playmoment</sender>
+   <signal>clicked()</signal>
+   <receiver>demo1</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>895</x>
+     <y>482</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>697</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playmoment</sender>
+   <signal>clicked()</signal>
+   <receiver>demo2</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>895</x>
+     <y>482</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>897</x>
+     <y>432</y>
     </hint>
    </hints>
   </connection>
