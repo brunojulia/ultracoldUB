@@ -16,6 +16,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import zipfile
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
@@ -59,6 +60,7 @@ class WD(QMainWindow,Ui_MainWindow):
         
         self.ButtonDemo_1.clicked.connect(self.demo1)
         self.ButtonDemo_2.clicked.connect(self.demo2)
+        self.demo=0
         self.horizontalSlider.valueChanged.connect(self.initial)
         self.pushButton_game.clicked.connect(self.game_call)
         self.pushButton_try.clicked.connect(self.graph_try)
@@ -142,8 +144,12 @@ class WD(QMainWindow,Ui_MainWindow):
                 ax1f2.set_title('initial state')
                 ax1f2.legend()
                 self.canvas.draw()
-                
+    
     def start1(self):
+        self.demo=0  
+        self.start2()          
+                
+    def start2(self):
         self.timer1.stop()
         self.timer2.stop()
         dialog = QtGui.QDialog()    
@@ -156,8 +162,18 @@ class WD(QMainWindow,Ui_MainWindow):
         self.true1=0
         prevdir = os.getcwd()
         self.spinBox_value=self.spinBox.value()
+        self.slider_simulation.setValue(0)
         try:
-            os.chdir(os.path.expanduser('./Wavepackdisper'))
+            if self.demo==0:
+                os.chdir(os.path.expanduser('./Wavepackdisper'))
+            else:
+                os.chdir(os.path.expanduser('./Wavepackdisper/Demo%s' %(self.demo)))
+                if (not os.path.exists('./WfWd-end')):
+                    zip_ref = zipfile.ZipFile('./Demo%s.zip' %(self.demo), 'r')
+                    zip_ref.extractall('.')
+                    zip_ref.close()
+                else:
+                    pass
             file=open('input.txt','w')  
             if (self.radioButton.isChecked()==True):
                 self.true1=1
@@ -168,30 +184,34 @@ class WD(QMainWindow,Ui_MainWindow):
             
             time1=int(self.spinBox_value*(10*np.pi*2.0))
             start_sub=time.time()
-            subprocess.Popen('python gpe_fft_ts_WP_v1.py',shell=True)
-            for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfWd"):
-                             os.remove((os.path.join(root, file)))
-                             
-            progressBar.porcessProgressBar.setMaximum(time1+1)
-            diff=0
-            while diff<time1+2:
+            
+            if self.demo==0:
+                exclude=set(['Demo1','Demo2'])
+                for root, dirs, files in os.walk(os.getcwd(), topdown=True):
+                        dirs[:] = [d for d in dirs if d not in exclude]
+                        for file in files:
+                            if file.startswith("WfWd"):
+                                 os.remove((os.path.join(root, file)))
+                subprocess.Popen('python gpe_fft_ts_WP_v1.py',shell=True)                 
+                progressBar.porcessProgressBar.setMaximum(time1+1)
                 diff=0
-                for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfWd"):
-                            diff +=1
-                    
-                    if (diff<10):
-                        progressBar.label.setText('Initiation of the progress...')
-                    if (diff<time1-10) and (diff>10):
-                        progressBar.label.setText(u'Solving Schrödinger equation...')
-                    if (diff<time1+1) and (diff>time1-10):
-                        progressBar.label.setText('Writing results ...')
-                                            
-                    progressBar.porcessProgressBar.setValue(diff)                     
-                    QApplication.processEvents()
+                while diff<time1+2:
+                    diff=0
+                    for root, dirs, files in os.walk(os.getcwd()):
+                        dirs[:] = [d for d in dirs if d not in exclude]
+                        for file in files:
+                            if file.startswith("WfWd"):
+                                diff +=1
+                        
+                        if (diff<10):
+                            progressBar.label.setText('Initiation of the progress...')
+                        if (diff<time1-10) and (diff>10):
+                            progressBar.label.setText(u'Solving Schrödinger equation...')
+                        if (diff<time1+1) and (diff>time1-10):
+                            progressBar.label.setText('Writing results ...')
+                                                
+                        progressBar.porcessProgressBar.setValue(diff)                     
+                        QApplication.processEvents()
                         
             if (self.true1==1):
                 self.file.write('Posición inicial del paquete de ondas=%s\nPotential armónico: YES\nExcitación del estado=%s\nNúmero de oscilaciones=%s\n\n' %(self.horizontalSlider.value(),self.spinBox_2.value(),self.spinBox.value()))
@@ -257,7 +277,7 @@ class WD(QMainWindow,Ui_MainWindow):
         axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
         axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
         axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
-        axf.set_xlim([-20,20])
+        axf.set_xlim([-self.horizontalSlider.value()-8,self.horizontalSlider.value()+8])
         if (self.true1==0):
             axf.set_ylim(0,0.6)
         axf.set_title('state at %s' %(0))
@@ -334,7 +354,10 @@ class WD(QMainWindow,Ui_MainWindow):
         self.sim=value
         prevdir = os.getcwd()
         try:
-            os.chdir(os.path.expanduser('./Wavepackdisper'))
+            if self.demo==0:
+                os.chdir(os.path.expanduser('./Wavepackdisper'))
+            else:
+                os.chdir(os.path.expanduser('./Wavepackdisper/Demo%s' %(self.demo)))
             for i in range(0,time1+1):
                 file=open('WfWd-%08d.txt'%(i),'r')
                 globals()['lines%s' %i]=file.readlines()
@@ -365,7 +388,7 @@ class WD(QMainWindow,Ui_MainWindow):
                     axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                     axf.fill_between(xv1,0,xv2,label='$R-Space$',facecolor='blue',alpha=0.5)
                     axf.fill_between(xv1,0,xv3,label='$K-Space$',facecolor='yellow',alpha=0.5)
-                    axf.set_xlim([-20,20])
+                    axf.set_xlim([-self.horizontalSlider.value()-8,self.horizontalSlider.value()+8])
                     if (self.true1==0):
                         axf.set_ylim(0,0.6)
                     axf.set_title('state at %s' %(i))
@@ -396,7 +419,10 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.spin_frequency.setValue(0.5)
                 prevdir = os.getcwd()
                 try:
-                    os.chdir(os.path.expanduser('./Wavepackdisper'))
+                    if self.demo==0:
+                        os.chdir(os.path.expanduser('./Wavepackdisper'))
+                    else:
+                        os.chdir(os.path.expanduser('./Wavepackdisper/Demo%s' %(self.demo)))
                     file2 = open('mean_value.txt','r')
                     lines2 = file2.readlines()
                     file2.close()
@@ -425,6 +451,8 @@ class WD(QMainWindow,Ui_MainWindow):
     def graph_try(self):
         if (self.radioButton.isChecked()==True):
             if (self.radioButton_oscil.isChecked()==True):
+                self.amplitude=self.spin_amplitude.value()
+                self.frequency=self.spin_frequency.value()
                 self.ani_co += 1
                 if self.ani_co>1:
                     self.ani.event_source.stop()
@@ -432,7 +460,10 @@ class WD(QMainWindow,Ui_MainWindow):
                 self.rmmpl2()
                 prevdir = os.getcwd()
                 try:
-                    os.chdir(os.path.expanduser('./Wavepackdisper'))
+                    if self.demo==0:
+                        os.chdir(os.path.expanduser('./Wavepackdisper'))
+                    else:
+                        os.chdir(os.path.expanduser('./Wavepackdisper/Demo%s' %(self.demo)))
                     file2 = open('mean_value.txt','r')
                     lines2 = file2.readlines()
                     file2.close()
@@ -464,10 +495,10 @@ class WD(QMainWindow,Ui_MainWindow):
                 
                 tf_sim =  time1/10.
                 def simData():
-                    L=self.spin_amplitude.value()
+                    L=self.amplitude
                     t_max =  time1/10.
                     dt = 0.05
-                    w = self.spin_frequency.value()
+                    w = self.frequency
                     y = 0.0
                     t = 0.0
                     while t <= t_max:
@@ -499,10 +530,10 @@ class WD(QMainWindow,Ui_MainWindow):
                 
                 def simPoints(simData):
                     y, t = simData[0], simData[1]
-                    if self.spin_amplitude.value()>=0:
-                        ori = -self.spin_amplitude.value()-1.
-                    if self.spin_amplitude.value()<=0:
-                        ori = self.spin_amplitude.value()-1.
+                    if self.amplitude>=0:
+                        ori = -self.amplitude-1.
+                    if self.amplitude<=0:
+                        ori = self.amplitude-1.
                     time_text.set_text(time_template%(t))
                     thisy = [ori, y]
                 
@@ -514,9 +545,9 @@ class WD(QMainWindow,Ui_MainWindow):
                     line2.set_data([1.,-1.],[ori,ori])  
                     line3.set_data([t,y])
                     tf = np.arange(0.0, t, 0.05)
-                    line4.set_data([tf,self.spin_amplitude.value()*np.cos(tf*self.spin_frequency.value())])
+                    line4.set_data([tf,self.amplitude*np.cos(tf*self.frequency)])
                     time_text.set_text(time_template % (t))
-                    return line, line2, line3, time_text,line_0, line_1, line_2, line_3, line_4, line_5, line_6, line_7, line_8, line_9, line4
+                    return line, line2, line3, line_0, line_1, line_2, line_3, line_4, line_5, line_6, line_7, line_8, line_9, line4
 #                gs=0
                 ax=0
                 ax2=0
@@ -526,17 +557,18 @@ class WD(QMainWindow,Ui_MainWindow):
 #                gs = gridspec.GridSpec(10, 10)
 #                ax = fig3.add_subplot(gs[:,03], xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
 #                ax2 = fig3.add_subplot(gs[:,4:])
-                ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
-                ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.spin_amplitude.value()-2., +self.spin_amplitude.value()+2.))
+                ax = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=2, autoscale_on=False, xlim=(-0.5, 0.5), ylim=(-self.amplitude-2., +self.amplitude+2.))
+                ax2 = plt.subplot2grid((10,10), (0,3), rowspan=10, colspan=7, autoscale_on=False, xlim=(0., tf_sim), ylim=(-self.amplitude-2., +self.amplitude+2.))
 #                ax = fig3.add_subplot(121)   
 #                ax2 = fig3.add_subplot(122)
                 ax.set_title('Spring')
                 ax.set_xticks(np.arange(-1., 2., 1.))
                 ax.set_xlim(-1,1)
-                if self.spin_amplitude.value()>=0:
-                    ax.set_ylim(-self.spin_amplitude.value()-2.,self.spin_amplitude.value()+2.)
-                if self.spin_amplitude.value()<=0:
-                    ax.set_ylim(self.spin_amplitude.value()-2.,-self.spin_amplitude.value()+2.)
+                ax.set_ylabel('x(m)',fontsize=13)
+                if self.amplitude>=0:
+                    ax.set_ylim(-self.amplitude-2.,self.amplitude+2.)
+                if self.amplitude<=0:
+                    ax.set_ylim(self.amplitude-2.,-self.amplitude+2.)
                 
                 
                 ax2.set_xlabel('t(s)',fontsize=13)        
@@ -672,15 +704,18 @@ class WD(QMainWindow,Ui_MainWindow):
         self.horizontalSlider.setValue(0)
         self.spinBox_2.setValue(0)
         self.spinBox.setValue(2)
-        self.start.click()
+        self.demo=1
+        self.start2()
         
     def demo2(self):
         self.radioButton.setChecked(True)
         self.horizontalSlider.setValue(3)
         self.spinBox_2.setValue(0)
-        self.spinBox.setValue(3)
-        self.start.click()
+        self.spinBox.setValue(2)
+        self.demo=2
+        self.start2()
         
+            
     def changefig(self,item):
         text=item.text()
         self.rmmpl()

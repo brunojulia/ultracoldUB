@@ -16,6 +16,8 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import zipfile
+
 
 from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
@@ -53,6 +55,7 @@ class DS(QMainWindow,Ui_MainWindow):
         
         self.ButtonDemo_1.clicked.connect(self.demo1)
         self.ButtonDemo_2.clicked.connect(self.demo2)
+        self.demo=0
         
         self.mplfigs.itemClicked.connect(self.changefig)
         self.label_5.hide()
@@ -133,6 +136,7 @@ class DS(QMainWindow,Ui_MainWindow):
         self.rmmpl()
         self.addmpl(self.fig_dict[str(text)])
         self.fig=None
+        self.groupBox_2.setEnabled(True)
         self.timer1.stop()
         self.timer2.stop()
         
@@ -201,6 +205,7 @@ class DS(QMainWindow,Ui_MainWindow):
     def on(self):
         self.timer1.stop()
         self.timer2.stop()
+        self.groupBox_2.setEnabled(False)
         if self.timer2==None:
             self.timer1=QtCore.QTimer(self)
             self.timer1.timeout.connect(self.plot)
@@ -214,10 +219,12 @@ class DS(QMainWindow,Ui_MainWindow):
     def pause(self):
         self.timer1.stop()
         self.timer2.stop()
+        self.groupBox_2.setEnabled(True)
         
     def back1(self):
         self.timer1.stop()
         self.timer2.stop()
+        self.groupBox_2.setEnabled(False)
         if self.timer1==None:
             self.timer2=QtCore.QTimer(self)
             self.timer2.timeout.connect(self.plot2)
@@ -231,6 +238,7 @@ class DS(QMainWindow,Ui_MainWindow):
     def game_call(self):
         self.timer1.stop()
         self.timer2.stop()
+        self.groupBox_2.setEnabled(True)
         if (self.radioButton.isChecked()==True):
             if (self.radioButton_densi.isChecked()==True):
                 self.widget_osci.hide()
@@ -279,7 +287,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                 axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                 axf.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
-                axf.set_title('state at %s' %np.real(self.sim/10.))
+                axf.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.))
                 axf.set_ylim(0.,0.6)
                 self.canvas.draw()
                 self.addmpl2(fig4)
@@ -341,7 +349,10 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.rmmpl2()
                 prevdir = os.getcwd()
                 try:
-                    os.chdir(os.path.expanduser('./darksolitons'))
+                    if self.demo==0:
+                        os.chdir(os.path.expanduser('./darksolitons'))
+                    else:
+                        os.chdir(os.path.expanduser('./darksolitons/Demo%s' %(self.demo)))
                     for i in range(0,time1+1):
                         file=open('WfDs-%08d.txt'%(i),'r')
                         globals()['lines%s' %i]=file.readlines()
@@ -366,7 +377,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
                 ax1f3.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
                 ax1f3.set_ylim(0.,0.1)
                 self.addmpl2(fig3)                           
                 
@@ -393,7 +404,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 ax1f3.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 ax1f3.set_ylim(0.,0.6)                
                 ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3,'y-',lw=2)
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
                 self.canvas.draw() 
                 
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
@@ -409,7 +420,10 @@ class DS(QMainWindow,Ui_MainWindow):
                 psi_time=np.empty([512,time1])
                 prevdir = os.getcwd()
                 try:
-                    os.chdir(os.path.expanduser('./darksolitons'))
+                    if self.demo==0:
+                        os.chdir(os.path.expanduser('./darksolitons'))
+                    else:
+                        os.chdir(os.path.expanduser('./darksolitons/Demo%s' %(self.demo)))
                     for i in range (0,time1+1):
                         file=open('WfDs-%08d.txt'%(i),'r')
                         globals()['lines%s' %i]=file.readlines()
@@ -444,15 +458,17 @@ class DS(QMainWindow,Ui_MainWindow):
 #                    self.canvas.draw()
                 
                 if (self.radioButton_2.isChecked()==True) and (self.spinBox_2_value==1):
+                    self.amplitude=self.spin_amplitude.value()
+                    self.frequency=self.spin_frequency.value()
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
                     tf_sim =  time1/10.
                     def simData():
-                        L=self.spin_amplitude.value()
+                        L=self.amplitude
                         t_max =  time1/10.
                         dt = 0.05
-                        w = self.spin_frequency.value()
+                        w = self.frequency
                         y = 0.0
                         t = 0.0
                         while t <= t_max:
@@ -484,10 +500,10 @@ class DS(QMainWindow,Ui_MainWindow):
                     
                     def simPoints(simData):
                         y, t = simData[0], simData[1]
-                        if self.spin_amplitude.value()>=0:
-                            ori = -self.spin_amplitude.value()-3.
-                        if self.spin_amplitude.value()<=0:
-                            ori = self.spin_amplitude.value()-3.
+                        if self.amplitude>=0:
+                            ori = -self.amplitude-3.
+                        if self.amplitude<=0:
+                            ori = self.amplitude-3.
                         time_text.set_text(time_template%(t))
                         thisy = [ori, y]
                     
@@ -499,9 +515,9 @@ class DS(QMainWindow,Ui_MainWindow):
                         line2.set_data([1.,-1.],[ori,ori])  
                         line3.set_data([t,y])
                         tf = np.arange(0.0, t, 0.05)
-                        line4.set_data([tf,self.spin_amplitude.value()*np.cos(tf*self.spin_frequency.value())])
+                        line4.set_data([tf,self.amplitude*np.cos(tf*self.frequency)])
                         time_text.set_text(time_template % (t))
-                        return line, line2, line3, time_text,line_0, line_1, line_2, line_3, line_4, line_5, line_6, line_7, line_8, line_9, line4
+                        return line, line2, line3, line_0, line_1, line_2, line_3, line_4, line_5, line_6, line_7, line_8, line_9, line4
     #                gs=0
                     ax=0
                     ax2=0
@@ -518,12 +534,13 @@ class DS(QMainWindow,Ui_MainWindow):
                     ax.set_title('Spring')
                     ax.set_xticks(np.arange(-1., 2., 1.))
                     ax.set_xlim(-1,1)
+                    ax.set_ylabel('$x/a_{ho}$',fontsize=17)
 #                    if self.spin_amplitude.value()>=0:
 #                        ax.set_ylim(-self.spin_amplitude.value()-2.,self.spin_amplitude.value()+2.)
 #                    if self.spin_amplitude.value()<=0:
 #                        ax.set_ylim(self.spin_amplitude.value()-2.,-self.spin_amplitude.value()+2.)
   
-                    ax2.set_xlabel('$T*w_{ho}$',fontsize=17)        
+                    ax2.set_xlabel('$T/t_{ho}$',fontsize=17)        
                     ax2.set_ylabel('$x/a_{ho}$',fontsize=17)
                     ax2.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
                     ax2.set_title('Condensate: real time evolution')
@@ -546,6 +563,11 @@ class DS(QMainWindow,Ui_MainWindow):
                     self.canvas.draw()
                 
                 if (self.radioButton_3.isChecked()==True) or (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
+                    self.amplitude2=self.spin_amplitude_2.value()
+                    self.frequency2=self.spin_frequency_2.value()  
+                    self.M=self.spin_M.value()
+                    self.N=self.spin_N.value()
+                    self.radi=self.spin_rad.value()
                     self.ani_co += 1
                     if self.ani_co>1:
                         self.ani.event_source.stop()
@@ -556,16 +578,16 @@ class DS(QMainWindow,Ui_MainWindow):
                     def simData():
                         tf_sim =  time1/10.
                         dt = 0.01
-                        M=self.spin_M.value()
-                        N=self.spin_N.value()
-                        r0=self.spin_rad.value()
+                        M=self.M
+                        N=self.N
+                        r0=self.radi
                         A = 0.0
                         C = 0.0
-                        B=self.spin_amplitude_2.value()
+                        B=self.amplitude2
                         D = 0.0
                         if (self.radioButton_2.isChecked()==True) and self.spinBox_2_value>1:
                             D = -B
-                        w = self.spin_frequency_2.value()
+                        w = self.frequency2
                         impac=0
                         t_max = tf_sim
                         m2 = 1.
@@ -715,10 +737,10 @@ class DS(QMainWindow,Ui_MainWindow):
                         
                     def simPoints(simData):
                         dt = 0.01
-                        M=self.spin_M.value()
-                        N=self.spin_N.value()
-                        r0=self.spin_rad.value()
-                        B = self.spin_amplitude_2.value()
+                        M=self.M
+                        N=self.N
+                        r0=self.radi
+                        B = self.amplitude2
                         B_0=B
                         r=2*r0
                         y, t, y2, t_, y_,y3 = simData[0], simData[1], simData[2], simData[3], simData[4], simData[5]
@@ -786,14 +808,16 @@ class DS(QMainWindow,Ui_MainWindow):
                                circle0, circle1, circle2, circle3, circle4, circle5, circle6, circle7, circle8, circle9, circle10, circle11, circle12, circle_3, circle_4, line_nc_31, line_nc_32)      
                         
                     fig = plt.figure()
-                    ax = plt.subplot2grid((100,200), (0,0), rowspan=50, colspan=50, autoscale_on=False, xlim=(-B-r0-0.05,B+r0+0.05), ylim=(+B+r0+0.05,-B-r0-0.05))
+                    ax = plt.subplot2grid((100,200), (0,0), rowspan=40, colspan=50, autoscale_on=False, xlim=(-B-r0-0.05,B+r0+0.05), ylim=(+B+r0+0.05,-B-r0-0.05))
                     ax2 = plt.subplot2grid((100,200), (0,80), rowspan=100, colspan=120, autoscale_on=False, xlim=(0., tf_sim), ylim=(-10.,10))
                     ax.set_title('NC')
+                    ax.set_ylabel('$y/a_{ho}$',fontsize=17) 
+                    ax.set_xlabel('$x/a_{ho}$',fontsize=17)
                     #ax.set_xticks(np.arange(-1., 2., 1.))
                     ax.grid()
                     
                     
-                    ax2.set_xlabel('$T*w_{ho}$',fontsize=17)        
+                    ax2.set_xlabel('$T/t_{ho}$',fontsize=17)        
                     ax2.set_ylabel('$x/a_{ho}$',fontsize=17)
                     ax2.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
                     ax2.set_title('Condensate: real time evolution')
@@ -848,7 +872,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_ylim(0.,0.1)                  
                 ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3,'y-',lw=2)
-                ax1f3.set_title('state at %s' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
                 self.canvas.draw()    
             
             
@@ -870,6 +894,11 @@ class DS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setValue(self.sim-1)
 
     def start1(self):
+        self.demo=0
+        self.start2()
+        
+    def start2(self):
+        self.groupBox_2.setEnabled(True)
         self.timer1.stop()
         self.timer2.stop()
         dialog = QtGui.QDialog()    
@@ -877,6 +906,7 @@ class DS(QMainWindow,Ui_MainWindow):
         progressBar.setupUi(dialog)
         dialog.show()
         diff = 0
+        self.slider_simulation.setValue(0)
 
         
         if (self.radioButton.isChecked()==True):
@@ -950,7 +980,7 @@ class DS(QMainWindow,Ui_MainWindow):
             axf.set_xlabel('$x/a_{ho}$',fontsize=17)
             axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
             axf.fill_between(xv2,yv2,0.6,facecolor='black')
-            axf.set_title('state at %s' %np.real(0/10.))
+            axf.set_title('state at %s $T/t_{ho}$' %np.real(0/10.))
             self.addmpl(self.fig)
             
             
@@ -1048,11 +1078,22 @@ class DS(QMainWindow,Ui_MainWindow):
             psi_time=np.empty([512,time1])
             prevdir = os.getcwd()
             try:
-                os.chdir(os.path.expanduser('./darksolitons'))
-                for root, dirs, files in os.walk(os.getcwd()):
-                    for file in files:
-                        if file.startswith("WfDs-"):
-                             os.remove((os.path.join(root, file)))
+                if self.demo==0:
+                    os.chdir(os.path.expanduser('./darksolitons'))
+                    exclude=set(['Demo1','Demo2'])
+                    for root, dirs, files in os.walk(os.getcwd(), topdown=True):
+                        dirs[:] = [d for d in dirs if d not in exclude]
+                        for file in files:
+                            if file.startswith("WfDs-"):
+                                 os.remove((os.path.join(root, file)))
+                else:
+                    os.chdir(os.path.expanduser('./darksolitons/Demo%s' %(self.demo)))
+                    if (not os.path.exists('./WfDs-end')):
+                        zip_ref = zipfile.ZipFile('./Demo%s.zip' %(self.demo), 'r')
+                        zip_ref.extractall('.')
+                        zip_ref.close()
+                    else:
+                        pass
                          
                 file=open('input.txt','w')  
                 if (self.radioButton_2.isChecked()==True):
@@ -1060,29 +1101,28 @@ class DS(QMainWindow,Ui_MainWindow):
                 if (self.radioButton_3.isChecked()==True):
                     file.write ('%s\t%s\t%s' %(self.horizontalSlider_2.value()/10.0,self.spinBox_4.value(),self.spinBox_5.value()*self.spinBox_6.value()*2))
                 file.close()
-                
                 start_sub=time.time()
-                subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
-                progressBar.porcessProgressBar.setMaximum(time1+1)
-                diff=0
-                print time1+2
-                while diff<time1+2:
+                if self.demo==0:
+                    subprocess.Popen('python gpe_fft_ts_DS_v1.py',shell=True)
+                    progressBar.porcessProgressBar.setMaximum(time1+1)
                     diff=0
-                    for root, dirs, files in os.walk(os.getcwd()):
-                        for file in files:
-                            if file.startswith("WfDs-"):
-                                diff +=1
-                        
-                        if (diff<10):
-                            progressBar.label.setText('Imaginary time method in progress...')
-                        if (diff<time1-10) and (diff>10):
-                            progressBar.label.setText('Evolution in real time in progress...')
-                        if (diff<time1+1) and (diff>time1-10):
-                            progressBar.label.setText('Writing results ...')
-                                                
-                        progressBar.porcessProgressBar.setValue(diff)                     
-                        QApplication.processEvents()
-                print diff  
+                    while diff<time1+2:
+                        diff=0
+                        for root, dirs, files in os.walk(os.getcwd()):
+                            dirs[:] = [d for d in dirs if d not in exclude]
+                            for file in files:
+                                if file.startswith("WfDs-"):
+                                    diff +=1
+                            
+                            if (diff<10):
+                                progressBar.label.setText('Imaginary time method in progress...')
+                            if (diff<time1-10) and (diff>10):
+                                progressBar.label.setText('Evolution in real time in progress...')
+                            if (diff<time1+1) and (diff>time1-10):
+                                progressBar.label.setText('Writing results ...')
+                                                    
+                            progressBar.porcessProgressBar.setValue(diff)                     
+                            QApplication.processEvents()
                 print (os.getcwd())
                 print ("READY")
                 self.state.show()
@@ -1152,13 +1192,13 @@ class DS(QMainWindow,Ui_MainWindow):
             axf4.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
             axf4.fill_between(xv2,yv2,0.1,facecolor='black')
             axf4.set_ylim(0.,0.10)
-            axf4.set_title('state at %s' %np.real(0/10.))
+            axf4.set_title('state at %s $T/t_{ho}$' %np.real(0/10.))
             self.addmpl(self.fig)            
             
             self.fig3=Figure()
             ax1f3=self.fig3.add_subplot(111)
             ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
-            ax1f3.set_xlabel('$T*w_{ho}$',fontsize=17)
+            ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)
             ax1f3.set_xlim(0,(time1-1)/10.)
             
             ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
@@ -1258,17 +1298,19 @@ class DS(QMainWindow,Ui_MainWindow):
         self.radioButton_2.click()
         self.horizontalSlider.setValue(35)
         self.spinBox_2.setValue(1)
-        self.spinBox.setValue(3)
-        self.start.click()
+        self.spinBox.setValue(2)
+        self.demo=1
+        self.start2()
         
     def demo2(self):
         self.radioButton_3.click()
         self.horizontalSlider_2.setValue(30)
         self.spinBox_2.setValue(0)
-        self.spinBox_4.setValue(3)
+        self.spinBox_4.setValue(2)
         self.spinBox_5.setValue(2)
         self.spinBox_6.setValue(1)
-        self.start.click()
+        self.demo=2 
+        self.start2()
             
     def simulation(self):
         if (self.radioButton.isChecked()==True):
@@ -1304,7 +1346,7 @@ class DS(QMainWindow,Ui_MainWindow):
                         axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                         axf.set_ylim([0,0.6])
                         axf.fill_between(xv1,xv2,0.6,facecolor='black')
-                        axf.set_title('state at %s' %np.real(i/10.))
+                        axf.set_title('state at %s $T/t_{ho}$' %np.real(i/10.))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)
@@ -1318,7 +1360,10 @@ class DS(QMainWindow,Ui_MainWindow):
             self.sim=value
             prevdir = os.getcwd()
             try:
-                os.chdir(os.path.expanduser('./darksolitons'))
+                if self.demo==0:
+                    os.chdir(os.path.expanduser('./darksolitons'))
+                else:
+                    os.chdir(os.path.expanduser('./darksolitons/Demo%s' %(self.demo)))
                 for i in range(0,time1+1):
                     file=open('WfDs-%08d.txt'%(i),'r')
                     globals()['lines%s' %i]=file.readlines()
@@ -1354,12 +1399,13 @@ class DS(QMainWindow,Ui_MainWindow):
                         if (self.radioButton_dens.isChecked()==True):
                             axf.fill_between(xv1,xv2,0.1,facecolor='black')
                             axf.set_ylim(0.,0.1)
-                        axf.set_title('state at %s' %(i/10.))
+                        axf.set_title('state at %s $T/t_{ho}$' %(i/10.))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)
             
     def close(self):
+        self.groupBox_2.setEnabled(True)
         self.timer1.stop()
         self.timer2.stop()
         self.hide()
