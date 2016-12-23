@@ -8,7 +8,7 @@ Created on Sun Oct 30 16:02:05 2016
 import os, glob
 import subprocess
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.uic import loadUiType
@@ -17,9 +17,10 @@ import zipfile
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import matplotlib.animation as animation  #for the animation
+#plt.rcParams['animation.ffmpeg_path'] = './brightsolitons/bs_evolution/ffmpegprog/bin/ffmpeg'   #relative to the ultracoldUB file
 import matplotlib.image as mpimg
 
-from PyQt4 import QtGui, QtCore
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import (FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT)
 
@@ -69,7 +70,7 @@ class BS(QMainWindow,Ui_MainWindow):
         self.btn_none.click()  #we select a potential (just in case no potential is chosen)
         
         self.demo1.clicked.connect(self.demo_1)  #for the harmonic movement demo
-        self.demo2.clicked.connect(self.demo_2)  #for the slip in 2 equal parts of the soliton
+        self.demo2.clicked.connect(self.demo_2)  #for the split in 2 equal parts of the soliton
         
         #unzip all material in pulse_data (takes a few seconds the first time...)
         if (not os.path.exists('./brightsolitons/bs_evolution/pulse_data')):
@@ -85,26 +86,26 @@ class BS(QMainWindow,Ui_MainWindow):
             zip_ref.close()
         else:
             pass
-        #unzip ffmpeg for later simulations (only once)
-        if (not os.path.exists('./brightsolitons/bs_evolution/ffmpegprog')):
-            zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/ffmpegprog.zip', 'r')
-            zip_ref.extractall('./brightsolitons/bs_evolution/')
-            zip_ref.close()
-        else:
-            pass
-        if (not os.path.exists('./brightsolitons/bs_evolution/moviepy-0.2.2.11')):
-            zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/moviepy-0.2.2.11.zip', 'r')
-            zip_ref.extractall('./brightsolitons/bs_evolution/')
-            zip_ref.close()
+  ##      #unzip ffmpeg for later simulations (only once)
+  #      if (not os.path.exists('./brightsolitons/bs_evolution/ffmpegprog')):
+  #          zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/ffmpegprog.zip', 'r')
+  #          zip_ref.extractall('./brightsolitons/bs_evolution/')
+  #          zip_ref.close()
+  #      else:
+  #          pass
+  #      if (not os.path.exists('./brightsolitons/bs_evolution/moviepy-0.2.2.11')):
+  #          zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/moviepy-0.2.2.11.zip', 'r')
+  #          zip_ref.extractall('./brightsolitons/bs_evolution/')
+  #          zip_ref.close()
             #now we have to install moviepy (from folder) for later simulations
-            prevdir=os.getcwd()
-            try:
-                os.chdir(os.path.expanduser('./brightsolitons/bs_evolution/moviepy-0.2.2.11'))
-                subprocess.Popen('python setup.py install',shell=True)
-            finally:
-                os.chdir(prevdir)  
-        else:
-            pass
+  #          prevdir=os.getcwd()
+  #          try:
+  #              os.chdir(os.path.expanduser('./brightsolitons/bs_evolution/moviepy-0.2.2.11'))
+  #              subprocess.Popen('python setup.py install',shell=True)
+   #         finally:
+   #             os.chdir(prevdir)  
+   #     else:
+   #         pass
 
         #creating signals and connecting them with the function        
         self.playmoment.clicked.connect(self.play2)    
@@ -225,7 +226,7 @@ class BS(QMainWindow,Ui_MainWindow):
             
     def change_sim(self):
         #to change the simulation that can be seen
-        if self.btn_sim.text()=="Sim: 1":
+        if self.format=='Demo' and self.btn_sim.text()=="Sim: 1":
             self.timer1.stop()
             self.timer2.stop()
             self.btn_sim.setText("Sim: 2")  #updating the name of the simulation
@@ -244,12 +245,143 @@ class BS(QMainWindow,Ui_MainWindow):
             self.ButtonBack.hide()
             self.ButtonPause.hide()
             self.label_5.hide()
-            self.value_sim.hide()           
-        elif self.btn_sim.text()=="Sim: 2":
+            self.value_sim.hide()   
+        
+        elif self.format=='Start' and self.btn_sim.text()=="Sim: 1":
+          #  self.fig=None  #added!
+            self.timer1.stop()
+            self.timer2.stop()
+            self.btn_sim.setText("Sim: 2")  #updating the name of the simulation
+            self.rmmpl()            
+            self.mpl_window.hide()
+            self.window_sims.show()
+            self.sims_2.hide()
+            self.sims.show()
+            #make some buttons unable
+            self.mplfigs.setEnabled(False)
+            self.interaction.setEnabled(False)
+            self.Confinement.setEnabled(False)
+            self.ext_potential.setEnabled(False)
+            self.slider_simulation.hide()
+            self.ButtonOn.hide()
+            self.ButtonBack.hide()
+            self.ButtonPause.hide()
+            self.label_5.hide()
+            self.value_sim.hide() 
+            
+            """Let's write the animation here"""
+            def update(i):
+                global dt,ddt,t,v,prob,x0,y0,n
+                prova = t/(15.0*dt) + ddt
+                Npart = 1 + int(prova)
+                x = np.empty([Npart])
+                y = np.empty([Npart])
+                for j in range(0,Npart):
+                    x[j] = x0[j]
+                    y[j] = y0[j]
+                    if n[j]==0:
+                        if x[j]>=-1.1 and x[j]<-0.5:    #if it's close to 0
+                            randnumber=np.random.random(size=None)   #gives us a random number
+                            if randnumber<=prob:
+                                x0[j] = x0[j] + float(v*dt)  #keeps going to the right
+                                y0[j] = y0[j] - float(v*dt)  #keeps going onwards (y=0)
+                                n[j]=1                       #n=1 means that it passed
+                            else:
+                                x0[j] = x0[j] - float(v*dt)  #goes to the left
+                                y0[j] = y0[j] - float(v*dt)  #goes down
+                                n[j]=2                       #n=2 means particle going backwards
+                        else:       #still not in the separating region
+                            x0[j] = x0[j] + float(v*dt)  #keeps going to the right
+                            y0[j] = y0[j] - float(v*dt)  #keeps going onwards (y=0)
+                    else:
+                        if n[j]==1:
+                            x0[j] = x0[j] + float(v*dt)
+                            y0[j] = y0[j] - float(v*dt)
+                        elif n[j]==2:
+                            x0[j] = x0[j] - float(v*dt)  #goes to the left
+                            y0[j] = y0[j] - float(v*dt)  #goes  down     
+                line.set_xdata(x)
+                line.set_ydata(y)
+                line2.set_xdata(x)
+                line2.set_ydata(y)
+                t += dt 
+                return line,line2
+                     
+            global dt,ddt,t,v,prob,x0,y0,n
+            
+            fig3 = plt.figure()
+            ax = fig3.add_subplot(111)
+            ax.set_axis_bgcolor('black')
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            #we configure the plot (size)
+            ax.set_ylim(-18.0,18.0)
+            ax.set_xlim(-18.0,18.0)
+            
+            self.addmpl4(fig3)
+            
+            #plot particles
+            line, = ax.plot([],[], "*", ms=12, color='white')
+            line2, = ax.plot([],[], "o", ms=12, color='white',alpha=0.4)
+            
+            #some parameters
+            timef=15    #total time of simulation
+            v=6.0      #velocity of the partciles (FIXED)
+            t=0.0       #initial time
+            dt=0.05     #time step (FIXED)
+            i=0         #a useless parameter, but given to the update() for not having problems with FuncAnimation()
+            ##prob=0.10    #define probability == T trans. coeff.
+            ddt=1.0e-7  #defined for not having problems with int() and the number of particles
+            
+            prevdir = os.getcwd()
+            #reads the T coeff
+            try:
+                os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
+                datacoef=open('llum.dat','r')
+                coef=datacoef.readlines()
+                valueT=float((coef[0]).split('\t')[1])
+                valueR=float((coef[0]).split('\t')[0])
+                valueTot=valueT + valueR
+                coefT=valueT/valueTot
+                prob=coefT    #define probability == T trans. coeff.
+                #and now the flashlight
+                light=mpimg.imread('linterna4.png')
+                ax.imshow(light,extent=(-18,-12,12,18),aspect='auto')
+            finally:
+                os.chdir(prevdir)            
+            
+            steps=int(timef/dt)     #to define the number of frames, one for each time step (dt)
+
+            Ninter=10000000         #we define some arrays to be used
+            x0=np.empty([Ninter])
+            y0=np.empty([Ninter])
+            n=np.empty([Ninter])    #counter for each particle
+
+            for j in range(0,Ninter):           #we define the initial position of the supposed particles
+                x0[j]=-13.75
+                y0[j]=13.75
+            
+            #let's plot like a barrier
+            barx=[]
+            bary=[]
+            for j in xrange(-200,200,1):
+                barx.append(j/100.0)
+                if j>=-100 and j<=100:
+                    bary.append(20.0)
+                else:
+                    bary.append(-20.0)
+            abx=np.array(barx)
+            aby=np.array(bary)
+            ax.fill_between(abx,aby,-20,color='blue',alpha=(1-prob))
+            
+            self.ani = animation.FuncAnimation(fig3, update, frames=steps, interval=25,repeat=True)
+            self.canvas.draw()            
+            
+        elif self.format=='Demo' and self.btn_sim.text()=="Sim: 2":
             self.timer1.stop()
             self.timer2.stop()
             self.btn_sim.setText("Sim: 3")  #updating the name of the simulation
-            self.rmmpl()
+            self.rmmpl4()
             self.mpl_window.hide()
             self.window_sims.show()
             #make some buttons unable
@@ -264,14 +396,181 @@ class BS(QMainWindow,Ui_MainWindow):
             self.sims_2.show()
             self.sims.hide()
             self.label_5.hide()
-            self.value_sim.hide()    
+            self.value_sim.hide()  
+        
+        elif self.format=='Start' and self.btn_sim.text()=="Sim: 2":
+            self.timer1.stop()
+            self.timer2.stop()
+            self.btn_sim.setText("Sim: 3")  #updating the name of the simulation
+            self.rmmpl4()               #added!
+            self.mpl_window.hide()
+            self.window_sims.show()
+            #make some buttons unable
+            self.mplfigs.setEnabled(False)
+            self.interaction.setEnabled(False)
+            self.Confinement.setEnabled(False)
+            self.ext_potential.setEnabled(False)
+            self.slider_simulation.hide()
+            self.ButtonOn.hide()
+            self.ButtonBack.hide()
+            self.ButtonPause.hide()
+            self.sims_2.show()
+            self.sims.hide()
+            self.label_5.hide()
+            self.value_sim.hide()
+            
+            """Let's write the animation here"""
+            def update(i):
+                global dt2,ddt2,t2,v2,x0f,y0f,x0p,y0p,x0b,y0b,n2
+                prova = t2/(15.0*dt2) + ddt2
+                Npart = 1 + int(prova)
+                xf = np.empty([Npart])             #x-positions of the forward-particles
+                yf = np.empty([Npart])             #y-positions of the forward-particles
+                xb = np.empty([Npart])             #x-positions of the backward-particles
+                yb = np.empty([Npart])             #y-positions of the backward-particles
+                xp = np.empty([Npart])             #x-positions of the previous-particles
+                yp = np.empty([Npart])             #y-positions of the previous-particles
+                for j in range(0,Npart):
+                    if n2[j]==0:
+                        xp[j] = x0p[j]
+                        yp[j] = y0p[j]
+                        xf[j] = -20
+                        yf[j] = -20
+                        xb[j] = -20
+                        yb[j] = -20   #stop moving (out of range)
+                        if xp[j]>=-1.1 and xp[j]<-0.5:    #if it's close to 0
+                            x0f[j] = x0f[j] + float(v2*dt2)  #keeps going to the right
+                            y0f[j] = y0f[j] - float(v2*dt2)  #keeps going onwards (y=0)
+                            x0b[j] = x0b[j] - float(v2*dt2)  #goes to the left
+                            y0b[j] = y0b[j] - float(v2*dt2)  #goes down
+                            x0p[j] = -20
+                            y0p[j] = -20  #stop moving
+                            n2[j]=1
+                        else:       #still not in the separating region
+                            x0f[j] = x0f[j] + float(v2*dt2)  #keeps going to the right
+                            y0f[j] = y0f[j] - float(v2*dt2)  #keeps going onwards (y=0)
+                            x0b[j] = x0b[j] + float(v2*dt2)  #keeps going to the right
+                            y0b[j] = y0b[j] - float(v2*dt2)  #keeps going onwards (y=0)
+                            x0p[j] = x0p[j] + float(v2*dt2)  #keeps going to the right
+                            y0p[j] = y0p[j] - float(v2*dt2)  #keeps going onwards (y=0)
+                    else:
+                        xf[j] = x0f[j]
+                        yf[j] = y0f[j]
+                        xb[j] = x0b[j]
+                        yb[j] = y0b[j]
+                        xp[j] = x0p[j]
+                        yp[j] = y0p[j]
+                        x0f[j] = x0f[j] + float(v2*dt2)
+                        y0f[j] = y0f[j] - float(v2*dt2)
+                        x0b[j] = x0b[j] - float(v2*dt2)  #goes to the left
+                        y0b[j] = y0b[j] - float(v2*dt2)  #goes  down
+                        x0p[j] = -20
+                        y0p[j] = -20  #stop moving    
+                line.set_xdata(xf)
+                line.set_ydata(yf)
+                line2.set_xdata(xf)
+                line2.set_ydata(yf)
+                line3.set_xdata(xb)
+                line3.set_ydata(yb)
+                line4.set_xdata(xb)
+                line4.set_ydata(yb)
+                line5.set_xdata(xp)
+                line5.set_ydata(yp)
+                line6.set_xdata(xp)
+                line6.set_ydata(yp)
+                t2 += dt2 
+                return line,line2,line3,line4,line5,line6
+                     
+            global dt2,ddt2,t2,v2,x0f,y0f,x0p,y0p,x0b,y0b,n2
+            fig4 = plt.figure()
+            ax = fig4.add_subplot(111)
+            ax.set_axis_bgcolor('black')
+            ax.axes.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
+            #we configure the plot (size)
+            ax.set_ylim(-18.0,18.0)
+            ax.set_xlim(-18.0,18.0)
+            
+            self.addmpl5(fig4)
+            
+            prevdir = os.getcwd()
+            #reads the T coeff
+            try:
+                os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
+                datacoef=open('llum.dat','r')
+                coef=datacoef.readlines()
+                valueT=float((coef[0]).split('\t')[1])
+                valueR=float((coef[0]).split('\t')[0])
+                valueTot=valueT + valueR
+                coefT=valueT/valueTot
+                #and now the flashlight
+                light=mpimg.imread('linterna4.png')
+                ax.imshow(light,extent=(-18,-12,12,18),aspect='auto')
+            finally:
+                os.chdir(prevdir) 
+                
+            prob=coefT    #define probability == T trans. coeff.
+       #     print (prob)
+            
+            #plot particles
+            line, = ax.plot([],[], "*", ms=15*prob, color='white')  #onwards (already passed)
+            line2, = ax.plot([],[], "o", ms=15*prob, color='white',alpha=0.4)
+            line3, = ax.plot([],[], "*", ms=15*(1.0-prob), color='white') #backwards (already hit)
+            line4, = ax.plot([],[], "o", ms=15*(1.0-prob), color='white',alpha=0.4)
+            line5, = ax.plot([],[], "*", ms=15, color='white') #going to the wall
+            line6, = ax.plot([],[], "o", ms=15, color='white',alpha=0.4)
+            
+            #some parameters
+            timef=15    #total time of simulation
+            v2=6.0      #velocity of the partciles (FIXED)
+            t2=0.0       #initial time
+            dt2=0.05     #time step (FIXED)
+            i=0         #a useless parameter, but given to the update() for not having problems with FuncAnimation()
+         ##   prob2=0.10    #define probability == T trans. coeff.
+            ddt2=1.0e-7  #defined for not having problems with int() and the number of particles
+                
+            steps=int(timef/dt2)     #to define the number of frames, one for each time step (dt)
+
+            Ninter=10000000         #we define some arrays to be used
+            x0f=np.empty([Ninter])
+            y0f=np.empty([Ninter])
+            x0b=np.empty([Ninter])
+            y0b=np.empty([Ninter])
+            x0p=np.empty([Ninter])
+            y0p=np.empty([Ninter])
+            n2=np.empty([Ninter])    #counter for each particle
+
+            for j in range(0,Ninter):           #we define the initial position of the supposed particles
+                x0f[j]=-13.75
+                y0f[j]=13.75
+                x0b[j]=-13.75
+                y0b[j]=13.75
+                x0p[j]=-13.75
+                y0p[j]=13.75
+            
+            #let's plot like a barrier
+            barx=[]
+            bary=[]
+            for j in xrange(-200,200,1):
+                barx.append(j/100.0)
+                if j>=-100 and j<=100:
+                    bary.append(20.0)
+                else:
+                    bary.append(-20.0)
+            abx=np.array(barx)
+            aby=np.array(bary)
+            ax.fill_between(abx,aby,-20,color='blue',alpha=(1-prob))
+            
+            self.ani = animation.FuncAnimation(fig4, update, frames=steps, interval=25,repeat=True)
+            self.canvas.draw() 
+            
         elif self.btn_sim.text()=="Sim: 3":
             self.btn_sim.setText("Sim: 1")  #updating the name of the simulation
             self.sims_2.hide()
             self.sims.hide()
-            self.mpl_window.show()
             self.window_sims.hide()
-            self.fig=None
+            self.rmmpl5()            #added!!
+          #  self.fig=None
             #make some buttons able again
             self.mplfigs.setEnabled(True)
             self.interaction.setEnabled(True)
@@ -397,14 +696,15 @@ class BS(QMainWindow,Ui_MainWindow):
                 x2=np.array(listx2)
                 x3=np.array(listx3)
                         
-                if self.fig==None:
-                    self.rmmpl()
-                    self.fig=Figure()
-                    self.addmpl(self.fig)
-                self.fig.clear()
+            #    if self.fig==None:
+            #        self.rmmpl()
+            ##        self.fig=Figure()
+            #        self.addmpl(self.fig)
+            #    self.fig.clear()
+                fig5=Figure()
                 gs=GridSpec(8,1)  #8 rows and 1 column
-                state=self.fig.add_subplot(gs[2:,:])
-                light=self.fig.add_subplot(gs[0:2,:])
+                state=fig5.add_subplot(gs[2:,:])
+                light=fig5.add_subplot(gs[0:2,:])
                 light.axes.get_yaxis().set_visible(False)
                 light.axes.get_xaxis().set_visible(False)
                 state.set_xlabel("Position ($x/ \\xi$)")
@@ -466,9 +766,13 @@ class BS(QMainWindow,Ui_MainWindow):
                     light.plot(x2,y2,color='yellow',linewidth=5.0,alpha=coefR)
                     light.plot(x3,y3,color='yellow',linewidth=5.0,alpha=coefT)
                 
-                self.canvas.draw()
+                self.addmpl(fig5)  #plot it
             finally:
                 os.chdir(prevdir) 
+            
+            #and show the plot
+            self.mpl_window.show()
+            self.fig=fig5
         
         
     def escriu2x(self):
@@ -485,7 +789,6 @@ class BS(QMainWindow,Ui_MainWindow):
         
     def initial(self):  #everytime we change the module (i.e. external potential)
         self.moment.hide()
-        self.fig.clear()
         #hiding or showing things        
         self.lot.hide()
         self.btn_sim.hide()
@@ -577,6 +880,28 @@ class BS(QMainWindow,Ui_MainWindow):
         self.mplvl.removeWidget(self.toolbar)
         self.toolbar.close()
         self.mplvl.removeWidget(self.canvas)
+        self.canvas.close()
+        
+    def addmpl4(self,fig):
+        #to add the plots in the main layout
+        self.canvas=FigureCanvas(fig)
+        self.mplvl4.addWidget(self.canvas)
+        self.canvas.draw() 
+        
+    def rmmpl4(self,): 
+        #to delete the plots in the main layout
+        self.mplvl4.removeWidget(self.canvas)
+        self.canvas.close()
+        
+    def addmpl5(self,fig):
+        #to add the plots in the main layout
+        self.canvas=FigureCanvas(fig)
+        self.mplvl5.addWidget(self.canvas)
+        self.canvas.draw() 
+        
+    def rmmpl5(self,): 
+        #to delete the plots in the main layout
+        self.mplvl5.removeWidget(self.canvas)
         self.canvas.close()
         
     def addmpl2(self,fig):
@@ -1179,35 +1504,35 @@ class BS(QMainWindow,Ui_MainWindow):
             self.slider_simulation.setMaximum(60*self.spinBox.value())
             self.slider_simulation.setSingleStep(1)
             
-        if pot==2:
+    #    if pot==2:
             #we add the gif from simulation_1 and 2
-            try:
-                self.mplvl4.removeWidget(self.movie_scr)
-                self.mplvl5.removeWidget(self.movie_scr2)
-            except:
-                pass
-            prevdir=os.getcwd()
-            try:                
-                os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-                self.movie = QMovie("simulation_1.gif", QByteArray(), self)
-             #   self.movie.setScaledSize(QtCore.QSize(651,201))
-                self.movie_scr = QLabel()
-                self.mplvl4.addWidget(self.movie_scr)
-                self.movie.setCacheMode(QMovie.CacheAll)
-                self.movie.setSpeed(100)
-                self.movie_scr.setMovie(self.movie)
-                self.movie.start()
-                
-                self.movie2 = QMovie("simulation_2.gif", QByteArray(), self)
-              #  self.movie2.setScaledSize(QtCore.QSize(651,201))
-                self.movie_scr2 = QLabel()
-                self.mplvl5.addWidget(self.movie_scr2)
-                self.movie2.setCacheMode(QMovie.CacheAll)
-                self.movie2.setSpeed(100)
-                self.movie_scr2.setMovie(self.movie2)
-                self.movie2.start()
-            finally:
-                os.chdir(prevdir)
+    #        try:
+    #            self.mplvl4.removeWidget(self.movie_scr)
+    #            self.mplvl5.removeWidget(self.movie_scr2)
+    #        except:
+    #            pass
+    #        prevdir=os.getcwd()
+    #        try:                
+    #            os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
+    #            self.movie = QMovie("simulation_1.gif", QByteArray(), self)
+    #         #   self.movie.setScaledSize(QtCore.QSize(651,201))
+    #            self.movie_scr = QLabel()
+    #            self.mplvl4.addWidget(self.movie_scr)
+    #            self.movie.setCacheMode(QMovie.CacheAll)
+    #            self.movie.setSpeed(100)
+    #            self.movie_scr.setMovie(self.movie)
+    #            self.movie.start()
+    #            
+    #            self.movie2 = QMovie("simulation_2.gif", QByteArray(), self)
+    #          #  self.movie2.setScaledSize(QtCore.QSize(651,201))
+    #            self.movie_scr2 = QLabel()
+    #            self.mplvl5.addWidget(self.movie_scr2)
+    #            self.movie2.setCacheMode(QMovie.CacheAll)
+    #            self.movie2.setSpeed(100)
+    #            self.movie_scr2.setMovie(self.movie2)
+    #            self.movie2.start()
+    #        finally:
+    #            os.chdir(prevdir)
         
         self.sim=0
         self.slider_simulation.setValue(self.sim+1)
