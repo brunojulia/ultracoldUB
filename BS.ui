@@ -1200,58 +1200,6 @@ p, li { white-space: pre-wrap; }
     <zorder>tanca</zorder>
     <zorder>intenta</zorder>
    </widget>
-   <widget class="QPushButton" name="playmoment">
-    <property name="geometry">
-     <rect>
-      <x>840</x>
-      <y>450</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Linear momentum</string>
-    </property>
-   </widget>
-   <widget class="QFrame" name="moment">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>591</width>
-      <height>581</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QTextBrowser" name="expltext">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>20</y>
-       <width>581</width>
-       <height>541</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="return2">
-     <property name="geometry">
-      <rect>
-       <x>470</x>
-       <y>540</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Return</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QPushButton" name="lot">
     <property name="geometry">
      <rect>
@@ -1329,7 +1277,6 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
    <zorder>play_2</zorder>
-   <zorder>moment</zorder>
    <zorder>back</zorder>
    <zorder>interaction</zorder>
    <zorder>ext_potential</zorder>
@@ -1344,7 +1291,6 @@ p, li { white-space: pre-wrap; }
    <zorder>info1</zorder>
    <zorder>value_sim</zorder>
    <zorder>play</zorder>
-   <zorder>playmoment</zorder>
    <zorder>lot</zorder>
    <zorder>window_sims</zorder>
    <zorder>btn_sim</zorder>
@@ -2036,102 +1982,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>playmoment</sender>
-   <signal>clicked()</signal>
-   <receiver>moment</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>846</x>
-     <y>479</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>590</x>
-     <y>65</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>return2</sender>
-   <signal>clicked()</signal>
-   <receiver>moment</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>554</x>
-     <y>563</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>586</x>
-     <y>522</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>playmoment</sender>
-   <signal>clicked()</signal>
-   <receiver>mplfigs</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>855</x>
-     <y>482</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>797</x>
-     <y>461</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>return2</sender>
-   <signal>clicked()</signal>
-   <receiver>mplfigs</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>515</x>
-     <y>576</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>692</x>
-     <y>539</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>playmoment</sender>
-   <signal>clicked()</signal>
-   <receiver>start</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>888</x>
-     <y>478</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>812</x>
-     <y>421</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>return2</sender>
-   <signal>clicked()</signal>
-   <receiver>start</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>541</x>
-     <y>568</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>769</x>
-     <y>428</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>demo1</sender>
    <signal>clicked()</signal>
    <receiver>mplfigs</receiver>
@@ -2160,70 +2010,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>772</x>
      <y>488</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>return2</sender>
-   <signal>clicked()</signal>
-   <receiver>demo1</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>517</x>
-     <y>572</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>697</x>
-     <y>432</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>return2</sender>
-   <signal>clicked()</signal>
-   <receiver>demo2</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>517</x>
-     <y>572</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>897</x>
-     <y>432</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>playmoment</sender>
-   <signal>clicked()</signal>
-   <receiver>demo1</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>895</x>
-     <y>482</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>697</x>
-     <y>432</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>playmoment</sender>
-   <signal>clicked()</signal>
-   <receiver>demo2</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>895</x>
-     <y>482</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>897</x>
-     <y>432</y>
     </hint>
    </hints>
   </connection>

@@ -29,12 +29,7 @@ import time
 Ui_MainWindow,QMainWindow=loadUiType('BS.ui')
 class BS(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
-        global language
         QtGui.QWidget.__init__(self,parent)
-        lang=open('language.txt','r')
-        lang2=lang.readlines()
-        language=int(lang2[0])
-        lang.close()
         self.file=open('output.txt','a')
         self.file.write('#################')
         self.file.write('Interfaz seleccionada: Bright Solitons')
@@ -62,8 +57,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.wall.hide()
         self.label_5.hide()
         self.slider_simulation.hide()
-        self.moment.hide()
-        self.playmoment.hide()
         self.none_20.click()
         self.wall_1.click()
         self.window_sims.hide()
@@ -86,30 +79,8 @@ class BS(QMainWindow,Ui_MainWindow):
             zip_ref.close()
         else:
             pass
-  ##      #unzip ffmpeg for later simulations (only once)
-  #      if (not os.path.exists('./brightsolitons/bs_evolution/ffmpegprog')):
-  #          zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/ffmpegprog.zip', 'r')
-  #          zip_ref.extractall('./brightsolitons/bs_evolution/')
-  #          zip_ref.close()
-  #      else:
-  #          pass
-  #      if (not os.path.exists('./brightsolitons/bs_evolution/moviepy-0.2.2.11')):
-  #          zip_ref = zipfile.ZipFile('./brightsolitons/bs_evolution/moviepy-0.2.2.11.zip', 'r')
-  #          zip_ref.extractall('./brightsolitons/bs_evolution/')
-  #          zip_ref.close()
-            #now we have to install moviepy (from folder) for later simulations
-  #          prevdir=os.getcwd()
-  #          try:
-  #              os.chdir(os.path.expanduser('./brightsolitons/bs_evolution/moviepy-0.2.2.11'))
-  #              subprocess.Popen('python setup.py install',shell=True)
-   #         finally:
-   #             os.chdir(prevdir)  
-   #     else:
-   #         pass
 
-        #creating signals and connecting them with the function        
-        self.playmoment.clicked.connect(self.play2)    
-        self.return2.clicked.connect(self.retorna2)
+        #creating signals and connecting them with the function            
         self.slider_simulation.valueChanged.connect(self.simulation)
         self.ButtonOn.clicked.connect(self.on)
         self.ButtonBack.clicked.connect(self.backsim)
@@ -788,13 +759,11 @@ class BS(QMainWindow,Ui_MainWindow):
         self.valor_v0_none.setNum(2*self.horizontalSlider_2.value())
         
     def initial(self):  #everytime we change the module (i.e. external potential)
-        self.moment.hide()
         #hiding or showing things        
         self.lot.hide()
         self.btn_sim.hide()
         self.window_sims.hide()
         self.mpl_window.show()
-        global language
         #let's show the initial state
         prevdir=os.getcwd()
         try:
@@ -943,7 +912,12 @@ class BS(QMainWindow,Ui_MainWindow):
             self.mplfigs.takeItem(self.mplfigs.row(item))
             
     def demo_1(self): #harmonic
-        self.rmmpl()
+        if self.fig==None:
+            self.rmmpl()            
+            self.fig=Figure()
+            self.addmpl(self.fig)
+        self.fig.clear()
+      #parat el 6/2/17  self.rmmpl()
         self.btn_none.click()   #for not having weird errors
         self.btn_harm.click()
         self.horizontalSlider_3.setValue(-25)
@@ -1153,7 +1127,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.label_5.show()
         self.value_sim.show()
         self.play.hide()
-        self.playmoment.hide()
         
         self.sim=0
         self.slider_simulation.setValue(self.sim+1)
@@ -1179,7 +1152,6 @@ class BS(QMainWindow,Ui_MainWindow):
         diff = 0
         
         #first we have to delete all previous files related to evolution
-        global language
         prevdir=os.getcwd()
         try:
             os.chdir(os.path.expanduser('./brightsolitons'))
@@ -1337,10 +1309,6 @@ class BS(QMainWindow,Ui_MainWindow):
                 self.play.show()
             else:
                 self.play.hide()
-            if pot==0:
-                self.playmoment.show()
-            else:
-                self.playmoment.hide()
             #let's read the ouput files to plot the data            
             energyfile=open('./bs_evolution/energies.dat','r')
             energy=energyfile.readlines()
@@ -1503,36 +1471,6 @@ class BS(QMainWindow,Ui_MainWindow):
             self.slider_simulation.setMinimum(0)
             self.slider_simulation.setMaximum(60*self.spinBox.value())
             self.slider_simulation.setSingleStep(1)
-            
-    #    if pot==2:
-            #we add the gif from simulation_1 and 2
-    #        try:
-    #            self.mplvl4.removeWidget(self.movie_scr)
-    #            self.mplvl5.removeWidget(self.movie_scr2)
-    #        except:
-    #            pass
-    #        prevdir=os.getcwd()
-    #        try:                
-    #            os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-    #            self.movie = QMovie("simulation_1.gif", QByteArray(), self)
-    #         #   self.movie.setScaledSize(QtCore.QSize(651,201))
-    #            self.movie_scr = QLabel()
-    #            self.mplvl4.addWidget(self.movie_scr)
-    #            self.movie.setCacheMode(QMovie.CacheAll)
-    #            self.movie.setSpeed(100)
-    #            self.movie_scr.setMovie(self.movie)
-    #            self.movie.start()
-    #            
-    #            self.movie2 = QMovie("simulation_2.gif", QByteArray(), self)
-    #          #  self.movie2.setScaledSize(QtCore.QSize(651,201))
-    #            self.movie_scr2 = QLabel()
-    #            self.mplvl5.addWidget(self.movie_scr2)
-    #            self.movie2.setCacheMode(QMovie.CacheAll)
-    #            self.movie2.setSpeed(100)
-    #            self.movie_scr2.setMovie(self.movie2)
-    #            self.movie2.start()
-    #        finally:
-    #            os.chdir(prevdir)
         
         self.sim=0
         self.slider_simulation.setValue(self.sim+1)
@@ -1542,7 +1480,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.interaction.setEnabled(False)
         self.Confinement.setEnabled(False)
         self.ext_potential.setEnabled(False)
-        global language
         self.rmmpl()
         self.timer1.stop()
         self.timer2.stop()
@@ -1558,7 +1495,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.ButtonOn.setEnabled(True)
         self.ButtonBack.setEnabled(True)
         self.ButtonPause.setEnabled(True)
-        global language
         self.rmmpl2()
         self.play_2.hide()        
         fig=Figure()
@@ -1567,7 +1503,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.fig=None
         
     def grafica(self): #play-plot
-        global language
         self.rmmpl()
         figura=Figure()
         self.addmpl2(figura)
@@ -1599,7 +1534,6 @@ class BS(QMainWindow,Ui_MainWindow):
         figmv.set_ylabel("Position ($x/ a_{ho}$)")
             
     def simulation(self):
-        global language
         self.lot.hide()
         self.btn_sim.hide()
         self.sim=self.slider_simulation.value()
@@ -1947,12 +1881,12 @@ class BS(QMainWindow,Ui_MainWindow):
         if self.timer2==None:
             self.timer1=QtCore.QTimer(self)
             self.timer1.timeout.connect(self.plotsim)
-            self.timer1.start(25)
+            self.timer1.start(75)
         else:
             self.timer1=QtCore.QTimer(self)
             self.timer1.timeout.connect(self.plotsim)
             self.timer2.stop()
-            self.timer1.start(25)
+            self.timer1.start(75)
         #things that the user can/can't change
         self.interaction.setEnabled(False)
         self.Confinement.setEnabled(False)
@@ -1965,12 +1899,12 @@ class BS(QMainWindow,Ui_MainWindow):
         if self.timer1==None:
             self.timer2=QtCore.QTimer(self)
             self.timer2.timeout.connect(self.plotsim2)
-            self.timer2.start(25)
+            self.timer2.start(75)
         else:
             self.timer2=QtCore.QTimer(self)
             self.timer2.timeout.connect(self.plotsim2)
             self.timer1.stop()
-            self.timer2.start(25)
+            self.timer2.start(75)
         #things that the user can/can't change
         self.interaction.setEnabled(False)
         self.Confinement.setEnabled(False)
@@ -2051,72 +1985,6 @@ class BS(QMainWindow,Ui_MainWindow):
             self.ButtonOn.setEnabled(True)
             self.ButtonBack.setEnabled(True)
             self.ButtonPause.setEnabled(True)
-            
-    def retorna2(self):
-        self.timer1.stop()
-        self.timer2.stop()
-        self.interaction.setEnabled(True)
-        self.Confinement.setEnabled(True)
-        self.ext_potential.setEnabled(True)
-            
-    def play2(self):
-        self.ButtonPause.click()
-        self.interaction.setEnabled(False)
-        self.Confinement.setEnabled(False)
-        self.ext_potential.setEnabled(False)
-        global language
-        if language==1:
-            self.expltext.setPlainText('Linear momentum \n \nLinear momentum is a derived quantity' + 
-            ' from other magnitudes or properties from the particle we are working with; in '+
-            'particular it is related with velocity following the relation:\n \n'+ '\t \t $\vect{p} = m \vect{v} $ \n \n'+
-            'In this case here, we have the soliton confined in a box, so once the soliton hits a wall '+
-            'it will go back as a ball hitting a wall would do.' + 'During this process, both energy and linear ' + 
-            'momentum are conserved, so in the end we have (for the whole system) the same energy and total linear momentum.\n\n' +  'How can we '+
-            'understand that? Imagine the previous example, we have two "particles": the ball (1) and the wall (2). '+
-            'Imagine that the ball has a mass $m$ and the wall, as a normal wall, is still and cannot change its place. '+
-            'In an ideal case, if you threw the ball against the wall with a velocity $v$ it would hit the wall and come back '+
-            'to you with the same velocity module. This situation corresponds to an elastic collision, though it may not seem at '+
-            "first sight, let's see how to understand it: \n \n"+r"\t    $ \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} $"+
-            '\vect{p_{f,2}}\n\n' + 'We can consider a wall with a very huge mass compared to the one of the ball (imagine it as infinity), so as we '+
-            'see in our daily life, a wall hitted by a ball does not move, right? So we could suppose that the velocity of the wall '+
-            'is both in the begining and end zero, and thus also the momentum.' + '\n\nSo taking into account the previous '+
-            'equation we could think that momentum is not conserved because in one side we have the initial momentum and on the '+
-            'other side we have the same value but negative (because the ball changed its direction to the opposed one), so the '+
-            'equality would not be true.'+' However, this is a bit tricky, because '+
-            'this is not what happens in reality: the wall really absorbes the momentum during the change, but as it has infinite '+
-            'mass, the observer is not able to appreciate a change in the wall, so we assume v=0, but it is not true. Thus, we '+
-            'can see that the momentum is conserved, with an absorption of momentum by the wall given by:\n\n '+
-            '\t   $\Delta{vect{p_{wall}}}=2|vect{p_{i,wall}}}|=2|vect{p_{f,wall}}}|' + '\n\nGiven that we now know that '+
-            'both momentum and energy are conserved, we can justify it is an elastic collision.' + 'You can go now to '+
-            'the plots of energy and velocity to check that this is shown there, that both magnitudes are conserved.')
-        if language==2:
-            self.expltext.setPlainText('Momento lineal \n \nEl momento lineal es una cantidad derivada' + 
-            ' de otras magnitudes o propiedades de la partícula con la que tratamos; concretamente '+
-            'se la relaciona con la velocidad a través de la siguiente expresión:\n \n'+ '\t \t $\vect{p} = m \vect{v} $ \n \n'+
-            'En este caso que tratamos aquí tenemos el solitón confinado en una pared, así, cuando el solitón '+ 
-            'llega a la pared y choca contra ésta, rebota y sigue su camino en sentido contrario, tal y como esperaríamos que '+
-            'hiciera una pelota al chocar contra una pared. Durante este proceso tanto la energía total como el momento lineal se '+
-            'conservan, y por lo tanto presentan el mismo valor para el conjunto del sistema al inicio y al final del proceso .\n' +  '¿Como podemos '+
-            'interpretar eso? Tomemos como ejemplo el caso expuesto sobre la pelota y la pared; en este caso tenemos '+
-            'dos "partículas": la pelota (1) y la pared (2). Imaginemos ahora que la pelota tiene una masa $m$ '+
-            'y la pared, como se espera, está quieta y no puede cambiar su posición. En un caso ideal, si lanzáramos una '+
-            'pelota contra una pared con una velocidad $v$ ésta chocaría contra la pared y volvería hacia el lanzador con '+
-            'una velocidad del mismo valor absoluto. Esta situación se corresponde con un choque elástico, aunque puede '+
-            'no parecerlo a primeras, veámoslo mejor: \n \n'+'\t     \vect{p_{i,1}} + \vect{p_{i,2}} = \vect{p_{f,1}} '+
-            '\vect{p_{f,2}}\n\n' + 'Podemos considerar una pared con una masa muy mayor a la de la pelota (incluso podemos '+
-            'suponer que la pared presenta una masa infinita) y tal y como vemos en nuestro día a día aunque una pelota '+
-            'golpee una pared, esta última no se mueve, con lo que tendríamos que la pared tiene velocidad cero, y por lo '+
-            'tanto, su momento también es cero.'+ '\nConsiderando pues la anterior ecuación podríamos pensar que el momento '+
-            'no se conserva puesto que en un lado tenemos el momento inicial y en el otro lado tenemos el mismo valor pero '+
-            'cambiado de signo (porqué la pelota ha cambiado su sentido aunque no su dirección ni valor absoluto de velocidad), '+
-            'y por lo tanto la igualdad ya no se cumpliría. No obstante, esto no es del todo cierto, porqué no es lo que sucede en '+
-            'realidad: de hecho, la pared absorbe momento lineal durante el proceso, pero al tener una masa infinita, el observador no '+
-            'se percaa del cambio tan pequeño en la velocidad y se asume $v=0$, aunque como se ha dicho no es estrictamente cierto. '+
-            'Por lo tanto, el momento lineal se conserva, y la absorción de momento por parte de la pared viene dada por:\n\n '+
-            '\t   $\Delta{vect{p_{wall}}}=2|vect{p_{i,wall}}}|=2|vect{p_{f,wall}}}|' + '\n\nAhora ya sabemos que tanto la energía '+
-            'como el momento lineal se conservan, así que podemos afirmar que efectivamente se trata de un choque elástico. '+
-            'Puedes ahora comprovar en los gráficos de energía y velocidad que la energía total se conserva y que el módulo de la '+
-            'velocidad al inicio y al final (ambos lejos de la pared) son iguales.')
         
     def close(self):
         self.timer1.stop()
