@@ -521,7 +521,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Height barrier (times the kinetic energy):</string>
+       <string>Barrier height (times the kinetic energy):</string>
       </property>
      </widget>
      <widget class="QSlider" name="hb">
@@ -559,7 +559,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Width barrier (times the healing lenght):</string>
+       <string>Barrier width (times the healing lenght):</string>
       </property>
      </widget>
      <widget class="QSlider" name="wb">
@@ -1073,11 +1073,11 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The bright soliton under an harmonic trap behaves as a normal particle would do in an harmonic potential. We know that in such case the particle follows a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	x(t) = A·cos(wt+B)&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;with A being its amplitude, w its angular frequency and B an arbitrary phase.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The bright solitons are a kind of solitons that follows the previous movement. Can you adjust the movement plotted from data to a function by introducing the coefficients A and w? Suppose B is 0.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'ms shell dlg 2'; font-size:8pt; color:#222222;&quot;&gt;Bright solitons behave as particles. As a consequence, under harmonic trapping a bright soliton follows a sinusoidal trajectory given by&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'ms shell dlg 2'; font-size:8pt; color:#222222;&quot;&gt;&lt;br /&gt;	x(t) = A cos(w t + B)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#ffffff;&quot;&gt;&lt;span style=&quot; font-family:'ms shell dlg 2'; font-size:8pt; color:#222222;&quot;&gt;where A is the amplitude, w is the angular frequency and B is an arbitrary phase.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'ms shell dlg 2'; font-size:8pt; color:#222222; background-color:#ffffff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; background-color:#ffffff;&quot;&gt;&lt;span style=&quot; font-family:'ms shell dlg 2'; font-size:8pt; color:#222222;&quot;&gt;By assuming B = 0, can you set the parameters A and w in order to reproduce the data in the plot?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="A">

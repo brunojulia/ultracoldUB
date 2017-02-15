@@ -928,7 +928,7 @@ class BS(QMainWindow,Ui_MainWindow):
         
     def demo_2(self): #barrier   #it does the same as start but with all fields on a folder (faster, everything already computed)
         self.format='Demo'      
-        print self.format
+        print(self.format)
         self.btn_none.click()   #for not having weird errors
         self.btn_wall.click()
         self.horizontalSlider_4.setValue(-20)
@@ -1066,10 +1066,10 @@ class BS(QMainWindow,Ui_MainWindow):
         allenergies.legend()
         integrals=fig3.add_subplot(111)
         integrals.plot(atime,alint,label='left side')
-        integrals.plot(atime,aiint,label='inside')
+        integrals.plot(atime,aiint,label='central barrier')
         integrals.plot(atime,arint,label='right side')
         integrals.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)")
-        integrals.set_title("Integrals of the wave function")
+        integrals.set_title("Probability density")
         integrals.legend()
         
         fig4=Figure()
@@ -1134,7 +1134,7 @@ class BS(QMainWindow,Ui_MainWindow):
         
     def start2(self):
         self.format='Start'
-        print self.format
+        print(self.format)
         time_b=time.time()  #time counter (the computation starts)
         self.timer1.stop()
         self.timer2.stop()
@@ -1417,10 +1417,10 @@ class BS(QMainWindow,Ui_MainWindow):
         if pot==2:
             integrals=fig3.add_subplot(111)
             integrals.plot(atime,alint,label='left side')
-            integrals.plot(atime,aiint,label='inside')
+            integrals.plot(atime,aiint,label='central barrier')
             integrals.plot(atime,arint,label='right side')
             integrals.set_xlabel("Time ($t$  $ {\hbar}/({m \\xi^2})$)")
-            integrals.set_title("Integrals of the wave function")
+            integrals.set_title("Probability density")
             integrals.legend()
         elif pot==1:    
             allenergies.axes.set_xlim([0,2*np.pi*self.spinBox.value()])
@@ -1441,7 +1441,7 @@ class BS(QMainWindow,Ui_MainWindow):
         fig7=Figure()       #only for harmonic potential
         velpos=fig7.add_subplot(111)
         velpos.plot(amv,avelm)
-        velpos.set_title("$<v>$ with $<x>$")
+        velpos.set_title("$<v>$ versus $<x>$")
         velpos.set_xlabel("Position ($x/ a_{ho}$)")
         velpos.set_ylabel("$<v>$ ($v/ a_{ho} \omega_{ho}$)")
           
@@ -1452,7 +1452,7 @@ class BS(QMainWindow,Ui_MainWindow):
         if pot==2:
             self.addfig("Integral",fig3)
         elif pot==1:
-            self.addfig("Mean velocity with position",fig7)
+            self.addfig("Mean velocity versus position",fig7)
         else:
             pass
         self.addfig("Position's mean value", fig1)
