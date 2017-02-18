@@ -196,29 +196,8 @@ class BS(QMainWindow,Ui_MainWindow):
             self.lot.setText("Light: On")
             
     def change_sim(self):
-        #to change the simulation that can be seen
-        if self.format=='Demo' and self.btn_sim.text()=="Sim: 1":
-            self.timer1.stop()
-            self.timer2.stop()
-            self.btn_sim.setText("Sim: 2")  #updating the name of the simulation
-            self.rmmpl()
-            self.mpl_window.hide()
-            self.window_sims.show()
-            self.sims_2.hide()
-            self.sims.show()
-            #make some buttons unable
-            self.mplfigs.setEnabled(False)
-            self.interaction.setEnabled(False)
-            self.Confinement.setEnabled(False)
-            self.ext_potential.setEnabled(False)
-            self.slider_simulation.hide()
-            self.ButtonOn.hide()
-            self.ButtonBack.hide()
-            self.ButtonPause.hide()
-            self.label_5.hide()
-            self.value_sim.hide()   
-        
-        elif self.format=='Start' and self.btn_sim.text()=="Sim: 1":
+        #to change the simulation that can be seen        
+        if (self.format=='Start' or self.format=='Demo') and self.btn_sim.text()=="Sim: 1":
           #  self.fig=None  #added!
             self.timer1.stop()
             self.timer2.stop()
@@ -308,13 +287,16 @@ class BS(QMainWindow,Ui_MainWindow):
             #reads the T coeff
             try:
                 os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-                datacoef=open('llum.dat','r')
-                coef=datacoef.readlines()
-                valueT=float((coef[0]).split('\t')[1])
-                valueR=float((coef[0]).split('\t')[0])
-                valueTot=valueT + valueR
-                coefT=valueT/valueTot
-                prob=coefT    #define probability == T trans. coeff.
+                if self.format=='Start':
+                    datacoef=open('llum.dat','r')
+                    coef=datacoef.readlines()
+                    valueT=float((coef[0]).split('\t')[1])
+                    valueR=float((coef[0]).split('\t')[0])
+                    valueTot=valueT + valueR
+                    coefT=valueT/valueTot
+                    prob=coefT    #define probability == T trans. coeff.
+                elif self.format=='Demo':
+                    prob=0.5
                 #and now the flashlight
                 light=mpimg.imread('linterna4.png')
                 ax.imshow(light,extent=(-18,-12,12,18),aspect='auto')
@@ -347,29 +329,8 @@ class BS(QMainWindow,Ui_MainWindow):
             
             self.ani = animation.FuncAnimation(fig3, update, frames=steps, interval=25,repeat=True)
             self.canvas.draw()            
-            
-        elif self.format=='Demo' and self.btn_sim.text()=="Sim: 2":
-            self.timer1.stop()
-            self.timer2.stop()
-            self.btn_sim.setText("Sim: 3")  #updating the name of the simulation
-            self.rmmpl4()
-            self.mpl_window.hide()
-            self.window_sims.show()
-            #make some buttons unable
-            self.mplfigs.setEnabled(False)
-            self.interaction.setEnabled(False)
-            self.Confinement.setEnabled(False)
-            self.ext_potential.setEnabled(False)
-            self.slider_simulation.hide()
-            self.ButtonOn.hide()
-            self.ButtonBack.hide()
-            self.ButtonPause.hide()
-            self.sims_2.show()
-            self.sims.hide()
-            self.label_5.hide()
-            self.value_sim.hide()  
         
-        elif self.format=='Start' and self.btn_sim.text()=="Sim: 2":
+        elif (self.format=='Start' or self.format=='Demo') and self.btn_sim.text()=="Sim: 2":
             self.timer1.stop()
             self.timer2.stop()
             self.btn_sim.setText("Sim: 3")  #updating the name of the simulation
@@ -468,12 +429,17 @@ class BS(QMainWindow,Ui_MainWindow):
             #reads the T coeff
             try:
                 os.chdir(os.path.expanduser("./brightsolitons/bs_evolution"))
-                datacoef=open('llum.dat','r')
-                coef=datacoef.readlines()
-                valueT=float((coef[0]).split('\t')[1])
-                valueR=float((coef[0]).split('\t')[0])
-                valueTot=valueT + valueR
-                coefT=valueT/valueTot
+                if self.format=='Start':
+                    datacoef=open('llum.dat','r')
+                    coef=datacoef.readlines()
+                    valueT=float((coef[0]).split('\t')[1])
+                    valueR=float((coef[0]).split('\t')[0])
+                    valueTot=valueT + valueR
+                    coefT=valueT/valueTot
+                    prob=coefT    #define probability == T trans. coeff.
+                elif self.format=='Demo':
+                    coefT=0.5
+                    prob=0.5                
                 #and now the flashlight
                 light=mpimg.imread('linterna4.png')
                 ax.imshow(light,extent=(-18,-12,12,18),aspect='auto')
@@ -1091,34 +1057,6 @@ class BS(QMainWindow,Ui_MainWindow):
         self.slider_simulation.setMinimum(0)
         self.slider_simulation.setMaximum(5*math.ceil(-2.0*self.horizontalSlider_4.value()/float(self.horizontalSlider_5.value())))            
         self.slider_simulation.setSingleStep(1)
-        
-        #we remove and add animation
-        try:
-            self.mplvl4.removeWidget(self.movie_scr)
-            self.mplvl5.removeWidget(self.movie_scr2)
-        except:
-            pass
-        
-        prevdir=os.getcwd()
-        try:                
-            os.chdir(os.path.expanduser("./brightsolitons/Demo_2"))
-            self.movie = QMovie("simulation_1.gif", QByteArray(), self)
-            self.movie_scr = QLabel()
-            self.mplvl4.addWidget(self.movie_scr)
-            self.movie.setCacheMode(QMovie.CacheAll)
-            self.movie.setSpeed(100)
-            self.movie_scr.setMovie(self.movie)
-            self.movie.start()
-            
-            self.movie2 = QMovie("simulation_2.gif", QByteArray(), self)
-            self.movie_scr2 = QLabel()
-            self.mplvl5.addWidget(self.movie_scr2)
-            self.movie2.setCacheMode(QMovie.CacheAll)
-            self.movie2.setSpeed(100)
-            self.movie_scr2.setMovie(self.movie2)
-            self.movie2.start()
-        finally:
-            os.chdir(prevdir)
                 
         self.ButtonOn.show() 
         self.ButtonBack.show()
