@@ -217,7 +217,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Number of excitation:</string>
+       <string>Number of nodes:</string>
       </property>
      </widget>
     </widget>
@@ -542,7 +542,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Lineal continuation</string>
+      <string>Nonlinear states</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="radioButton_2">
@@ -664,7 +664,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The dark solitons under an harmonic trap behave as a normal particle would do in an harmonic potential. We know that in such case the particle follows a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The dark soliton under a harmonic trap behaves as a normal particle would do in a harmonic potential. We know that in such case the particle follows a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	x(t)=A cos(wt+B)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -784,10 +784,10 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;In the Bose-Einstein condensation there is a regime called Thomas-Fermi approximation. This regime is characterized to have a chemical potential much bigger than the characteristic energy of the harmonic potential (hw). In this approximation we can write the wave function as follows:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;For high values of the interaction energy, a harmonically trapped Bose-Einstein condensate enters the so-called Thomas-Fermi regime, where the chemical potential is much greater than the characteristic energy (hw) of the linear harmonic oscillator. In this regime, the condensate wave function can be well aproximated by:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	&lt;/span&gt;&lt;img src=&quot;file:///C:\Users\ivan\AppData\Local\Temp\msohtmlclip1\01\clip_image002.png&quot; width=&quot;97&quot; height=&quot;44&quot; /&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; 		&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:8pt; color:#252525; background-color:#ffffff;&quot;&gt;ψ&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:8pt; color:#252525; background-color:#ffffff; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:8pt; color:#252525; background-color:#ffffff;&quot;&gt;=(&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ-&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;V&lt;/span&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;harm&lt;/span&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:8pt; color:#252525; background-color:#ffffff;&quot;&gt;)/gN&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Where &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:8pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;is chemical potential, V&lt;/span&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;harm&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; is the harmonic potential, g is the coupling constant and N is the number of particles.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Can you adjust the movement plotted from data to a function by introducing the coefficients &lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10pt;&quot;&gt;µ&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and gN?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1039,6 +1039,27 @@ p, li { white-space: pre-wrap; }
        <string>gN:</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QTextBrowser" name="textBrowser_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>601</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;A: Initial amplitude of spheres in motion.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;w: Trap frequency.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;M: Initial number of spheres in motion.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;N: Initial number of stationary spheres.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;r: Spheres radius.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="interact_game" native="true">
