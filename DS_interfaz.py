@@ -247,6 +247,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 self.widget_densi.show()
                 self.textBrowser_2.show()
                 self.textBrowser.hide()
+                self.textBrowser_3.hide()
                 self.mplwindow.hide()
                 self.start.hide()
                 self.ButtonDemo_1.hide()
@@ -281,13 +282,13 @@ class DS(QMainWindow,Ui_MainWindow):
                 finally:
                         os.chdir(prevdir)
                 
-                    
+                gint = 2.*0.0002*500.*(1./30.)*self.sim*10.
                 fig4=Figure()
                 axf=fig4.add_subplot(111)
                 axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                 axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                 axf.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
-                axf.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.))
+                axf.set_title('state at $g_{int}$=%.3f' %np.real(gint))
                 axf.set_ylim(0.,0.6)
                 self.canvas.draw()
                 self.addmpl2(fig4)
@@ -297,12 +298,15 @@ class DS(QMainWindow,Ui_MainWindow):
                 if (self.radioButton_3.isChecked()==True):
                     self.spin_M.setMaximum(2.)
                     self.spin_N.setMaximum(3.)
+                    self.textBrowser.hide()
+                    self.textBrowser_3.show()
                 if (self.radioButton_2.isChecked()==True):
                     self.spin_M.setMaximum(1.)
                     self.spin_N.setMaximum(1.)
+                    self.textBrowser.show()
+                    self.textBrowser_3.hide()
                 self.rmmpl()
                 self.textBrowser_2.hide()
-                self.textBrowser.show()
                 self.rmmpl2()
                 self.mplwindow.hide()
                 if (self.radioButton_2.isChecked()==True) and self.spinBox_2_value==1:
@@ -377,7 +381,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
                 ax1f3.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
-                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at t=%s $T/t_{ho}$' %np.real(self.sim/10.)) 
                 ax1f3.set_ylim(0.,0.1)
                 self.addmpl2(fig3)                           
                 
@@ -398,13 +402,14 @@ class DS(QMainWindow,Ui_MainWindow):
                 xv3=np.abs(np.sqrt((xv3)/self.spin_gn.value()))**2.  
                 fig5=Figure()
                 self.addmpl2(fig5)
+                gint = 2.*0.0002*500.*(1./30.)*self.sim    
                 ax1f3=fig5.add_subplot(111)
                 ax1f3.set_xlabel('$x/a_{ho}$',fontsize=17)
                 ax1f3.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                 ax1f3.fill_between(globals()['xv1_lin%s' %(self.sim)],globals()['xv2_lin%s' %(self.sim)],0.6,facecolor='black')
                 ax1f3.set_ylim(0.,0.6)                
                 ax1f3.plot(globals()['xv1_lin%s' %(self.sim)],xv3,'y-',lw=2)
-                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at $g_{int}$=%.3f' %np.real(gint)) 
                 self.canvas.draw() 
                 
         if (self.radioButton_2.isChecked()==True) or (self.radioButton_3.isChecked()==True):
@@ -532,7 +537,7 @@ class DS(QMainWindow,Ui_MainWindow):
     #                ax = fig3.add_subplot(121)   
     #                ax2 = fig3.add_subplot(122)
                     ax.set_title('Spring')
-                    ax.set_xticks(np.arange(-1., 2., 1.))
+                    ax.set_xticks(np.arange(-2., 3., 5.))
                     ax.set_xlim(-1,1)
                     ax.set_ylabel('$x/a_{ho}$',fontsize=17)
 #                    if self.spin_amplitude.value()>=0:
@@ -872,7 +877,7 @@ class DS(QMainWindow,Ui_MainWindow):
                 ax1f3.fill_between(globals()['xv1_%s' %(self.sim)],globals()['xv2_%s' %(self.sim)],0.1,facecolor='black')
                 ax1f3.set_ylim(0.,0.1)                  
                 ax1f3.plot(globals()['xv1_%s' %(self.sim)],xv3,'y-',lw=2)
-                ax1f3.set_title('state at %s $T/t_{ho}$' %np.real(self.sim/10.)) 
+                ax1f3.set_title('state at t=%s $T/t_{ho}$' %np.real(self.sim/10.)) 
                 self.canvas.draw()    
             
             
@@ -977,10 +982,11 @@ class DS(QMainWindow,Ui_MainWindow):
             self.rmmpl()
             self.fig=Figure()
             axf=self.fig.add_subplot(111)
+            gint = 2.*0.0002*500.*(1./30.)*self.sim*10. 
             axf.set_xlabel('$x/a_{ho}$',fontsize=17)
             axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
             axf.fill_between(xv2,yv2,0.6,facecolor='black')
-            axf.set_title('state at %s $T/t_{ho}$' %np.real(0/10.))
+            axf.set_title('state at $g_{int}$=%.3f' %np.real(gint))
             self.addmpl(self.fig)
             
             
@@ -1009,7 +1015,7 @@ class DS(QMainWindow,Ui_MainWindow):
             
             fig1=Figure()
             ax1f1=fig1.add_subplot(111)
-            ax1f1.set_ylabel('$\mu/hw$',fontsize=14)
+            ax1f1.set_ylabel('$\mu/\hbar \omega$',fontsize=14)
             ax1f1.set_xlabel('$g_{int}$',fontsize=17)        
             ax1f1.plot(xv2,yv2, 'b.-')
             ax1f1.set_title('non-linear continuation')     
@@ -1018,7 +1024,7 @@ class DS(QMainWindow,Ui_MainWindow):
             
             fig2=Figure()
             ax1f2=fig2.add_subplot(111)
-            ax1f2.set_ylabel('$E_{cin}/hw$',fontsize=14)
+            ax1f2.set_ylabel('$E_{kin}/\hbar \omega$',fontsize=14)
             ax1f2.set_xlabel('$g_{int}$',fontsize=17)        
             ax1f2.plot(xv2,zv2, 'b.-')
             ax1f2.set_title('non-linear continuation')     
@@ -1026,14 +1032,14 @@ class DS(QMainWindow,Ui_MainWindow):
             
             fig3=Figure()
             ax1f3=fig3.add_subplot(111)
-            ax1f3.set_ylabel('$E_{pot}/hw$',fontsize=14)
+            ax1f3.set_ylabel('$E_{pot}/\hbar \omega$',fontsize=14)
             ax1f3.set_xlabel('$g_{int}$',fontsize=17)        
             ax1f3.plot(xv2,cv2, 'b.-')
             ax1f3.set_title('non-linear continuation')     
             
             fig4=Figure()
             ax1f4=fig4.add_subplot(111)
-            ax1f4.set_ylabel('$E_{int}/hw$',fontsize=14)
+            ax1f4.set_ylabel('$E_{int}/\hbar \omega$',fontsize=14)
             ax1f4.set_xlabel('$g_{int}$',fontsize=17)        
             ax1f4.plot(xv2,vv2, 'b.-')
             ax1f4.set_title('non-linear continuation')
@@ -1192,7 +1198,7 @@ class DS(QMainWindow,Ui_MainWindow):
             axf4.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
             axf4.fill_between(xv2,yv2,0.1,facecolor='black')
             axf4.set_ylim(0.,0.10)
-            axf4.set_title('state at %s $T/t_{ho}$' %np.real(0/10.))
+            axf4.set_title('state at t=%s $T/t_{ho}$' %np.real(0/10.))
             self.addmpl(self.fig)            
             
             self.fig3=Figure()
@@ -1202,7 +1208,7 @@ class DS(QMainWindow,Ui_MainWindow):
             ax1f3.set_xlim(0,(time1-1)/10.)
             
             ax1f3.pcolor(np.arange(0,time1+1)/10.,xv1,psi_time, cmap='Greys_r')  # plot the particle denisity
-            ax1f3.set_title('evolution condensate')
+            ax1f3.set_title('Condensate evolution')
             
             
             
@@ -1216,11 +1222,11 @@ class DS(QMainWindow,Ui_MainWindow):
             yv2 = np.array(y2)
             fig1=Figure()
             ax1f1=fig1.add_subplot(111)
-            ax1f1.set_ylabel('PHASE',fontsize=14)
+            ax1f1.set_ylabel('Phase',fontsize=14)
             ax1f1.set_xlabel('$T/t_{ho}$',fontsize=17)        
             ax1f1.plot(xv2,yv2, 'b.-')
             ax1f1.set_ylim(0,2*np.pi)
-            ax1f1.set_title('Phase difference produced by soliton')
+            ax1f1.set_title('Phase step produced by the soliton')
           
     
     
@@ -1249,23 +1255,23 @@ class DS(QMainWindow,Ui_MainWindow):
             fig2=Figure()
             ax1f2=fig2.add_subplot(111)
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)        
-            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.set_ylabel('$E/\hbar \omega$',fontsize=17)
             ax1f2.plot(xv,yv, 'r.-' , label='Mean Energy')
             
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.set_ylabel('$E/\hbar \omega$',fontsize=17)
             ax1f2.plot(xv,zv, 'g.-', label='Chemical Potential')
             
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.set_ylabel('$E/\hbar \omega$',fontsize=17)
             ax1f2.plot(xv,cv, 'y.-', label='Kinetic energy')
             
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.set_ylabel('$E/\hbar \omega$',fontsize=17)
             ax1f2.plot(xv,vv, 'b.-',label='Potential energy')
             
             ax1f2.set_xlabel('$T/t_{ho}$',fontsize=17)
-            ax1f2.set_ylabel('$E/hw$',fontsize=17)
+            ax1f2.set_ylabel('$E/\hbar \omega$',fontsize=17)
             ax1f2.plot(xv,bv, 'm.-', label='Interaction energy')
             
             ax1f2.legend()
@@ -1341,12 +1347,13 @@ class DS(QMainWindow,Ui_MainWindow):
                             self.fig=Figure()
                             self.addmpl(self.fig)
                         self.fig.clear()
+                        gint = 2.*0.0002*500.*(1./30.)*self.sim*10. 
                         axf=self.fig.add_subplot(111)
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                         axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                         axf.set_ylim([0,0.6])
                         axf.fill_between(xv1,xv2,0.6,facecolor='black')
-                        axf.set_title('state at %s $T/t_{ho}$' %np.real(i/10.))
+                        axf.set_title('state at $g_{int}$=%.3f' %np.real(gint))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)
@@ -1393,13 +1400,15 @@ class DS(QMainWindow,Ui_MainWindow):
                         axf.set_xlabel('$x/a_{ho}$',fontsize=17)
                         axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                         if (self.radioButton_ph.isChecked()==True):
+                            axf.set_ylabel('Phase',fontsize=14)
                             axf.set_xlim([-8.5,8.5])
                             axf.set_ylim(-4.,4.)
                             axf.plot(xv1,xv2)
                         if (self.radioButton_dens.isChecked()==True):
+                            axf.set_ylabel('density $|\psi|^2 a_{ho}$',fontsize=14)
                             axf.fill_between(xv1,xv2,0.1,facecolor='black')
                             axf.set_ylim(0.,0.1)
-                        axf.set_title('state at %s $T/t_{ho}$' %(i/10.))
+                        axf.set_title('state at t=%s $T/t_{ho}$' %(i/10.))
                         self.canvas.draw()
             finally:
                 os.chdir(prevdir)

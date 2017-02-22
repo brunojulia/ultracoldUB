@@ -125,7 +125,7 @@
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>80</x>
        <y>20</y>
        <width>71</width>
        <height>16</height>
@@ -140,12 +140,12 @@
       <rect>
        <x>0</x>
        <y>20</y>
-       <width>181</width>
+       <width>81</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Initial position WavePack:</string>
+      <string>Initial position:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -197,7 +197,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Harmonic:</string>
+      <string>Harmonic trap:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -210,7 +210,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Excitation of the state:</string>
+      <string>Number of nodes:</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBox_2">
@@ -377,7 +377,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The dark solitons under an harmonic trap behave as a normal particle would do in an harmonic potential. We know that in such case the particle follows a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Particles behave as waves but under a harmonic trap, in average, follow a harmonic motion. We know that in such case particles follow a sinusoidal function for its position with time, so to say:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;	x(t)=A cos(wt+B)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -566,7 +566,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="text">
-     <string>Diffusion</string>
+     <string>Dispersion</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textDiffu">
@@ -583,11 +583,12 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Diffusion is the process by which a certain magnitude is transported following a gradient. A gradient indicates the change in a variable (for example, temperature) with the change in another quantity (for example, distance). It is important to see that diffusion does not imply a mass transport like in advection or convection. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;At the top left can be observed an illustration with spheres of the light dispersion. At the beginning there is only one white sphere but when it enters in the dispersive material it gets separated in different coloured spheres (depending on the frequency associated with the colour).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Just below, it is represented an histogram of the spheres.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Here we have an example of the thermal diffusion in 2D. We have a sheet that has a fixed temperature in its extremes and an initial thermal profile (gaussian). We can observe that exists a transport of temperature in the sheet, from high to low temperatures.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;At the top right there is a graphic of the statistical dispersion versus time. The statistical dispersion is the extent to which a distribution is stretched or squeezed. It is important to notice that there is a linear regression.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;At the left we can see the temperature profile in the sheet and clearly we can observe that exists a temperature gradient. At the right we have the cross-section of our temperature profile. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Finally, an artistic representation shows light dispersion in a prism.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ButtonBackDiffu">

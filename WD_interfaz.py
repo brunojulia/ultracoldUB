@@ -150,6 +150,8 @@ class WD(QMainWindow,Ui_MainWindow):
         self.start2()          
                 
     def start2(self):
+        self.rmmpl()
+        self.fig.clear()
         self.timer1.stop()
         self.timer2.stop()
         dialog = QtGui.QDialog()    
@@ -280,7 +282,7 @@ class WD(QMainWindow,Ui_MainWindow):
         axf.set_xlim([-self.horizontalSlider.value()-8,self.horizontalSlider.value()+8])
         if (self.true1==0):
             axf.set_ylim(0,0.6)
-        axf.set_title('state at %s' %(0))
+        axf.set_title('state at t=%s $T/t_{ho}$' %(0))
         axf.legend()
         self.addmpl(self.fig)
         
@@ -303,7 +305,7 @@ class WD(QMainWindow,Ui_MainWindow):
         fig=Figure()
         ax1f1=fig.add_subplot(111)
         ax1f1.set_xlabel('$T/t_{ho}$',fontsize=17)        
-        ax1f1.set_ylabel('$E/hw$',fontsize=17)
+        ax1f1.set_ylabel('$E/\hbar \omega$',fontsize=17)
         ax1f1.plot(xv,yv,'r.-',label='$E_{tot}$')
         ax1f1.plot(xv,zv,'y.-',label='Kinetic Energy')
         ax1f1.plot(xv,jv,'b.-',label='Potential Energy')
@@ -391,7 +393,7 @@ class WD(QMainWindow,Ui_MainWindow):
                     axf.set_xlim([-self.horizontalSlider.value()-8,self.horizontalSlider.value()+8])
                     if (self.true1==0):
                         axf.set_ylim(0,0.6)
-                    axf.set_title('state at %s' %(i))
+                    axf.set_title('state at t=%s $T/t_{ho}$' %(i))
                     axf.legend()
                     self.canvas.draw()
         finally:
@@ -441,7 +443,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 ax1f3.set_xlabel('$T/t_{ho}$',fontsize=17)        
                 ax1f3.set_ylabel('$x/a_{ho}$',fontsize=17)
                 ax1f3.plot(xv,yv, 'r.-',label='$R-Space$')                
-                ax1f3.set_title('Mean value x')
+                ax1f3.set_title('Wave packet trajectory')
                 ax1f3.legend()
                 self.addmpl2(fig3)
 
@@ -562,7 +564,7 @@ class WD(QMainWindow,Ui_MainWindow):
 #                ax = fig3.add_subplot(121)   
 #                ax2 = fig3.add_subplot(122)
                 ax.set_title('Spring')
-                ax.set_xticks(np.arange(-1., 2., 1.))
+                ax.set_xticks(np.arange(-2., 3., 5.))
                 ax.set_xlim(-1,1)
                 ax.set_ylabel('x(m)',fontsize=13)
                 if self.amplitude>=0:
@@ -574,7 +576,7 @@ class WD(QMainWindow,Ui_MainWindow):
                 ax2.set_xlabel('t(s)',fontsize=13)        
                 ax2.set_ylabel('x(m)',fontsize=13)
                 ax2.plot(xv,yv, 'r.-')                
-                ax2.set_title('Mean value x')
+                ax2.set_title('Wave packet trajectory')
                 self.addmpl2(fig3)
                 
                 line, = ax.plot([], [], 'o-', lw=2)
