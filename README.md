@@ -25,5 +25,14 @@ The main goal was to build interactive code to play with quasionedimensional Bos
 
 This package has been used extensively as the main tool to do science popularisation in the [ultracold UB project](https://serviparticules.ub.edu/lab-fisica-computacional).
 
+## Installing
 
+UltracoldUB uses qt4. To install it in ubuntu 18.04 just make a new environment (using the file py35_qt4.txt in folder condaenvclone)
 
+`conda create --name py35_qt4 --file py35_qt4.txt`
+
+then activate the environment
+`source activate py35_qt4`
+
+and run the code with 
+`python Interfaz_main.py`
